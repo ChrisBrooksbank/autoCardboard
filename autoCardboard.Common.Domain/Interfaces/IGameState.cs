@@ -3,6 +3,6 @@
     public interface IGameState
     {
         T GetState<T>();
-        T GetState<T>(IPlayerBot playerBot);
+        T GetState<T>(IPlayer playerBot);
     }
 }

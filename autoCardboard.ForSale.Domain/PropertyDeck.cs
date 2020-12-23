@@ -1,26 +1,21 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.ForSale.Domain.Interfaces;
 using System.Collections.Generic;
+using autoCardboard.Common.Domain;
 
 namespace autoCardboard.ForSale.Domain
 {
-    class PropertyDeck : IPropertyDeck
+    public class PropertyDeck : CardDeck
     {
-        private List<PropertyCard> cards;
-
-        public PropertyDeck()
+      public PropertyDeck()
         {
+            cards = new List<ICard>();
 
-        }
+            for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
+            {
+                cards.Add( new Card{ Id = cardNumber, Name = cardNumber.ToString()});
+            }
 
-        public IEnumerable<ICard> Draw(int count)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Shuffle()
-        {
-            throw new System.NotImplementedException();
+            Shuffle();
         }
     }
 }

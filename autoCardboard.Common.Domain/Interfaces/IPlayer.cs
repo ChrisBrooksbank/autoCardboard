@@ -1,6 +1,6 @@
 ﻿namespace autoCardboard.Common.Domain.Interfaces
 {
-    public interface IPlayerBot
+    public interface IPlayer
     {
         int Id { get; set; }
         string Name { get; set; }

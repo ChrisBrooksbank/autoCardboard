@@ -4,7 +4,7 @@ namespace autoCardboard.Common.Domain.Interfaces
 {
     public interface IGame
     {
-        void Initialise(IEnumerable<IPlayerBot> players, IGameMonitor gameMonitor);
+        void Initialise(IEnumerable<IPlayer> players, IGameMonitor gameMonitor);
         void Play();
     }
 }
