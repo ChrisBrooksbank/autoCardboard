@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using autoCardboard.Common.Domain.Interfaces;
 using autoCardboard.ForSale.Domain;
 
 namespace autoCardboard.ConsoleApp
@@ -9,22 +11,27 @@ namespace autoCardboard.ConsoleApp
         {
             DrawCardsFromPropertyDeck();
 
-            // TODO create five players
-            // implement a TakeTurn() which just says "player n taking turn"
+            // TODO develop gameState types. Initialise gamestate.
 
-            Console.ReadLine();
         }
 
         static void DrawCardsFromPropertyDeck()
         {
             var deck = new PropertyDeck();
 
-            var cards = deck.Draw(30);
+            ShowCards(deck.Reveal(5));
+            ShowCards(deck.Reveal(5));
+            ShowCards(deck.Draw(5));
+            ShowCards(deck.Draw(5));
+        }
 
+        private static void ShowCards(IEnumerable<ICard> cards)
+        {
             foreach (var card in cards)
             {
-                Console.WriteLine(card.Id);
+                Console.Write($"{card.Id} ");
             }
+            Console.WriteLine();
         }
     }
 }

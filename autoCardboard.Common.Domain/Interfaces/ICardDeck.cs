@@ -6,5 +6,6 @@ namespace autoCardboard.Common.Domain.Interfaces
     {
         void Shuffle();
         IEnumerable<ICard> Draw(int count);
+        IEnumerable<ICard> Reveal(int count);
     }
 }

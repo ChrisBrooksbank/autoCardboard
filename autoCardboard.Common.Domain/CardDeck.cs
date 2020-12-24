@@ -22,9 +22,17 @@ namespace autoCardboard.Common.Domain
 
         public IEnumerable<ICard> Draw(int count)
         {
-            // TODO check bounds, remove drawn cards from this deck
+            count = count > cards.Count ? cards.Count : count;
             var drawnCards = cards.GetRange(0, count);
+            cards.RemoveRange(0,count);
             return drawnCards;
+        }
+
+        public IEnumerable<ICard> Reveal(int count)
+        {
+            count = count > cards.Count ? cards.Count : count;
+            var revealedCards = cards.GetRange(0, count);
+            return revealedCards;
         }
     }
 }
