@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using autoCardboard.Common.Domain;
 using autoCardboard.Common.Domain.Interfaces;
 using autoCardboard.ForSale.Domain;
+using autoCardboard.ForSale.Domain.Interfaces;
 
 namespace autoCardboard.ConsoleApp
 {
@@ -19,10 +21,33 @@ namespace autoCardboard.ConsoleApp
         {
             var deck = new PropertyDeck();
 
-            ShowCards(deck.Reveal(5));
-            ShowCards(deck.Reveal(5));
-            ShowCards(deck.Draw(5));
-            ShowCards(deck.Draw(5));
+            List<IPlayer> players = new List<IPlayer>();
+            const int playerCount = 5;
+            for(int player = 1;player <=playerCount;player++)
+            {
+                players.Add(new Player
+                {
+                    Id = player,
+                    Name = player.ToString(),
+                    State = new PlayerState
+                    {
+                        PropertyCards = new List<Card>(),
+                        OneThousandDollarCoinCount = playerCount < 5 ? 14 : 10,
+                        TwoThousandDollarCoinCount = 2
+                    }
+                }); ;
+            }
+
+            var gameState = new ForSaleGameState();
+
+            for (var turn = 1;turn<=3;turn++)
+            {
+                foreach (var player in players)
+                {
+                    // gameState = player.TakeTurn(gameState);
+                }
+            }
+
         }
 
         private static void ShowCards(IEnumerable<ICard> cards)

@@ -4,6 +4,7 @@
     {
         int Id { get; set; }
         string Name { get; set; }
+        IPlayerState State { get; set; }
 
         IGameState TakeTurn(IGameState gameState);
     }

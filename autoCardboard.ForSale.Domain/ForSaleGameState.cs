@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSaleGameState
+    public class ForSaleGameState: IGameState
     {
         public IEnumerable<ICard> PropertyDrawDeck { get; set; }
         public IEnumerable<ICard> PropertyDiscardDeck { get; set; }
@@ -12,5 +12,15 @@ namespace autoCardboard.ForSale.Domain
 
         public IEnumerable<IPlayer> Players { get; set; }
 
+        // TODO move to a base class ????
+        public T GetState<T>()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public T GetState<T>(IPlayer playerBot)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
