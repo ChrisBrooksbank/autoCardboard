@@ -1,9 +1,11 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
+using System;
 using System.Collections.Generic;
 
-namespace autoCardboard.Common.Domain
+namespace autoCardboard.ForSale.Domain
 {
-    public class Player : IPlayer
+    // TODO implement especially TakeTurn
+    public class ForSalePlayer : IPlayer
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -11,7 +13,7 @@ namespace autoCardboard.Common.Domain
 
         public Dictionary<string, object> TakeTurn(Dictionary<string, object> gameState)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

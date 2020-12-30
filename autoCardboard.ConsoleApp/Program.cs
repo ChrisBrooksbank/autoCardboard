@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using autoCardboard.Common.Domain;
 using autoCardboard.Common.Domain.Interfaces;
 using autoCardboard.ForSale.Domain;
@@ -11,52 +10,32 @@ namespace autoCardboard.ConsoleApp
     {
         static void Main(string[] args)
         {
-            DrawCardsFromPropertyDeck();
-
-            // TODO develop gameState types. Initialise gamestate.
-
+            var forSaleGame = SetupForSaleGame(5);
+            forSaleGame.Play();
         }
 
-        static void DrawCardsFromPropertyDeck()
+        static IGame SetupForSaleGame(int playerCount)
         {
-            var deck = new PropertyDeck();
+            var game = new ForSaleGame();
 
+            // TODO move this logic to a player factory, in ForSale namespace
             List<IPlayer> players = new List<IPlayer>();
-            const int playerCount = 5;
-            for(int player = 1;player <=playerCount;player++)
+            for (int player = 1; player <= playerCount; player++)
             {
-                players.Add(new Player
+                players.Add(new ForSalePlayer
                 {
                     Id = player,
                     Name = player.ToString(),
-                    State = new PlayerState
+                    State = new Dictionary<string, object>
                     {
-                        PropertyCards = new List<Card>(),
-                        OneThousandDollarCoinCount = playerCount < 5 ? 14 : 10,
-                        TwoThousandDollarCoinCount = 2
+                      ["PropertyCards"] = new List<Card>(),
+                      ["ThousandDollarCoinCount"] = playerCount < 5 ? 16 : 12
                     }
                 }); ;
             }
 
-            var gameState = new ForSaleGameState();
-
-            for (var turn = 1;turn<=3;turn++)
-            {
-                foreach (var player in players)
-                {
-                    // gameState = player.TakeTurn(gameState);
-                }
-            }
-
-        }
-
-        private static void ShowCards(IEnumerable<ICard> cards)
-        {
-            foreach (var card in cards)
-            {
-                Console.Write($"{card.Id} ");
-            }
-            Console.WriteLine();
+            game.Setup(players);
+            return game;
         }
     }
 }

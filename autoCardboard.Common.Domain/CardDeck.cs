@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using autoCardboard.Common.Domain.Interfaces;
 
 namespace autoCardboard.Common.Domain
@@ -7,7 +8,7 @@ namespace autoCardboard.Common.Domain
     public class CardDeck: ICardDeck
     {
         private static Random r = new Random();
-        protected List<ICard> cards;
+        protected List<ICard> cards = new List<ICard>();
 
         public void Shuffle()
         {
@@ -34,5 +35,18 @@ namespace autoCardboard.Common.Domain
             var revealedCards = cards.GetRange(0, count);
             return revealedCards;
         }
+
+        public void AddCard(ICard card)
+        {
+            cards.Add(card);
+        }
+
+        public void AddCards(IEnumerable<ICard> cards)
+        {
+            foreach(var card in cards)
+            {
+                AddCard(card);
+            }
+                   }
     }
 }

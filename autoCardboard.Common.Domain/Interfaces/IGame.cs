@@ -4,7 +4,10 @@ namespace autoCardboard.Common.Domain.Interfaces
 {
     public interface IGame
     {
-        void Initialise(IEnumerable<IPlayer> players, IGameMonitor gameMonitor);
+        Dictionary<string,object> State { get; set; }
+        IEnumerable<IPlayer> Players { get; set; }
+
+        void Setup(IEnumerable<IPlayer> players);
         void Play();
     }
 }
