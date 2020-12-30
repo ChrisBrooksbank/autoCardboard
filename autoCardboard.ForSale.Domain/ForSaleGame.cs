@@ -1,21 +1,55 @@
 ﻿using autoCardboard.Common.Domain;
 using autoCardboard.Common.Domain.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace autoCardboard.ForSale.Domain
 {
     public class ForSaleGame : Game
     {
-        // TODO add boolean GameFinished
-
         public override void Play()
         {
-            for (var turn = 1; turn <= 3; turn++)
+            var propertyBiddingIsFinished = false;
+            var propertyDeck = State["PropertyDeck"] as CardDeck;
+            var playerCount = Players.Count();
+
+
+            while (!propertyBiddingIsFinished)
             {
-                // TODO draw <player> cards for players to bid on, put in gamestate
-                foreach (var player in Players)
+                var propertiesToBidOn = propertyDeck.Draw(playerCount);
+
+                if (propertiesToBidOn.Count() == playerCount)
                 {
-                    // gameState = player.TakeTurn(gameState);
+                    State["PropertyCardsOnTable"] = propertiesToBidOn;
+
+                    Console.Write("Property cards drawn to bid on : ");
+                    foreach(var propertyCard in propertiesToBidOn)
+                    {
+                        Console.Write(propertyCard.Name + " ");
+                    }
+                    Console.WriteLine("");
+
+                    var activeBidders = true;
+
+                    while (activeBidders)
+                    {
+                        foreach (var player in Players)
+                        {
+                            State = player.TakeTurn(State);
+                        }
+
+                        if (Players.Count(p => ((string)p.State["LastAction"]).Equals("bid")) < 2)
+                        {
+                            activeBidders = false;
+                            HandleEndOfBiddingTurn();
+                        }
+
+                    }
+                }
+                else
+                {
+                    propertyBiddingIsFinished = true;
                 }
             }
         }
@@ -32,7 +66,26 @@ namespace autoCardboard.ForSale.Domain
             propertyDeck.Shuffle();
             State["PropertyDeck"] = propertyDeck;
 
+            State["PropertyCardsOnTable"] = new List<ICard>();
+            State["CurrentBid"] = 0;
+
             Players = players;
+        }
+
+        private void HandleEndOfBiddingTurn()
+        {
+            var propertiesInOrder = ((IEnumerable<ICard>)State["PropertyCardsOnTable"]).OrderByDescending(c => c.Id).ToList();
+            var playersInBidOrder = Players.OrderByDescending(p => (int)p.State["CoinsBid"]).ToList();
+
+            foreach(var player in playersInBidOrder)
+            {
+                var playerPropertyCards = (List<ICard>)player.State["PropertyCards"];
+                var propertyCardWon = propertiesInOrder[0];
+                playerPropertyCards.Add(propertyCardWon);
+                propertiesInOrder.Remove(propertyCardWon);
+                Console.WriteLine($"Player {player.Id} won property {propertyCardWon.Id}");
+            }
+
         }
     }
 }

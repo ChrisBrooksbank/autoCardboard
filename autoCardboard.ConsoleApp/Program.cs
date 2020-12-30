@@ -10,32 +10,12 @@ namespace autoCardboard.ConsoleApp
     {
         static void Main(string[] args)
         {
-            var forSaleGame = SetupForSaleGame(5);
-            forSaleGame.Play();
-        }
-
-        static IGame SetupForSaleGame(int playerCount)
-        {
             var game = new ForSaleGame();
-
-            // TODO move this logic to a player factory, in ForSale namespace
-            List<IPlayer> players = new List<IPlayer>();
-            for (int player = 1; player <= playerCount; player++)
-            {
-                players.Add(new ForSalePlayer
-                {
-                    Id = player,
-                    Name = player.ToString(),
-                    State = new Dictionary<string, object>
-                    {
-                      ["PropertyCards"] = new List<Card>(),
-                      ["ThousandDollarCoinCount"] = playerCount < 5 ? 16 : 12
-                    }
-                }); ;
-            }
-
+            var playerFactory = new PlayerFactory();
+            var players = playerFactory.CreatePlayers(5);
             game.Setup(players);
-            return game;
+            game.Play();
         }
+
     }
 }
