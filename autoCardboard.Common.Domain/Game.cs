@@ -8,10 +8,10 @@ namespace autoCardboard.Common.Domain
         where TGameTurn : IGameTurn
     {
         public TGameState State { get; set; }
-        public IEnumerable<IPlayer> Players { get; set; }
+        public IEnumerable<IPlayer<TGameTurn>> Players { get; set; }
 
         abstract public void Play();
 
-        abstract public void Setup(IEnumerable<IPlayer> players);
+        abstract public void Setup(IEnumerable<IPlayer<TGameTurn>> players);
     }
 }

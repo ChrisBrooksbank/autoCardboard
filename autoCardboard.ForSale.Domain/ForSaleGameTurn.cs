@@ -6,17 +6,17 @@ namespace autoCardboard.ForSale.Domain
     {
         public ForSaleGameState State { get; set; }
 
-        void Pass()
+        public void Pass()
         {
             // TODO
         }
 
-        void Bid()
+        public void Bid()
         {
             // TODO
         }
 
-        void Bid(int amount)
+        public void Bid(int amount)
         {
             // TODO
             // throw an Exception if too high ( check state )

@@ -2,8 +2,8 @@
 
 namespace autoCardboard.Common.Domain.Interfaces
 {
-    public interface IPlayerFactory
+    public interface IPlayerFactory<TGameTurn> where TGameTurn: IGameTurn
     {
-        IEnumerable<IPlayer> CreatePlayers(int playerCount);
+        IEnumerable<IPlayer<TGameTurn>> CreatePlayers(int playerCount);
     }
 }

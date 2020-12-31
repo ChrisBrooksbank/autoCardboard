@@ -4,38 +4,26 @@ using System.Collections.Generic;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSalePlayer : IPlayer
+    public class ForSalePlayer : IPlayer<ForSaleGameTurn>
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Dictionary<string,object> State { get; set; }
 
-        public Dictionary<string, object> TakeTurn(Dictionary<string, object> gameState)
+        public void TakeTurn(ForSaleGameTurn turn)
         {
-            var propertiesBiddingOn = gameState["PropertyCardsOnTable"] as IEnumerable<ICard>;
-            var currentBidByAnyPlayer = (int)gameState["CurrentBid"];
-            var coinBalance = (int)State["CoinBalance"];
-            var coinsBid = (int)State["CoinsBid"];
+            // Simply bid the minimum amount if we can afford it, else pass
+            var playerState = turn.State.PlayerStates[Id];
+            var minimumNextBid = turn.State.CurrentBid + 1;
 
-            var minimumNextBid = currentBidByAnyPlayer + 1;
-
-            if (minimumNextBid <= coinBalance)
+            if (minimumNextBid <= playerState.CoinBalance)
             {
-                var newBid = minimumNextBid;
-                var newCoinBalance = coinBalance + coinsBid - newBid;
-                State["CoinBalance"] = newCoinBalance;
-                State["CoinsBid"] = newBid;
-                State["LastAction"] = "bid";
-                gameState["CurrentBid"] = newBid;
-                Console.WriteLine($"Player {Id} bids {newBid} reducing their coin balance to {newCoinBalance}");
+                turn.Bid(minimumNextBid);
             }
             else
             {
-                State["LastAction"] = "pass";
-                Console.WriteLine($"Player {Id} passes");
+                turn.Pass();
             }
-
-            return gameState;
         }
+
     }
 }

@@ -21,7 +21,6 @@ namespace autoCardboard.ForSale.Domain
             var propertyDeck = State.PropertyDeck;
             var playerCount = Players.Count();
 
-
             while (!propertyBiddingIsFinished)
             {
                 var propertiesToBidOn = propertyDeck.Draw(playerCount);
@@ -43,15 +42,16 @@ namespace autoCardboard.ForSale.Domain
                     {
                         foreach (var player in Players)
                         {
-                            //TODO this changing !!
-                            //State = player.TakeTurn(State);
+                            var turn = new ForSaleGameTurn { State = State };
+                            player.TakeTurn(turn);
                         }
 
-                        if (Players.Count(p => ((string)p.State["LastAction"]).Equals("bid")) < 2)
-                        {
-                            activeBidders = false;
-                            HandleEndOfBiddingTurn();
-                        }
+                        // TODO
+                        //if (Players.Count(p => ((string)p.State["LastAction"]).Equals("bid")) < 2)
+                        //{
+                        //    activeBidders = false;
+                        //    HandleEndOfBiddingTurn();
+                        //}
 
                     }
                 }
@@ -62,7 +62,7 @@ namespace autoCardboard.ForSale.Domain
             }
         }
 
-        public override void Setup(IEnumerable<IPlayer> players)
+        public override void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
         {
             var propertyDeck = new CardDeck();
             for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
@@ -81,11 +81,11 @@ namespace autoCardboard.ForSale.Domain
         private void HandleEndOfBiddingTurn()
         {
             var propertiesInOrder = State.PropertyCardsOnTable.OrderByDescending(c => c.Id).ToList();
-            var playersInBidOrder = Players.OrderByDescending(p => (int)p.State["CoinsBid"]).ToList();
+            var playersInBidOrder = Players; // TODO .OrderByDescending(p => (int)p.State["CoinsBid"]).ToList();
 
             foreach(var player in playersInBidOrder)
             {
-                var playerPropertyCards = (List<ICard>)player.State["PropertyCards"];
+                var playerPropertyCards = State.PlayerStates[player.Id].PropertyCards;
                 var propertyCardWon = propertiesInOrder[0];
                 playerPropertyCards.Add(propertyCardWon);
                 propertiesInOrder.Remove(propertyCardWon);

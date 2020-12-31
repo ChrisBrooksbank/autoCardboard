@@ -7,9 +7,9 @@ namespace autoCardboard.Common.Domain.Interfaces
         where TGameTurn : IGameTurn
     {
         TGameState State { get; set; }
-        IEnumerable<IPlayer> Players { get; set; }
+        IEnumerable<IPlayer<IGameTurn>> Players { get; set; }
 
-        void Setup(IEnumerable<IPlayer> players);
+        void Setup(IEnumerable<IPlayer<IGameTurn>> players);
         void Play();
     }
 }
