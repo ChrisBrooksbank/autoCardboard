@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using autoCardboard.Common.Domain;
-using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.ForSale.Domain;
-using autoCardboard.ForSale.Domain.Interfaces;
+﻿using autoCardboard.ForSale.Domain;
 
 namespace autoCardboard.ConsoleApp
 {

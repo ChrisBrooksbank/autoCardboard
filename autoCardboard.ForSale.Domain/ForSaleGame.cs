@@ -6,12 +6,19 @@ using System.Linq;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSaleGame : Game
+    public class ForSaleGame: Game<ForSaleGameState, ForSaleGameTurn>
     {
+
+        public ForSaleGame()
+        {
+            State = new ForSaleGameState();
+        }
+
+        // TODO as soon as a player passes, they should get the lowest property card left on the table
         public override void Play()
         {
             var propertyBiddingIsFinished = false;
-            var propertyDeck = State["PropertyDeck"] as CardDeck;
+            var propertyDeck = State.PropertyDeck;
             var playerCount = Players.Count();
 
 
@@ -21,7 +28,7 @@ namespace autoCardboard.ForSale.Domain
 
                 if (propertiesToBidOn.Count() == playerCount)
                 {
-                    State["PropertyCardsOnTable"] = propertiesToBidOn;
+                    State.PropertyCardsOnTable = propertiesToBidOn;
 
                     Console.Write("Property cards drawn to bid on : ");
                     foreach(var propertyCard in propertiesToBidOn)
@@ -36,7 +43,8 @@ namespace autoCardboard.ForSale.Domain
                     {
                         foreach (var player in Players)
                         {
-                            State = player.TakeTurn(State);
+                            //TODO this changing !!
+                            //State = player.TakeTurn(State);
                         }
 
                         if (Players.Count(p => ((string)p.State["LastAction"]).Equals("bid")) < 2)
@@ -56,25 +64,23 @@ namespace autoCardboard.ForSale.Domain
 
         public override void Setup(IEnumerable<IPlayer> players)
         {
-            State = new Dictionary<string,object>();
-
             var propertyDeck = new CardDeck();
             for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
             {
                 propertyDeck.AddCard(new Card { Id = cardNumber, Name = cardNumber.ToString() });
             }
             propertyDeck.Shuffle();
-            State["PropertyDeck"] = propertyDeck;
+            State.PropertyDeck = propertyDeck;
 
-            State["PropertyCardsOnTable"] = new List<ICard>();
-            State["CurrentBid"] = 0;
+            State.PropertyCardsOnTable = new List<ICard>();
+            State.CurrentBid = 0;
 
             Players = players;
         }
 
         private void HandleEndOfBiddingTurn()
         {
-            var propertiesInOrder = ((IEnumerable<ICard>)State["PropertyCardsOnTable"]).OrderByDescending(c => c.Id).ToList();
+            var propertiesInOrder = State.PropertyCardsOnTable.OrderByDescending(c => c.Id).ToList();
             var playersInBidOrder = Players.OrderByDescending(p => (int)p.State["CoinsBid"]).ToList();
 
             foreach(var player in playersInBidOrder)

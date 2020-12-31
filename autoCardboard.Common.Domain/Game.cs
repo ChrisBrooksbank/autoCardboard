@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 namespace autoCardboard.Common.Domain
 {
-    public abstract class Game : IGame
+    public abstract class Game<TGameState, TGameTurn>
+        where TGameState : IGameState
+        where TGameTurn : IGameTurn
     {
-        public Dictionary<string,object> State { get; set; }
+        public TGameState State { get; set; }
         public IEnumerable<IPlayer> Players { get; set; }
 
         abstract public void Play();

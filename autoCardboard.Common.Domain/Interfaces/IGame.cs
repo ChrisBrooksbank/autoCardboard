@@ -2,9 +2,11 @@
 
 namespace autoCardboard.Common.Domain.Interfaces
 {
-    public interface IGame
+    public interface IGame<TGameState,TGameTurn>
+        where TGameState : IGameState
+        where TGameTurn : IGameTurn
     {
-        Dictionary<string,object> State { get; set; }
+        TGameState State { get; set; }
         IEnumerable<IPlayer> Players { get; set; }
 
         void Setup(IEnumerable<IPlayer> players);
