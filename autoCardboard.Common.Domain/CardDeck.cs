@@ -10,6 +10,8 @@ namespace autoCardboard.Common.Domain
         private static Random r = new Random();
         protected List<ICard> cards = new List<ICard>();
 
+        public bool Empty => !cards.Any();
+
         public void Shuffle()
         {
             for (int n = cards.Count - 1; n > 0; --n)

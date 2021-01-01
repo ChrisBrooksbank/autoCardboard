@@ -9,7 +9,7 @@ namespace autoCardboard.ForSale.Domain
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public void TakeTurn(ForSaleGameTurn turn)
+        public void GetTurn(ForSaleGameTurn turn)
         {
             // Simply bid the minimum amount if we can afford it, else pass
             var playerState = turn.State.PlayerStates[Id];

@@ -8,90 +8,60 @@ namespace autoCardboard.ForSale.Domain
 {
     public class ForSaleGame: Game<ForSaleGameState, ForSaleGameTurn>
     {
-
         public ForSaleGame()
         {
             State = new ForSaleGameState();
         }
 
-        // TODO as soon as a player passes, they should get the lowest property card left on the table
-        public override void Play()
-        {
-            var propertyBiddingIsFinished = false;
-            var propertyDeck = State.PropertyDeck;
-            var playerCount = Players.Count();
-
-            while (!propertyBiddingIsFinished)
-            {
-                var propertiesToBidOn = propertyDeck.Draw(playerCount);
-
-                if (propertiesToBidOn.Count() == playerCount)
-                {
-                    State.PropertyCardsOnTable = propertiesToBidOn;
-
-                    Console.Write("Property cards drawn to bid on : ");
-                    foreach(var propertyCard in propertiesToBidOn)
-                    {
-                        Console.Write(propertyCard.Name + " ");
-                    }
-                    Console.WriteLine("");
-
-                    var activeBidders = true;
-
-                    while (activeBidders)
-                    {
-                        foreach (var player in Players)
-                        {
-                            var turn = new ForSaleGameTurn { State = State };
-                            player.TakeTurn(turn);
-                        }
-
-                        // TODO
-                        //if (Players.Count(p => ((string)p.State["LastAction"]).Equals("bid")) < 2)
-                        //{
-                        //    activeBidders = false;
-                        //    HandleEndOfBiddingTurn();
-                        //}
-
-                    }
-                }
-                else
-                {
-                    propertyBiddingIsFinished = true;
-                }
-            }
-        }
-
         public override void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
         {
-            var propertyDeck = new CardDeck();
+            State.PropertyDeck = new CardDeck();
             for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
             {
-                propertyDeck.AddCard(new Card { Id = cardNumber, Name = cardNumber.ToString() });
+                State.PropertyDeck.AddCard(new Card { Id = cardNumber, Name = cardNumber.ToString() });
             }
-            propertyDeck.Shuffle();
-            State.PropertyDeck = propertyDeck;
-
+            State.PropertyDeck.Shuffle();
+          
             State.PropertyCardsOnTable = new List<ICard>();
             State.CurrentBid = 0;
-
             Players = players;
+
+            SetupPlayerStates();
         }
 
-        private void HandleEndOfBiddingTurn()
+        public override void Play()
         {
-            var propertiesInOrder = State.PropertyCardsOnTable.OrderByDescending(c => c.Id).ToList();
-            var playersInBidOrder = Players; // TODO .OrderByDescending(p => (int)p.State["CoinsBid"]).ToList();
-
-            foreach(var player in playersInBidOrder)
+            while (!State.PropertyDeck.Empty)
             {
-                var playerPropertyCards = State.PlayerStates[player.Id].PropertyCards;
-                var propertyCardWon = propertiesInOrder[0];
-                playerPropertyCards.Add(propertyCardWon);
-                propertiesInOrder.Remove(propertyCardWon);
-                Console.WriteLine($"Player {player.Id} won property {propertyCardWon.Id}");
+                PlayPropertyBidRound();
             }
+        }
 
+        private void PlayPropertyBidRound()
+        {
+            State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count());
+
+            foreach (var player in Players)
+            {
+                var turn = new ForSaleGameTurn { State = State };
+                player.GetTurn(turn);
+
+                // IF player passed, they get half their coins back and the lowest valued property deck
+            }
+        }
+
+        private void SetupPlayerStates()
+        {
+            State.PlayerStates = new Dictionary<int, ForSalePlayerState>();
+            foreach(var player in Players)
+            {
+                State.PlayerStates[player.Id] = new ForSalePlayerState
+                {
+                    PropertyCards = new List<ICard>(),
+                    CoinBalance = 16,
+                    CoinsBid = 0
+                };
+            }
         }
     }
 }

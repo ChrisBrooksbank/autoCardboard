@@ -10,6 +10,6 @@ namespace autoCardboard.Common.Domain
         public string Name { get; set; }
         public Dictionary<string,object> State { get; set; }
 
-        public abstract void TakeTurn(TGameTurn turn);
+        public abstract void GetTurn(TGameTurn turn);
     }
 }

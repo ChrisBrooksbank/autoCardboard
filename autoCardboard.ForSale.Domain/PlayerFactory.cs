@@ -1,5 +1,4 @@
-﻿using autoCardboard.Common.Domain;
-using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Common.Domain.Interfaces;
 using System.Collections.Generic;
 
 namespace autoCardboard.ForSale.Domain
@@ -15,14 +14,6 @@ namespace autoCardboard.ForSale.Domain
                 {
                     Id = player,
                     Name = player.ToString()
-                    // TODO
-                    //State = new Dictionary<string, object>
-                    //{
-                    //    ["PropertyCards"] = new List<ICard>(),
-                    //    ["CoinBalance"] = 16,
-                    //    ["CoinsBid"] = 0,
-                    //    ["LastAction"] = ""
-                    //}
                 };
                 players.Add(newPlayer); ;
             }
