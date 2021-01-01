@@ -1,4 +1,6 @@
-﻿namespace autoCardboard.Common.Domain.Interfaces
+﻿using System;
+
+namespace autoCardboard.Common.Domain.Interfaces
 {
     public interface IGameState
     {

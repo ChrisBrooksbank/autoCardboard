@@ -8,7 +8,6 @@ namespace autoCardboard.Common.Domain
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Dictionary<string,object> State { get; set; }
 
         public abstract void GetTurn(TGameTurn turn);
     }

@@ -9,8 +9,7 @@ namespace autoCardboard.ConsoleApp
             var game = new ForSaleGame();
             var playerFactory = new PlayerFactory();
             var players = playerFactory.CreatePlayers(5);
-            game.Setup(players);
-            game.Play();
+            game.Play(players);
         }
 
     }

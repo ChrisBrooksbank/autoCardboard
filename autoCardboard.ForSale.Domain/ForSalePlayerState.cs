@@ -1,8 +1,10 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace autoCardboard.ForSale.Domain
 {
+    [Serializable]
     public class ForSalePlayerState
     {
         public List<ICard> PropertyCards { get; set; }

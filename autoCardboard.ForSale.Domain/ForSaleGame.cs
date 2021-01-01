@@ -12,25 +12,11 @@ namespace autoCardboard.ForSale.Domain
         {
             State = new ForSaleGameState();
         }
+             
 
-        public override void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        public override void Play(IEnumerable<IPlayer<ForSaleGameTurn>> players)
         {
-            State.PropertyDeck = new CardDeck();
-            for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
-            {
-                State.PropertyDeck.AddCard(new Card { Id = cardNumber, Name = cardNumber.ToString() });
-            }
-            State.PropertyDeck.Shuffle();
-          
-            State.PropertyCardsOnTable = new List<ICard>();
-            State.CurrentBid = 0;
-            Players = players;
-
-            SetupPlayerStates();
-        }
-
-        public override void Play()
-        {
+            Setup(players);
             while (!State.PropertyDeck.Empty)
             {
                 PlayPropertyBidRound();
@@ -43,11 +29,27 @@ namespace autoCardboard.ForSale.Domain
 
             foreach (var player in Players)
             {
-                var turn = new ForSaleGameTurn { State = State };
+                var turn = new ForSaleGameTurn { CurrentPlayerId = player.Id, State = State };
                 player.GetTurn(turn);
 
                 // IF player passed, they get half their coins back and the lowest valued property deck
             }
+        }
+
+        private void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        {
+            State.PropertyDeck = new CardDeck();
+            for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
+            {
+                State.PropertyDeck.AddCard(new Card { Id = cardNumber, Name = cardNumber.ToString() });
+            }
+            State.PropertyDeck.Shuffle();
+
+            State.PropertyCardsOnTable = new List<ICard>();
+            State.CurrentBid = 0;
+            Players = players;
+
+            SetupPlayerStates();
         }
 
         private void SetupPlayerStates()

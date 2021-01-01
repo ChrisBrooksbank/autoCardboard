@@ -1,6 +1,4 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
 
 namespace autoCardboard.ForSale.Domain
 {
@@ -9,6 +7,11 @@ namespace autoCardboard.ForSale.Domain
         public int Id { get; set; }
         public string Name { get; set; }
 
+        /// <summary>
+        /// Choose a turn based on turn.State and make it
+        /// any changes made to turn.State are ignored
+        /// </summary>
+        /// <param name="turn"></param>
         public void GetTurn(ForSaleGameTurn turn)
         {
             // Simply bid the minimum amount if we can afford it, else pass

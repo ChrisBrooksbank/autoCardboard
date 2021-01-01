@@ -5,6 +5,7 @@ using autoCardboard.Common.Domain.Interfaces;
 
 namespace autoCardboard.Common.Domain
 {
+    [Serializable]
     public class CardDeck: ICardDeck
     {
         private static Random r = new Random();
