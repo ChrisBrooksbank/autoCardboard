@@ -50,6 +50,6 @@ namespace autoCardboard.Common.Domain
             {
                 AddCard(card);
             }
-                   }
+        }
     }
 }
