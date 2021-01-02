@@ -12,7 +12,7 @@ namespace autoCardboard.Common.Domain
         protected List<ICard> cards = new List<ICard>();
 
         public bool Empty => !cards.Any();
-
+        public int CardCount => cards.Count;
         public void Shuffle()
         {
             for (int n = cards.Count - 1; n > 0; --n)

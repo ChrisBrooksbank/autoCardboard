@@ -1,4 +1,5 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
+using System.Linq;
 
 namespace autoCardboard.ForSale.Domain
 {
@@ -16,7 +17,8 @@ namespace autoCardboard.ForSale.Domain
         {
             // Simply bid the minimum amount if we can afford it, else pass
             var playerState = turn.State.PlayerStates[Id];
-            var minimumNextBid = turn.State.CurrentBid + 1;
+            var currentMaxBid = turn.State.PlayerStates.Max(p => p.Value.CoinsBid);
+            var minimumNextBid = currentMaxBid + 1;
 
             if (minimumNextBid <= playerState.CoinBalance)
             {

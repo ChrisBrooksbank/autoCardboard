@@ -53,7 +53,7 @@ namespace autoCardboard.ForSale.Domain
             var maxBidOnTable = 0;
             foreach(var player in _state.PlayerStates)
             {
-                if (player.Key != CurrentPlayerId && player.Value.CoinsBid > maxBidOnTable)
+                if (player.Value.CoinsBid > maxBidOnTable)
                 {
                     maxBidOnTable = player.Value.CoinsBid;
                 }

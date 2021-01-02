@@ -14,7 +14,6 @@ namespace autoCardboard.ForSale.Domain
     {
         public CardDeck PropertyDeck { get; set; }
         public IEnumerable<ICard> PropertyCardsOnTable { get; set; }
-        public int CurrentBid { get; set; }
 
         public Dictionary<int,ForSalePlayerState> PlayerStates { get; set; }
 
