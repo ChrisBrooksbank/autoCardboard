@@ -17,40 +17,35 @@ namespace autoCardboard.ForSale.Domain
         {
             Setup(players);
 
-            // Play property bidding rounds
             while (State.PropertyDeck.CardCount >= players.Count())
             {
                 PlayPropertyBidRound();
             }
 
+            OutputPropertyBiddingSummary(players);
+        }
+
+        private void OutputPropertyBiddingSummary(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        {
             Console.WriteLine();
-            foreach(var player in players)
+            foreach (var player in players)
             {
-                Console.Write($"player {player.Id} got properties : ");
-                foreach(var card in State.PlayerStates[player.Id].PropertyCards)
+                Console.Write($"player {player.Id} has coin balance {State.PlayerStates[player.Id].CoinBalance} and properties : ");
+                foreach (var card in State.PlayerStates[player.Id].PropertyCards)
                 {
                     Console.Write($"{card.Id} ");
                 }
                 Console.WriteLine();
             }
-            Console.ReadLine();
-
-            // TODO play property flipping rounds
         }
 
         private void PlayPropertyBidRound()
         {
-            State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count());
+            State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count()).OrderBy(c => c.Id).ToList();
+            OutputPropertyBidRoundStartingState();
+            var passedPlayers = new List<int>();
             while (State.PropertyCardsOnTable.Count() > 0)
             {
-                Console.Write("Bidding on these properties : ");
-                foreach (var card in State.PropertyCardsOnTable)
-                {
-                    Console.Write($"{card.Id} ");
-                }
-                Console.WriteLine();
-
-                var passedPlayers = new List<int>();
                 foreach (var player in Players.Where(p => !passedPlayers.Contains(p.Id)))
                 {
                     var turn = new ForSaleGameTurn { CurrentPlayerId = player.Id, State = State };
@@ -68,14 +63,20 @@ namespace autoCardboard.ForSale.Domain
                             passedPlayers.Add(player.Id);
                         }
                     }
-
                 }
-
-                Console.WriteLine("Bidding round ends");
-                Console.WriteLine();
-                State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count());
             }
-          
+
+        }
+
+        private void OutputPropertyBidRoundStartingState()
+        {
+            Console.WriteLine("***");
+            Console.Write("Opening bidding on properties : ");
+            foreach (var card in State.PropertyCardsOnTable)
+            {
+                Console.Write($"{card.Id} ");
+            }
+            Console.WriteLine();
         }
 
         private void PlayerPaysForLastPropertyCard(ForSaleGameTurn turn)
@@ -86,8 +87,10 @@ namespace autoCardboard.ForSale.Domain
 
             if (cardsOnTable.Remove(cardToTake))
             {
+                Console.WriteLine($"Player {turn.CurrentPlayerId} takes last property {cardToTake.Id} paying {playerState.CoinsBid}");
                 playerState.PropertyCards.Add(cardToTake);
                 playerState.CoinsBid = 0;
+                State.PropertyCardsOnTable = cardsOnTable;
             }
         }
 
@@ -115,12 +118,20 @@ namespace autoCardboard.ForSale.Domain
             {
                 // Refund half of players bid
                 var refund = (playerState.CoinsBid / 2);
+                if (playerState.CoinsBid > 0)
+                {
+                    Console.WriteLine($"Player {playerId} passes and gets a refund of {refund} on a bid of {playerState.CoinsBid} getting property {cardToTake.Id}");
+                }
+                else
+                {
+                    Console.WriteLine($"Player {playerId} passes on first turn getting property {cardToTake.Id}");
+                }
+               
                 playerState.CoinBalance += refund;
                 playerState.CoinsBid = 0;
                 // Remove lowest property card and give to this player
                 playerState.PropertyCards.Add(cardToTake);
                 State.PropertyCardsOnTable = cardsOnTable;
-                Console.WriteLine($"Player {playerId} passed. They got property {cardToTake.Id} and got {refund} coins back.");
             }
         }
 
@@ -132,10 +143,11 @@ namespace autoCardboard.ForSale.Domain
             {
                 throw new ApplicationException("Player cannot afford bid made");
             }
-            
+
+            var oldBid = playerState.CoinsBid;
             playerState.CoinsBid = bidAmount;
-            playerState.CoinBalance -= bidAmount;
-            Console.WriteLine($"Player {playerId} bids {bidAmount}");
+            playerState.CoinBalance = playerState.CoinBalance - (bidAmount - oldBid);
+            Console.WriteLine($"Player {playerId} bids {bidAmount} reducing their balance to {playerState.CoinBalance}");
         }
 
         private void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
