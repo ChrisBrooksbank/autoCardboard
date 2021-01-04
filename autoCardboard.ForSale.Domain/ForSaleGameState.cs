@@ -13,7 +13,9 @@ namespace autoCardboard.ForSale.Domain
     public class ForSaleGameState: GameState
     {
         public CardDeck PropertyDeck { get; set; }
+        public CardDeck ChequeDeck { get; set; }
         public IEnumerable<ICard> PropertyCardsOnTable { get; set; }
+        public IEnumerable<ICard> ChequesOnTable { get; set; }
 
         public Dictionary<int,ForSalePlayerState> PlayerStates { get; set; }
 

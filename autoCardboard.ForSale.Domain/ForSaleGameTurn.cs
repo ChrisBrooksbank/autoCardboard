@@ -1,5 +1,6 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
 using System;
+using autoCardboard.Common.Domain;
 
 namespace autoCardboard.ForSale.Domain
 {
@@ -13,6 +14,7 @@ namespace autoCardboard.ForSale.Domain
 
         public bool Passed;
         public int BidAmount;
+        public ICard PropertyToFlip { get; set; }
 
         public ForSaleGameState State
         {

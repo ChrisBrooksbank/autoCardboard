@@ -18,12 +18,24 @@ namespace autoCardboard.ForSale.Domain
         /// <param name="turn"></param>
         public void GetTurn(ForSaleGameTurn turn)
         {
+            if (turn.State.PropertyCardsOnTable.Any())
+            {
+                GetPropertyBiddingTurn(turn);
+            }
+            else
+            {
+                GetPropertyFlippingTurn(turn);
+            }
+           
+        }
+
+        private void GetPropertyBiddingTurn(ForSaleGameTurn turn)
+        {
             var playerState = turn.State.PlayerStates[Id];
             var currentHighestBid = turn.State.PlayerStates.Max(p => p.Value.CoinsBid);
             var minimumNextBid = currentHighestBid + 1;
 
-            // TODO players arent passing after making a bid : BUG
-            if (minimumNextBid <= playerState.CoinBalance && FuzzyDecideIfIWantToPass(turn) )
+            if (minimumNextBid <= playerState.CoinBalance && FuzzyDecideIfIWantToPass(turn))
             {
                 turn.Bid(minimumNextBid);
             }
@@ -31,6 +43,13 @@ namespace autoCardboard.ForSale.Domain
             {
                 turn.Pass();
             }
+        }
+
+        private void GetPropertyFlippingTurn(ForSaleGameTurn turn)
+        {
+            var playerState = turn.State.PlayerStates[turn.CurrentPlayerId];
+            var die = new Die(playerState.PropertyCards.Count);
+            turn.PropertyToFlip = playerState.PropertyCards[die.Throw() -1];
         }
 
         private bool FuzzyDecideIfIWantToPass(ForSaleGameTurn turn)
