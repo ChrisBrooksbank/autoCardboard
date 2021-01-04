@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\autoCardboard.ForSale.Domain\autoCardboard.ForSale.Domain.csproj" />
+    <ProjectReference Include="..\autoCardboard.Pandemic.Domain\autoCardboard.Pandemic.Domain.csproj" />
   </ItemGroup>
 
 </Project>
