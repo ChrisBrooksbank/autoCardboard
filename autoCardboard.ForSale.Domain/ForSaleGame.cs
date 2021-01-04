@@ -69,6 +69,7 @@ namespace autoCardboard.ForSale.Domain
             State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count()).OrderBy(c => c.Id).ToList();
             // OutputPropertyBidRoundStartingState();
             var passedPlayers = new List<int>();
+
             while (State.PropertyCardsOnTable.Any())
             {
                 foreach (var player in Players.Where(p => !passedPlayers.Contains(p.Id)))
@@ -78,9 +79,11 @@ namespace autoCardboard.ForSale.Domain
                     if (State.PropertyCardsOnTable.Count() == 1)
                     {
                         PlayerPaysForLastPropertyCard(turn);
+                        // TODO this player gos first in next round
                     }
                     else
                     {
+                        player.GetTurn(turn);
                         ProcessTurn(turn);
                         if (turn.Passed)
                         {

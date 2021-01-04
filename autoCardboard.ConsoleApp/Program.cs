@@ -8,13 +8,11 @@ namespace autoCardboard.ConsoleApp
     {
         static void Main(string[] args)
         {
-            var pandemicMap = new PandemicMap();
-
             var game = new ForSaleGame();
-            var playerFactory = new PlayerFactory();
+            var playerFactory = new ForSale.Domain.PlayerFactory();
             var players = playerFactory.CreatePlayers(5).ToList();
 
-            for(var gameNumber = 1; gameNumber < 2; gameNumber++)
+            for(var gameNumber = 1; gameNumber < 200; gameNumber++)
             {
                 game.Play(players);
             }

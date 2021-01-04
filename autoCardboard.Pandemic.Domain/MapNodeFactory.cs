@@ -69,7 +69,6 @@ namespace autoCardboard.Pandemic.Domain
             return newNode;
         }
 
-        // TODO
         private List<City> GetConnectedCities(City city)
         {
             var cities = new List<City>();
