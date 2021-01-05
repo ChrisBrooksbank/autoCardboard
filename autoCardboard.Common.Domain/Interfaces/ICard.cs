@@ -2,7 +2,7 @@
 {
     public interface ICard
     {
-        int Id { get; set; }
+        int Value { get; set; }
         string Name{ get; set; }
     }
 }

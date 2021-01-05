@@ -2,12 +2,17 @@
 
 namespace autoCardboard.Common.Domain.Interfaces
 {
-    public interface ICardDeck
+    public interface ICardDeck<TCardType> where TCardType: ICard
     {
         void Shuffle();
-        void AddCard(ICard card);
-        void AddCards(IEnumerable<ICard> cards);
-        IEnumerable<ICard> Draw(int count);
-        IEnumerable<ICard> Reveal(int count);
+        void AddCard(TCardType card);
+        void AddCards(IEnumerable<TCardType> cards);
+        TCardType DrawTop();
+        IEnumerable<TCardType> Draw(int count);
+        TCardType RevealTop();
+        IEnumerable<TCardType> Reveal(int count);
+        IEnumerable<CardDeck<TCardType>> Divide(int count);
+        void Add(IEnumerable<CardDeck<TCardType>> decks);
+        void Add(CardDeck<TCardType> deck);
     }
 }

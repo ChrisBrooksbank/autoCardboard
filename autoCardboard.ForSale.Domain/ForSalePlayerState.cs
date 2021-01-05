@@ -16,6 +16,6 @@ namespace autoCardboard.ForSale.Domain
 
         public int CoinBalance { get; set; }
 
-        public int TotalScore => CoinBalance + ChequeCards.Sum(c => c.Id);
+        public int TotalScore => CoinBalance + ChequeCards.Sum(c => c.Value);
     }
 }
