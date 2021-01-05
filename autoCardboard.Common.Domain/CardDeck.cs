@@ -69,12 +69,12 @@ namespace autoCardboard.Common.Domain
             return cards.Count == 0 ? default(TCardType) : cards[0];
         }
 
-        public IEnumerable<CardDeck<TCardType>> Divide(int count)
+        public IEnumerable<CardDeck<TCardType>> Divide(int pileCount)
         {
             var piles = new List<CardDeck<TCardType>>();
 
-            var pileNumber = 1;
-            for(pileNumber = 1; pileNumber <=count;pileNumber++)
+            int pileNumber;
+            for(pileNumber = 1; pileNumber <=pileCount;pileNumber++)
             {
                 piles.Add(new CardDeck<TCardType>());
             }
@@ -84,7 +84,7 @@ namespace autoCardboard.Common.Domain
             {
                 piles[pileNumber++ - 1].AddCard(card);
 
-                if (pileNumber > count)
+                if (pileNumber > pileCount)
                 {
                     pileNumber = 1;
                 }
@@ -95,15 +95,13 @@ namespace autoCardboard.Common.Domain
             return piles;
         }
 
-        // TODO bug we get repeated pandemic cards
         public void Add(IEnumerable<CardDeck<TCardType>> decks)
         {
-            var piles = decks.ToList();
-            var pileCount = piles.Count();
+            decks = decks.Reverse().ToList();
 
-            for (var pileNumber = pileCount; pileCount > 0; pileCount--)
+            foreach (var deck in decks)
             {
-                Add(piles[pileNumber-1]);
+                Add(deck);
             }
         }
 
@@ -113,7 +111,6 @@ namespace autoCardboard.Common.Domain
             {
                 cards.Add(card);
             }
-
         }
     }
 }

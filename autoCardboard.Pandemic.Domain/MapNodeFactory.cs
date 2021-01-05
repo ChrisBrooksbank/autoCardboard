@@ -62,7 +62,13 @@ namespace autoCardboard.Pandemic.Domain
             var newNode = new MapNode
             {
                 City = city,
-                DiseaseCubes = new Dictionary<Disease, int>(),
+                DiseaseCubes = new Dictionary<Disease, int>()
+                {
+                    {Disease.Blue,0},
+                    {Disease.Red,0},
+                    {Disease.Yellow,0},
+                    {Disease.Black,0}
+                },
                 ConnectedCities = GetConnectedCities(city)
             };
 

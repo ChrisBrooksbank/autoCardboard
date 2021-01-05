@@ -11,7 +11,7 @@ namespace autoCardboard.Common.Domain.Interfaces
         IEnumerable<TCardType> Draw(int count);
         TCardType RevealTop();
         IEnumerable<TCardType> Reveal(int count);
-        IEnumerable<CardDeck<TCardType>> Divide(int count);
+        IEnumerable<CardDeck<TCardType>> Divide(int pileCount);
         void Add(IEnumerable<CardDeck<TCardType>> decks);
         void Add(CardDeck<TCardType> deck);
     }

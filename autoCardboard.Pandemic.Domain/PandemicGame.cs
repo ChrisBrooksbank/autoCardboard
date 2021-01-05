@@ -10,7 +10,6 @@ namespace autoCardboard.Pandemic.Domain
     {
         public PandemicGame()
         {
-
             State = new PandemicGameState();
         }
 
@@ -22,48 +21,13 @@ namespace autoCardboard.Pandemic.Domain
 
         private void Setup(IEnumerable<IPlayer<PandemicGameTurn>> players)
         {
-            // TODO refactor e.g. into a new PlayerDeck type
-            State.PlayerDeck = new CardDeck<PandemicPlayerCard>();
-            foreach (var city in Enum.GetValues(typeof(City)))
-            {
-                State.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)city, Name = city.ToString(), PlayerCardType = PlayerCardType.City});
-            }
-            foreach (var eventCard in Enum.GetValues(typeof(EventCard)))
-            {
-                State.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)eventCard, Name = eventCard.ToString(), PlayerCardType = PlayerCardType.Event});
-            }
-            State.PlayerDeck.Shuffle();
-            var playerDeckCardPiles = State.PlayerDeck.Divide(State.EpidemicCardCount).ToList();
-            foreach (var cardDeck in playerDeckCardPiles)
-            {
-                cardDeck.AddCard( new PandemicPlayerCard{ PlayerCardType = PlayerCardType.Epidemic, Name = "Epidemic", Value = 0});
-                cardDeck.Shuffle();
-            }
+            State.EpidemicCardCount = 6;
 
-            State.PlayerDeck.Add(playerDeckCardPiles);
+            State.InfectionDeck = new InfectionDeck();
 
-            Console.WriteLine();
-            Console.Write("Pandemic player deck : ");
-            while (!State.PlayerDeck.Empty)
-            {
-                var card = State.PlayerDeck.Draw(1).Single() as PandemicPlayerCard;
-                switch (card.PlayerCardType)
-                {
-                    case PlayerCardType.City:
-                        Console.WriteLine($"{card.Name} ");
-                        break;
-                    case PlayerCardType.Epidemic:
-                        Console.WriteLine($"***{card.Name} ");
-                        break;
-                    case PlayerCardType.Event:
-                        Console.WriteLine($"**{card.Name} ");
-                        break;
-                }
-            }
-
-            Console.ReadLine();
-
-
+            State.PlayerDeck = new PlayerDeck();
+            State.PlayerDeck.Setup(State.EpidemicCardCount);
+          
             //SetupPlayerStates();
         }
 
