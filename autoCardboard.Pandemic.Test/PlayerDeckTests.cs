@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using autoCardboard.Pandemic.Domain;
 using NUnit.Framework;
 
@@ -32,10 +33,12 @@ namespace autoCardboard.Pandemic.Test
         public void IsExpectedDeckSizeWith5Epidemics()
         {
             var cityCount = Enum.GetValues(typeof(City)).Length;
-            var eventCount =Enum.GetValues(typeof(EventCard)).Length;
+            var eventCount= Enum.GetValues(typeof(EventCard)).Length;
 
             Assert.AreEqual(deckWith5Epidemics.CardCount, 5 + cityCount + eventCount);
         }
+
+     
       
     }
 }

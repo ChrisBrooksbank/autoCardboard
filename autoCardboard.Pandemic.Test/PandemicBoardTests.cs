@@ -24,7 +24,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void AddingFourBlueDiseasesIncreasesOutbreakCount()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Chicago);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Chicago);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Chicago);
@@ -35,7 +34,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void Adding2Blue2BlackDiseasesDoesntIncreaseOutbreakCount()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Chicago);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Chicago);
             _pandemicBoard.AddDiseaseCube(Disease.Black, City.Chicago);
@@ -46,7 +44,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void OutBreakInMontrealSpreadsToNewYork()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
@@ -60,7 +57,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void AddingDiseaseDecrementsDiseaseCubeStock()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             Assert.AreEqual(_pandemicBoard.DiseaseCubeStock[Disease.Blue], 23);
         }
@@ -68,7 +64,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void TreatingDiseaseIncrementsDiseaseCubeStock()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.TreatDisease(Disease.Blue, City.Montreal);
             Assert.AreEqual(_pandemicBoard.DiseaseCubeStock[Disease.Blue], 24);
@@ -77,7 +72,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void DoubleOutbreakSetsDiseaseCubeStockOk()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
@@ -94,7 +88,6 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void DoubleOutbreakSetsAddsDiseaseToCorrectCities()
         {
-            _pandemicBoard.Clear();
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
             _pandemicBoard.AddDiseaseCube(Disease.Blue, City.Montreal);
@@ -110,7 +103,5 @@ namespace autoCardboard.Pandemic.Test
             var citiesWithBlueDiseaseCsv = string.Join(',', citiesWithBlueDisease);
             Assert.AreEqual(citiesWithBlueDiseaseCsv, "Chicago,London,Madrid,Montreal,NewYork,Washington");
         }
-
-
     }
 }
