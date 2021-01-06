@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using autoCardboard.Common.Domain;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -15,9 +16,31 @@ namespace autoCardboard.Pandemic.Domain
 
         public Dictionary<Disease, int> DiseaseCubeStock => _diseaseCubeStock;
 
-        public void Clear()
+        public InfectionDeck InfectionDeck { get; set; }
+        public CardDeck<Card> InfectionDiscardPile { get; set; }
+        public PlayerDeck PlayerDeck { get; set; }
+        public PlayerDeck PlayerDiscardPile { get; set; }
+        public int InfectionRateMarker { get; set; }
+        public int[] InfectionRateTrack { get; set; }
+        public int EpidemicCardCount { get; set; }
+
+        public Dictionary<Disease,DiseaseState> DiscoveredCures { get; set; }
+
+        public void Setup(int pandemicCardCount = 6)
         {
             Cities = new List<MapNode>();
+
+            InfectionDeck = new InfectionDeck();
+            InfectionDiscardPile = new CardDeck<Card>();
+            PlayerDeck = new PlayerDeck();
+            PlayerDeck.Setup(pandemicCardCount);
+
+            PlayerDiscardPile = new PlayerDeck();
+
+            DiscoveredCures = new Dictionary<Disease, DiseaseState>();
+            InfectionRateMarker = 0;
+            InfectionRateTrack = new int[] {2,2,2,3,3,4,4};
+            EpidemicCardCount = 6;
 
             var nodeFactory = new MapNodeFactory();
 
@@ -34,6 +57,32 @@ namespace autoCardboard.Pandemic.Domain
                 {Disease.Red, 24 },
                 {Disease.Yellow, 24}
             };
+
+            PerformInitialInfections();
+        }
+        
+        private void PerformInitialInfections()
+        {
+            var infectionCards = InfectionDeck.Draw(3).ToList();
+            InfectionDiscardPile.AddCards(infectionCards);
+            foreach (var infectionCard in infectionCards)
+            { 
+                AddDiseaseCubes((City)infectionCard.Value,3);
+            }
+
+            infectionCards = InfectionDeck.Draw(3).ToList();
+            InfectionDiscardPile.AddCards(infectionCards);
+            foreach (var infectionCard in infectionCards)
+            { 
+                AddDiseaseCubes((City)infectionCard.Value,2);
+            }
+
+            infectionCards = InfectionDeck.Draw(3).ToList();
+            InfectionDiscardPile.AddCards(infectionCards);
+            foreach (var infectionCard in infectionCards)
+            { 
+                AddDiseaseCubes((City)infectionCard.Value,1);
+            }
         }
 
         // TODO what if disease is cured, you then remove all
@@ -51,6 +100,16 @@ namespace autoCardboard.Pandemic.Domain
 
             node.DiseaseCubes[disease]--;
             _diseaseCubeStock[disease]++;
+        }
+
+        public void AddDiseaseCubes(City city, int count = 1)
+        {
+            var disease = city.GetDefaultDisease();
+
+            for (var i = 0; i < count; i++)
+            {
+                AddDiseaseCube(disease, city);
+            }
         }
 
         public void AddDiseaseCube(Disease disease, City city, List<City> ignoreCities = null)
@@ -76,7 +135,7 @@ namespace autoCardboard.Pandemic.Domain
 
         public PandemicBoard()
         {
-            Clear();
+            Setup();
         }
     }
 }

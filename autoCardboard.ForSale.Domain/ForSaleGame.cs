@@ -23,51 +23,17 @@ namespace autoCardboard.ForSale.Domain
                 PlayPropertyBidRound();
             }
 
-            // OutputPropertyBiddingSummary(players);
-
             // Property flipping rounds
             while (State.ChequeDeck.CardCount >= players.Count())
             {
                 PlayPropertyFlippingRound();
             }
-
-            OutputGameResult();
         }
-
-
-        private void OutputGameResult()
-        {
-            var playerStatesByTotalScore = State.PlayerStates.OrderByDescending(s => s.Value.TotalScore).ToList();
-            var winningPlayerState = playerStatesByTotalScore[0];
-
-            Console.WriteLine($"won by player {winningPlayerState.Key} with score of {winningPlayerState.Value.TotalScore}");
-
-            //Console.WriteLine();
-            //var position = 2;
-            //foreach(var playerState in playerStatesByTotalScore.Skip(1))
-            //{
-            //    Console.WriteLine($"position {position++} is player {playerState.Key} with score of {playerState.Value.TotalScore}");
-            //}
-
-        }
-        private void OutputPropertyBiddingSummary(IEnumerable<IPlayer<ForSaleGameTurn>> players)
-        {
-            Console.WriteLine();
-            foreach (var player in players)
-            {
-                Console.Write($"player {player.Id} has coin balance {State.PlayerStates[player.Id].CoinBalance} and properties : ");
-                foreach (var card in State.PlayerStates[player.Id].PropertyCards)
-                {
-                    Console.Write($"{card.Value} ");
-                }
-                Console.WriteLine();
-            }
-        }
-
+        
         private void PlayPropertyBidRound()
         {
             State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count()).OrderBy(c => c.Value).ToList();
-            // OutputPropertyBidRoundStartingState();
+
             var passedPlayers = new List<int>();
 
             while (State.PropertyCardsOnTable.Any())
@@ -124,18 +90,7 @@ namespace autoCardboard.ForSale.Domain
                 }
             }
         }
-
-        private void OutputPropertyBidRoundStartingState()
-        {
-            Console.WriteLine("***");
-            Console.Write("Opening bidding on properties : ");
-            foreach (var card in State.PropertyCardsOnTable)
-            {
-                Console.Write($"{card.Value} ");
-            }
-            Console.WriteLine();
-        }
-
+        
         private void PlayerPaysForLastPropertyCard(ForSaleGameTurn turn)
         {
             var playerState = State.PlayerStates[turn.CurrentPlayerId];
@@ -144,7 +99,6 @@ namespace autoCardboard.ForSale.Domain
 
             if (cardsOnTable.Remove(cardToTake))
             {
-                // Console.WriteLine($"Player {turn.CurrentPlayerId} takes last property {cardToTake.Id} paying {playerState.CoinsBid}");
                 playerState.PropertyCards.Add(cardToTake);
                 playerState.CoinsBid = 0;
                 State.PropertyCardsOnTable = cardsOnTable;
@@ -198,15 +152,6 @@ namespace autoCardboard.ForSale.Domain
                 // Refund half of players bid
                 var refund = (playerState.CoinsBid / 2);
 
-                //if (playerState.CoinsBid > 0)
-                //{
-                //    Console.WriteLine($"Player {playerId} passes and gets a refund of {refund} on a bid of {playerState.CoinsBid} getting property {cardToTake.Id}");
-                //}
-                //else
-                //{
-                //    Console.WriteLine($"Player {playerId} passes on first turn getting property {cardToTake.Id}");
-                //}
-               
                 playerState.CoinBalance += refund;
                 playerState.CoinsBid = 0;
                 // Remove lowest property card and give to this player
@@ -227,7 +172,6 @@ namespace autoCardboard.ForSale.Domain
             var oldBid = playerState.CoinsBid;
             playerState.CoinsBid = bidAmount;
             playerState.CoinBalance = playerState.CoinBalance - (bidAmount - oldBid);
-            // Console.WriteLine($"Player {playerId} bids {bidAmount} reducing their balance to {playerState.CoinBalance}");
         }
 
         private void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)

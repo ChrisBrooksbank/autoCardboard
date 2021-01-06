@@ -1,8 +1,6 @@
-﻿using System;
-using autoCardboard.Common.Domain;
+﻿using autoCardboard.Common.Domain;
 using autoCardboard.Common.Domain.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -21,13 +19,7 @@ namespace autoCardboard.Pandemic.Domain
 
         private void Setup(IEnumerable<IPlayer<PandemicGameTurn>> players)
         {
-            State.EpidemicCardCount = 6;
-
-            State.InfectionDeck = new InfectionDeck();
-
-            State.PlayerDeck = new PlayerDeck();
-            State.PlayerDeck.Setup(State.EpidemicCardCount);
-          
+            State.Board.Setup();
             //SetupPlayerStates();
         }
 
