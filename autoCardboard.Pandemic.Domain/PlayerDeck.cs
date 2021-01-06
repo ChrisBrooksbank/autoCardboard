@@ -4,6 +4,7 @@ using autoCardboard.Common.Domain;
 
 namespace autoCardboard.Pandemic.Domain
 {
+    [Serializable]
     public class PlayerDeck: CardDeck<PandemicPlayerCard>
     {
         public void Setup(int pandemicCardCount)

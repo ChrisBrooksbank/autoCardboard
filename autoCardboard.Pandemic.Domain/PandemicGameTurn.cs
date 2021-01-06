@@ -4,6 +4,7 @@ using System;
 namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
+    // TODO add operations for available play actions
     public class PandemicGameTurn: IGameTurn
     {
         // _state is a clone of the game state ( so any changes to it by player are ignored )
@@ -24,5 +25,9 @@ namespace autoCardboard.Pandemic.Domain
             }
         }
 
+        public void DriveOrFerry(City toCity)
+        {
+
+        }
     }
 }

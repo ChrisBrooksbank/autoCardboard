@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using autoCardboard.ForSale.Domain;
 using autoCardboard.Pandemic.Domain;
+using forSalePlayerFactory = autoCardboard.ForSale.Domain.PlayerFactory;
+using pandemicPlayerFactory = autoCardboard.Pandemic.Domain.PlayerFactory;
 
 namespace autoCardboard.ConsoleApp
 {
@@ -9,16 +11,14 @@ namespace autoCardboard.ConsoleApp
         static void Main(string[] args)
         {
             var pandemicGame = new PandemicGame();
-            pandemicGame.Play(null);
+            var pandemicPlayerFactory = new pandemicPlayerFactory();
+            var pandemicPlayers = pandemicPlayerFactory.CreatePlayers(2).ToList();
+            pandemicGame.Play(pandemicPlayers);
           
             var game = new ForSaleGame();
-            var playerFactory = new ForSale.Domain.PlayerFactory();
-            var players = playerFactory.CreatePlayers(5).ToList();
-
-            for(var gameNumber = 1; gameNumber < 12; gameNumber++)
-            {
-                game.Play(players);
-            }
+            var forSalePlayerFactory = new forSalePlayerFactory();
+            var players = forSalePlayerFactory.CreatePlayers(5).ToList();
+            game.Play(players);
         }
 
     }

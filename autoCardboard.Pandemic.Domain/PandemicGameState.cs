@@ -1,8 +1,10 @@
-﻿using autoCardboard.Common.Domain;
+﻿using System;
+using autoCardboard.Common.Domain;
 using System.Collections.Generic;
 
 namespace autoCardboard.Pandemic.Domain
 {
+    [Serializable]
     public class PandemicGameState: GameState
     {
         public PandemicBoard Board { get; set; }

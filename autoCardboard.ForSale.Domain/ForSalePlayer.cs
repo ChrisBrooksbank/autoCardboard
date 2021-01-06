@@ -49,12 +49,12 @@ namespace autoCardboard.ForSale.Domain
         {
             var playerState = turn.State.PlayerStates[turn.CurrentPlayerId];
             var die = new Die(playerState.PropertyCards.Count);
-            turn.PropertyToFlip = playerState.PropertyCards[die.Throw() -1];
+            turn.PropertyToFlip = playerState.PropertyCards[die.Roll() -1];
         }
 
         private bool FuzzyDecideIfIWantToPass(ForSaleGameTurn turn)
         {
-            return _d100.Throw() > GetPercentageRoundDone(turn);
+            return _d100.Roll() > GetPercentageRoundDone(turn);
         }
 
         private float GetPercentageRoundDone(ForSaleGameTurn turn)

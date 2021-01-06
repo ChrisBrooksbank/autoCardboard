@@ -3,6 +3,7 @@ using autoCardboard.Common.Domain;
 
 namespace autoCardboard.Pandemic.Domain
 {
+    [Serializable]
     public class InfectionDeck: CardDeck<Card>
     {
         public InfectionDeck()

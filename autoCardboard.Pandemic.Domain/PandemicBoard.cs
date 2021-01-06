@@ -1,10 +1,12 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common.Domain;
 
 namespace autoCardboard.Pandemic.Domain
 {
+    [Serializable]
     public class PandemicBoard
     {
         private int _outbreakCount;
@@ -26,8 +28,53 @@ namespace autoCardboard.Pandemic.Domain
 
         public Dictionary<Disease,DiseaseState> DiscoveredCures { get; set; }
 
-        public void Setup(int pandemicCardCount = 6)
+        public Boolean IsGameOver { get; set; }
+
+        public IEnumerable<PandemicPlayerCard> DrawPlayerCards()
         {
+            if (PlayerDeck.CardCount < 2)
+            {
+                Console.WriteLine("Game over. Empty playerdeck");
+                IsGameOver = true;
+                return new List<PandemicPlayerCard>();
+            }
+
+            return PlayerDeck.Draw(2);
+        }
+
+        public void Epidemic()
+        {
+            var bottomCard = InfectionDeck.DrawBottom();
+            Console.WriteLine($"Epidemic in {(City)bottomCard.Value}");
+            InfectionDiscardPile.AddCard(bottomCard);
+            AddDiseaseCubes((City)bottomCard.Value,3);
+
+            // Intensify
+            InfectionDiscardPile.Shuffle();
+            InfectionDeck.AddCardDeck(InfectionDiscardPile,CardDeckPosition.Top);
+
+            InfectionRateMarker++;
+        }
+
+        public void Infect()
+        {
+            var infectionRate = InfectionRateTrack[InfectionRateMarker];
+            var infectionCards = InfectionDeck.Draw(infectionRate).ToList();
+
+            foreach (var infectionCard in infectionCards)
+            {
+                var city = (City) infectionCard.Value;
+                var disease = city.GetDefaultDisease();
+                AddDiseaseCube(disease, city);
+            }
+
+            InfectionDiscardPile.AddCards(infectionCards);
+        }
+
+
+        public void Clear(int pandemicCardCount = 6)
+        {
+            IsGameOver = false;
             Cities = new List<MapNode>();
 
             InfectionDeck = new InfectionDeck();
@@ -40,7 +87,7 @@ namespace autoCardboard.Pandemic.Domain
             DiscoveredCures = new Dictionary<Disease, DiseaseState>();
             InfectionRateMarker = 0;
             InfectionRateTrack = new int[] {2,2,2,3,3,4,4};
-            EpidemicCardCount = 6;
+            EpidemicCardCount = pandemicCardCount;
 
             var nodeFactory = new MapNodeFactory();
 
@@ -57,7 +104,11 @@ namespace autoCardboard.Pandemic.Domain
                 {Disease.Red, 24 },
                 {Disease.Yellow, 24}
             };
+        }
 
+        public void Setup(int pandemicCardCount = 6)
+        {
+            Clear();
             PerformInitialInfections();
         }
         
@@ -91,8 +142,6 @@ namespace autoCardboard.Pandemic.Domain
         {
             var node = Cities.Single(c => c.City == city);
 
-            var diseaseCount = node.DiseaseCubes[disease];
-
             if (disease == 0)
             {
                 return;
@@ -120,12 +169,29 @@ namespace autoCardboard.Pandemic.Domain
 
             if (node.DiseaseCubes[disease] < 3)
             {
+                if (_diseaseCubeStock[disease] == 0)
+                {
+                    Console.WriteLine($"Game over. No cubes left for {disease}");
+                    IsGameOver = true;
+                    return;
+                }
+
                 node.DiseaseCubes[disease] += 1;
                 _diseaseCubeStock[disease]--;
+
                 return;
             }
 
+            Console.WriteLine($"Outbreak in {node.City}");
             _outbreakCount++;
+
+            if (_outbreakCount > 7)
+            {
+                Console.WriteLine($"Game over. Too many outbreaks");
+                IsGameOver = true;
+                return;
+            }
+
             ignoreCities.Add(city);
             foreach (var connectedCity in node.ConnectedCities.Where(c => !ignoreCities.Contains(c)))
             {

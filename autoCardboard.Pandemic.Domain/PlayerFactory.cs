@@ -7,7 +7,18 @@ namespace autoCardboard.Pandemic.Domain
     {
         public IEnumerable<IPlayer<PandemicGameTurn>> CreatePlayers(int playerCount)
         {
-            throw new System.NotImplementedException();
+            List<IPlayer<PandemicGameTurn>> players = new List<IPlayer<PandemicGameTurn>>();
+            for (int player = 1; player <= playerCount; player++)
+            {
+                var newPlayer = new PandemicPlayer()
+                {
+                    Id = player,
+                    Name = player.ToString()
+                };
+                players.Add(newPlayer); ;
+            }
+
+            return players;
         }
     }
 }

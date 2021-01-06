@@ -15,7 +15,7 @@ namespace autoCardboard.Common.Domain
         public int CardCount => cards.Count;
         public void Shuffle()
         {
-            for (int n = cards.Count - 1; n > 0; --n)
+            for (var n = cards.Count - 1; n > 0; --n)
             {
                 var k = r.Next(n+1);
                 var temp = cards[n];
@@ -23,7 +23,7 @@ namespace autoCardboard.Common.Domain
                 cards[k] = temp;
             }
         }
-
+        
         public IEnumerable<TCardType> Draw(int count)
         {
             count = count > cards.Count ? cards.Count : count;
@@ -39,17 +39,36 @@ namespace autoCardboard.Common.Domain
             return revealedCards;
         }
 
-        public void AddCard(TCardType card)
+        public void AddCard(TCardType card, CardDeckPosition position = CardDeckPosition.Bottom)
         {
-            cards.Add(card);
+            if (position == CardDeckPosition.Bottom)
+            {
+                cards.Add(card);
+            }
+            else
+            {
+              cards.Insert(0, card);
+            }
         }
 
-        public void AddCards(IEnumerable<TCardType> cards)
+        public void AddCards(IEnumerable<TCardType> cards, CardDeckPosition position = CardDeckPosition.Bottom)
         {
             foreach(var card in cards)
             {
-                AddCard(card);
+                AddCard(card, position);
             }
+        }
+
+        public TCardType DrawBottom()
+        {
+            if (cards.Count == 0)
+            {
+                return default(TCardType);
+            }
+
+            var card = cards[cards.Count-1];
+            cards.Remove(card);
+            return card;
         }
 
         public TCardType DrawTop()
@@ -111,6 +130,12 @@ namespace autoCardboard.Common.Domain
             {
                 cards.Add(card);
             }
+        }
+
+        public void AddCardDeck(CardDeck<TCardType> cardDeck, CardDeckPosition position = CardDeckPosition.Bottom)
+        {
+            AddCards(cardDeck.cards, position);
+            cardDeck.cards.Clear();
         }
     }
 }

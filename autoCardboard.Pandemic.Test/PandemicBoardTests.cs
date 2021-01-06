@@ -12,6 +12,7 @@ namespace autoCardboard.Pandemic.Test
         public void Setup()
         {
             _pandemicBoard = new PandemicBoard();
+            _pandemicBoard.Clear();
         }
 
         [Test]
@@ -103,5 +104,28 @@ namespace autoCardboard.Pandemic.Test
             var citiesWithBlueDiseaseCsv = string.Join(',', citiesWithBlueDisease);
             Assert.AreEqual(citiesWithBlueDiseaseCsv, "Chicago,London,Madrid,Montreal,NewYork,Washington");
         }
+
+        [Test]
+        public void InitialInfectionDepletesDiseaseStockpile()
+        {
+            _pandemicBoard.Setup();
+
+            var diseaseCubesInStockpile = _pandemicBoard.DiseaseCubeStock[Disease.Blue]
+                                          + _pandemicBoard.DiseaseCubeStock[Disease.Black]
+                                          + _pandemicBoard.DiseaseCubeStock[Disease.Yellow]
+                                          + _pandemicBoard.DiseaseCubeStock[Disease.Red];
+            Assert.AreEqual(diseaseCubesInStockpile, 78);
+        }
+
+        [Test]
+        public void InitialInfectionInfectsCities()
+        {
+            _pandemicBoard.Setup();
+
+            var infectedCities = _pandemicBoard.Cities.Where(c => c.DiseaseCubeCount > 0);
+
+            Assert.AreEqual(infectedCities.Count(), 9);
+        }
+
     }
 }
