@@ -2,6 +2,7 @@
 using autoCardboard.Common.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
+using autoCardboard.Common.Domain.Cards;
 
 namespace autoCardboard.ForSale.Domain
 {

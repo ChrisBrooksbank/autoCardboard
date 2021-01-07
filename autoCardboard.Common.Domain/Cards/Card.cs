@@ -1,7 +1,7 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
-using System;
+﻿using System;
+using autoCardboard.Common.Domain.Interfaces;
 
-namespace autoCardboard.Common.Domain
+namespace autoCardboard.Common.Domain.Cards
 {
     [Serializable]
     public class Card: ICard

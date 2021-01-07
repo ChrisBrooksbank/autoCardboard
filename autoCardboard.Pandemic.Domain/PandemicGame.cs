@@ -87,7 +87,7 @@ namespace autoCardboard.Pandemic.Domain
 
         private void SetupPlayerStates()
         {
-            // TODO pick a random playerrole
+            var roleDeck = new RoleDeck();
             
             State.PlayerStates = new Dictionary<int, PandemicPlayerState>();
             foreach (var player in Players)
@@ -95,7 +95,8 @@ namespace autoCardboard.Pandemic.Domain
                 State.PlayerStates[player.Id] = new PandemicPlayerState
                 {
                     PlayerHand = new List<PandemicPlayerCard>(), // TODO start with 4 cards
-                    Location = City.Atlanta
+                    Location = City.Atlanta,
+                    PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
                 };
             }
         }

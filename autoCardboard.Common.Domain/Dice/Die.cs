@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace autoCardboard.Common.Domain
+namespace autoCardboard.Common.Domain.Dice
 {
- 
     /// <summary>
     /// Throw a die, with any number of sides
     /// https://commons.wikimedia.org/wiki/Dice_by_number_of_sides#D1

@@ -1,5 +1,5 @@
 ﻿using System;
-using autoCardboard.Common.Domain;
+using autoCardboard.Common.Domain.Cards;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -14,6 +14,5 @@ namespace autoCardboard.Pandemic.Domain
             }
             Shuffle();
         }
-        
     }
 }

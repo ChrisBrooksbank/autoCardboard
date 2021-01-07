@@ -1,8 +1,7 @@
-﻿using System;
+﻿using autoCardboard.Common.Domain.Cards;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using autoCardboard.Common.Domain;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -114,6 +113,8 @@ namespace autoCardboard.Pandemic.Domain
         
         private void PerformInitialInfections()
         {
+            Console.WriteLine("Starting initial infections");
+
             var infectionCards = InfectionDeck.Draw(3).ToList();
             InfectionDiscardPile.AddCards(infectionCards);
             foreach (var infectionCard in infectionCards)
@@ -134,6 +135,8 @@ namespace autoCardboard.Pandemic.Domain
             { 
                 AddDiseaseCubes((City)infectionCard.Value,1);
             }
+
+            Console.WriteLine("Finished initial infections");
         }
 
         // TODO what if disease is cured, you then remove all
@@ -163,6 +166,8 @@ namespace autoCardboard.Pandemic.Domain
 
         public void AddDiseaseCube(Disease disease, City city, List<City> ignoreCities = null)
         {
+            Console.WriteLine($"Adding {disease} to {city}");
+
             ignoreCities = ignoreCities ?? new List<City>();
 
             var node = Cities.Single(n => n.City == city);
@@ -197,11 +202,9 @@ namespace autoCardboard.Pandemic.Domain
             {
                 AddDiseaseCube(disease,connectedCity, ignoreCities);
             }
-        }
 
-        public PandemicBoard()
-        {
-            Setup();
+            Console.WriteLine($"Finished adding {disease} to {city}");
         }
+        
     }
 }

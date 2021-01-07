@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using autoCardboard.Common.Domain.Cards;
 
 namespace autoCardboard.Common.Domain.Interfaces
 {

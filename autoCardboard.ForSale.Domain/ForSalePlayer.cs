@@ -1,6 +1,6 @@
-﻿using autoCardboard.Common.Domain;
-using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Common.Domain.Interfaces;
 using System.Linq;
+using autoCardboard.Common.Domain.Dice;
 
 namespace autoCardboard.ForSale.Domain
 {
