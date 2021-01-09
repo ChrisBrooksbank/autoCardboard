@@ -1,7 +1,10 @@
 # autoCardboard
 models board games played by bots.
 
-Initial implention of two games : 
+Developers can write logic which plays turns on any supported board game. ( Currently Pandemic and For Sale )
+They can expose this logic on a endpoint and play a game to test out the success of their logic against bots , or other player endpoints.
+
+Initial implentation of two games : 
 * For Sale ( https://www.ultraboardgames.com/for-sale/game-rules.php ) 
 * and Pandemic (https://www.ultraboardgames.com/pandemic/game-rules.php). 
 For Sale is competitive, Pandemic is co-operative.

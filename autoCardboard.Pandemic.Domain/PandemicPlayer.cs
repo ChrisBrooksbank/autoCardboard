@@ -10,7 +10,6 @@ namespace autoCardboard.Pandemic.Domain
         public void GetTurn(PandemicGameTurn turn)
         {
             // TODO implement turn
-            turn.DriveOrFerry(City.MexicoCity);
         }
     }
 }

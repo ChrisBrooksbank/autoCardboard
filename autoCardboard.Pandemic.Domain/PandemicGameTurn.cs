@@ -8,6 +8,8 @@ namespace autoCardboard.Pandemic.Domain
     [Serializable]
     // TODO add operations for available play actions
     // each player has four actions
+
+    // TODO move validation logic to a validator interface/class for sharing with Game type
     public class PandemicGameTurn : IGameTurn
     {
         // _state is a clone of the game state 
@@ -36,13 +38,10 @@ namespace autoCardboard.Pandemic.Domain
 
         public void DriveOrFerry(City toConnectedCity)
         {
-            if (_playerActions.Count == 4)
-            {
-                throw new ApplicationException("Only four actions allowed per turn");
-            }
+            ValidateAvailableAction();
 
             var playerState = State.PlayerStates[CurrentPlayerId];
-            var currentMapLocation = State.Board.Cities.Single(n => n.City == playerState.Location);
+            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
 
             if (!currentMapLocation.ConnectedCities.Any(c => c == toConnectedCity))
             {
@@ -55,10 +54,7 @@ namespace autoCardboard.Pandemic.Domain
 
         public void DirectFlight(City discardCityCardOfDestination)
         {
-            if (_playerActions.Count == 4)
-            {
-                throw new ApplicationException("Only four actions allowed per turn");
-            }
+            ValidateAvailableAction();
 
             var playerState = State.PlayerStates[CurrentPlayerId];
             if (!playerState.PlayerHand.Exists(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == discardCityCardOfDestination))
@@ -75,17 +71,19 @@ namespace autoCardboard.Pandemic.Domain
         /// </summary>
         public void BuildResearchStation()
         {
-            if (_playerActions.Count == 4)
-            {
-                throw new ApplicationException("Only four actions allowed per turn");
-            }
+            ValidateAvailableAction();
 
             var playerState = State.PlayerStates[CurrentPlayerId];
-            var currentMapLocation = State.Board.Cities.Single(n => n.City == playerState.Location);
+            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
 
             if (currentMapLocation.HasResearchStation)
             {
                 throw new ApplicationException("City already has research station");
+            }
+
+            if (playerState.PlayerRole.Equals(PlayerRole.OperationsExpert))
+            {
+                _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.BuildResearchStation, City = playerState.Location });
             }
 
             if (!playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == currentMapLocation.City))
@@ -105,10 +103,7 @@ namespace autoCardboard.Pandemic.Domain
         /// <param name="anyCityAsDestination"></param>
         public void CharterFlight(City anyCityAsDestination)
         {
-            if (_playerActions.Count == 4)
-            {
-                throw new ApplicationException("Only four actions allowed per turn");
-            }
+            ValidateAvailableAction();
 
             var playerState = State.PlayerStates[CurrentPlayerId];
             var currentLocation = playerState.Location;
@@ -129,14 +124,11 @@ namespace autoCardboard.Pandemic.Domain
         /// <param name="anyCityAlsoWithResearchStation"></param>
         public void ShuttleFlight(City anyCityAlsoWithResearchStation)
         {
-            if (_playerActions.Count == 4)
-            {
-                throw new ApplicationException("Only four actions allowed per turn");
-            }
+            ValidateAvailableAction();
 
             var playerState = State.PlayerStates[CurrentPlayerId];
-            var currentMapLocation = State.Board.Cities.Single(n => n.City == playerState.Location);
-            var destinationMapLocation = State.Board.Cities.Single(n => n.City == anyCityAlsoWithResearchStation);
+            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
+            var destinationMapLocation = State.Cities.Single(n => n.City == anyCityAlsoWithResearchStation);
 
             if (!currentMapLocation.HasResearchStation || !destinationMapLocation.HasResearchStation || currentMapLocation.City == destinationMapLocation.City)
             {
@@ -149,31 +141,82 @@ namespace autoCardboard.Pandemic.Domain
 
         public void TreatDisease()
         {
-            if (_playerActions.Count == 4)
-            {
-                throw new ApplicationException("Only four actions allowed per turn");
-            }
+            ValidateAvailableAction();
 
             var playerState = State.PlayerStates[CurrentPlayerId];
             _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.TreatDisease, City = playerState.Location });
         }
 
-        public void ShareKnowledge(int shareKnowledgeWithOtherPlayerId)
+        public void ShareKnowledge(City shareCity, int playerId)
         {
-            // TODO
-            if (_playerActions.Count == 4)
+            // TODO, handle all playerroles
+            ValidateAvailableAction();
+
+            var playerState = State.PlayerStates[CurrentPlayerId];
+
+            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
+            var playersAtSameLocation = State.PlayerStates.Where(p => p.Value.Location == currentMapLocation.City && p.Key != CurrentPlayerId).ToList();
+
+            if (!playersAtSameLocation.Any())
             {
-                throw new ApplicationException("Only four actions allowed per turn");
+                throw new ApplicationException("No other player at same location");
             }
+
+            if (playerState.PlayerRole == PlayerRole.Researcher)
+            {
+                _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.ShareKnowledge, City = playerState.Location });
+            }
+
+            if (currentMapLocation.City != shareCity)
+            {
+                throw new ApplicationException("Can onl");
+            }
+
+            var currentPlayerHasCityCard = playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == currentMapLocation.City);
+            if (currentPlayerHasCityCard)
+            {
+                _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.ShareKnowledge, City = playerState.Location });
+            }
+            else
+            {
+                // TODO check that another player at same location, has current location city card in hand
+            }
+
         }
+
 
         public void DiscoverACure(Disease disease)
         {
-            // TODO
+            ValidateAvailableAction();
+
+            var playerState = State.PlayerStates[CurrentPlayerId];
+            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
+            if (!currentMapLocation.HasResearchStation)
+            {
+                throw new ApplicationException("You are not at a research station");
+            }
+
+            var matchingCards = playerState.PlayerHand.Count(c => c.PlayerCardType == PlayerCardType.City && ((City)c.Value).GetDefaultDisease() == disease);
+            var cardsNeededForCure = playerState.PlayerRole == PlayerRole.Scientist ? 4 : 5;
+            if (matchingCards < cardsNeededForCure)
+            {
+                throw new ApplicationException($"You need {cardsNeededForCure} cards of matching color for cure");
+            }
+
+            _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.DiscoverCure, City = playerState.Location, Disease = disease });
+        }
+
+        // TODO Dispatcher can move another players pawn
+
+        // 
+
+        private void ValidateAvailableAction()
+        {
             if (_playerActions.Count == 4)
             {
                 throw new ApplicationException("Only four actions allowed per turn");
             }
         }
     }
+
 }

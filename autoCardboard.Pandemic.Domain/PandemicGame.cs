@@ -16,11 +16,11 @@ namespace autoCardboard.Pandemic.Domain
         {
             Setup(players);
 
-            while (!State.Board.IsGameOver)
+            while (!State.IsGameOver)
             {
                 foreach (var player in Players)
                 {
-                    if (State.Board.IsGameOver)
+                    if (State.IsGameOver)
                     {
                         break;
                     }
@@ -30,13 +30,13 @@ namespace autoCardboard.Pandemic.Domain
                     ProcessTurn(turn);
 
                     // draw 2 new player cards
-                    var newPlayerCards = State.Board.PlayerDeck.Draw(2);
+                    var newPlayerCards = State.PlayerDeck.Draw(2);
                     foreach (var newPlayerCard in newPlayerCards)
                     {
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
-                            State.Board.Epidemic();
-                            State.Board.PlayerDiscardPile.AddCard(newPlayerCard);
+                            State.Epidemic();
+                            State.PlayerDiscardPile.AddCard(newPlayerCard);
                         }
                         else
                         {
@@ -54,10 +54,10 @@ namespace autoCardboard.Pandemic.Domain
                         // TODO remove this fake code, designed to allow testing of flow of game
                         var cardToDiscard = State.PlayerStates[turn.CurrentPlayerId].PlayerHand[0];
                         State.PlayerStates[turn.CurrentPlayerId].PlayerHand.Remove(cardToDiscard);
-                        State.Board.PlayerDiscardPile.AddCard(cardToDiscard);
+                        State.PlayerDiscardPile.AddCard(cardToDiscard);
                     }
 
-                    State.Board.Infect();
+                    State.Infect();
                 }
             }
 
@@ -80,7 +80,7 @@ namespace autoCardboard.Pandemic.Domain
 
         private void Setup(IEnumerable<IPlayer<PandemicGameTurn>> players)
         {
-            State.Board.Setup();
+            State.Setup();
             Players = players;
             SetupPlayerStates();
         }

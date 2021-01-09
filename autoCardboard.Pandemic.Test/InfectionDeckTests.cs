@@ -6,44 +6,44 @@ namespace autoCardboard.Pandemic.Test
 {
     public class InfectionDeckTests
     {
-        private PandemicBoard _board;
+        private PandemicGameState _gameState;
 
         [SetUp]
         public void Setup()
         {
-            _board = new PandemicBoard();
-            _board.Clear();
+            _gameState = new PandemicGameState();
+            _gameState.Clear();
         }
         
         [Test]
         public void CheckEpidemicRefillsInfectionDeck()
         {
-            var drawnInfectionCards = _board.InfectionDeck.Draw(3);
-            _board.InfectionDiscardPile.AddCards(drawnInfectionCards);
+            var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
+            _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _board.Epidemic();
-            Assert.AreEqual(_board.InfectionDeck.CardCount, 48);
+            _gameState.Epidemic();
+            Assert.AreEqual(_gameState.InfectionDeck.CardCount, 48);
         }
 
         [Test]
         public void CheckEpidemicEmptiesInfectionDiscardDeck()
         {
-            var drawnInfectionCards = _board.InfectionDeck.Draw(3);
-            _board.InfectionDiscardPile.AddCards(drawnInfectionCards);
+            var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
+            _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _board.Epidemic();
-            Assert.AreEqual( _board.InfectionDiscardPile.CardCount, 0);
+            _gameState.Epidemic();
+            Assert.AreEqual(_gameState.InfectionDiscardPile.CardCount, 0);
         }
 
         [Test]
         public void CheckEpidemicAddsThreeCubesToOneCity()
         {
-            var drawnInfectionCards = _board.InfectionDeck.Draw(3);
-            _board.InfectionDiscardPile.AddCards(drawnInfectionCards);
+            var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
+            _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _board.Epidemic();
+            _gameState.Epidemic();
 
-            var infectedCity = _board.Cities.Single(c => c.DiseaseCubeCount > 0);
+            var infectedCity = _gameState.Cities.Single(c => c.DiseaseCubeCount > 0);
 
             Assert.AreEqual( infectedCity.DiseaseCubeCount, 3);
         }
@@ -51,11 +51,11 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void CheckEpidemicIncrementsInfectionRateMarker()
         {
-            var drawnInfectionCards = _board.InfectionDeck.Draw(3);
-            _board.InfectionDiscardPile.AddCards(drawnInfectionCards);
+            var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
+            _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _board.Epidemic();
-            Assert.AreEqual( _board.InfectionRateMarker, 1);
+            _gameState.Epidemic();
+            Assert.AreEqual(_gameState.InfectionRateMarker, 1);
         }
 
     }
