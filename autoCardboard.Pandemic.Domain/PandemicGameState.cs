@@ -63,7 +63,7 @@ namespace autoCardboard.Pandemic.Domain
             InfectionRateMarker++;
         }
 
-        public void Infect()
+        public void InfectCities()
         {
             var infectionRate = InfectionRateTrack[InfectionRateMarker];
             var infectionCards = InfectionDeck.Draw(infectionRate).ToList();

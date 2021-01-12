@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace autoCardboard.Pandemic.Domain
 {
-    public class PlayerFactory : IPlayerFactory<PandemicGameTurn>
+    public class PlayerFactory : IPlayerFactory<PandemicTurn>
     {
-        public IEnumerable<IPlayer<PandemicGameTurn>> CreatePlayers(int playerCount)
+        public IEnumerable<IPlayer<PandemicTurn>> CreatePlayers(int playerCount)
         {
-            List<IPlayer<PandemicGameTurn>> players = new List<IPlayer<PandemicGameTurn>>();
+            List<IPlayer<PandemicTurn>> players = new List<IPlayer<PandemicTurn>>();
             for (int player = 1; player <= playerCount; player++)
             {
                 var newPlayer = new PandemicPlayer()

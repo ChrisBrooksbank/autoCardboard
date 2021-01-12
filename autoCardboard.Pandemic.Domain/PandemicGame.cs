@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 namespace autoCardboard.Pandemic.Domain
 {
-    public class PandemicGame : Game<PandemicGameState, PandemicGameTurn>
+    public class PandemicGame : Game<PandemicGameState, PandemicTurn>
     {
         public PandemicGame()
         {
             State = new PandemicGameState();
         }
 
-        public override void Play(IEnumerable<IPlayer<PandemicGameTurn>> players)
+        public override void Play(IEnumerable<IPlayer<PandemicTurn>> players)
         {
             Setup(players);
 
@@ -25,7 +25,7 @@ namespace autoCardboard.Pandemic.Domain
                         break;
                     }
 
-                    var turn = new PandemicGameTurn() { CurrentPlayerId = player.Id, State = State };
+                    var turn = new PandemicTurn() { CurrentPlayerId = player.Id, State = State };
                     player.GetTurn(turn);
                     ProcessTurn(turn);
 
@@ -57,28 +57,28 @@ namespace autoCardboard.Pandemic.Domain
                         State.PlayerDiscardPile.AddCard(cardToDiscard);
                     }
 
-                    State.Infect();
+                    State.InfectCities();
                 }
             }
 
             Console.WriteLine("GAME OVER !!!");
         }
 
-        private void ProcessTurn(PandemicGameTurn turn)
+        private void ProcessTurn(PandemicTurn turn)
         {
            // TODO
            var playerId = turn.CurrentPlayerId;
 
         }
 
-        private void ProcessDiscardToHandLimitTurn(PandemicGameTurn turn)
+        private void ProcessDiscardToHandLimitTurn(PandemicTurn turn)
         {
             // TODO
             var playerId = turn.CurrentPlayerId;
 
         }
 
-        private void Setup(IEnumerable<IPlayer<PandemicGameTurn>> players)
+        private void Setup(IEnumerable<IPlayer<PandemicTurn>> players)
         {
             State.Setup();
             Players = players;
