@@ -1,5 +1,4 @@
-﻿using autoCardboard.Common.Domain;
-using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Common.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,25 +6,29 @@ using autoCardboard.Common.Domain.Cards;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSaleGame: Game<ForSaleGameState, ForSaleGameTurn>
+    public class ForSaleGame : IGame<ForSaleGameState, ForSaleGameTurn>
     {
+        private readonly ForSaleGameState _state;
+
+        public IEnumerable<IPlayer<ForSaleGameTurn>> Players { get; set; }
+
         public ForSaleGame()
         {
-            State = new ForSaleGameState();
+            _state = new ForSaleGameState();
         }
 
-        public override void Play(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        public void Play(IEnumerable<IPlayer<ForSaleGameTurn>> players)
         {
             Setup(players);
 
             // Property bidding rounds
-            while (State.PropertyDeck.CardCount >= players.Count())
+            while (_state.PropertyDeck.CardCount >= players.Count())
             {
                 PlayPropertyBidRound();
             }
 
             // Property flipping rounds
-            while (State.ChequeDeck.CardCount >= players.Count())
+            while (_state.ChequeDeck.CardCount >= players.Count())
             {
                 PlayPropertyFlippingRound();
             }
@@ -33,17 +36,17 @@ namespace autoCardboard.ForSale.Domain
         
         private void PlayPropertyBidRound()
         {
-            State.PropertyCardsOnTable = State.PropertyDeck.Draw(Players.Count()).OrderBy(c => c.Value).ToList();
+            _state.PropertyCardsOnTable = _state.PropertyDeck.Draw(Players.Count()).OrderBy(c => c.Value).ToList();
 
             var passedPlayers = new List<int>();
 
-            while (State.PropertyCardsOnTable.Any())
+            while (_state.PropertyCardsOnTable.Any())
             {
                 foreach (var player in Players.Where(p => !passedPlayers.Contains(p.Id)))
                 {
-                    var turn = new ForSaleGameTurn { CurrentPlayerId = player.Id, State = State };
+                    var turn = new ForSaleGameTurn { CurrentPlayerId = player.Id, State = _state };
 
-                    if (State.PropertyCardsOnTable.Count() == 1)
+                    if (_state.PropertyCardsOnTable.Count() == 1)
                     {
                         PlayerPaysForLastPropertyCard(turn);
                         // TODO this player gos first in next round
@@ -64,25 +67,25 @@ namespace autoCardboard.ForSale.Domain
 
         private void PlayPropertyFlippingRound()
         {
-            State.ChequesOnTable = State.ChequeDeck.Draw(Players.Count()).OrderBy(c => c.Value).ToList();
+            _state.ChequesOnTable = _state.ChequeDeck.Draw(Players.Count()).OrderBy(c => c.Value).ToList();
 
             foreach(var player in Players)
             {
-                var turn = new ForSaleGameTurn { CurrentPlayerId = player.Id, State = State };
+                var turn = new ForSaleGameTurn { CurrentPlayerId = player.Id, State = _state };
                 player.GetTurn(turn);
                 ProcessTurn(turn);
             }
 
             // give cheques out to players
-            var chequesInOrder = State.ChequesOnTable.OrderByDescending(c => c.Value).ToList();
-            var flippingPropertiesInOrder = State.PlayerStates
+            var chequesInOrder = _state.ChequesOnTable.OrderByDescending(c => c.Value).ToList();
+            var flippingPropertiesInOrder = _state.PlayerStates
                 .Select( p => p.Value.PropertySelling.Value)
                 .OrderByDescending(p => p)
                 .ToList();
 
             foreach (var propertyToFlip in flippingPropertiesInOrder)
             {
-                var flippingPlayer = State.PlayerStates
+                var flippingPlayer = _state.PlayerStates
                     .SingleOrDefault(p => p.Value.PropertySelling.Value == propertyToFlip);
                 var chequeToAllocate = chequesInOrder[0];
                 if (chequesInOrder.Remove(chequeToAllocate))
@@ -94,21 +97,21 @@ namespace autoCardboard.ForSale.Domain
         
         private void PlayerPaysForLastPropertyCard(ForSaleGameTurn turn)
         {
-            var playerState = State.PlayerStates[turn.CurrentPlayerId];
-            var cardsOnTable = State.PropertyCardsOnTable.ToList();
+            var playerState = _state.PlayerStates[turn.CurrentPlayerId];
+            var cardsOnTable = _state.PropertyCardsOnTable.ToList();
             var cardToTake = cardsOnTable[0];
 
             if (cardsOnTable.Remove(cardToTake))
             {
                 playerState.PropertyCards.Add(cardToTake);
                 playerState.CoinsBid = 0;
-                State.PropertyCardsOnTable = cardsOnTable;
+                _state.PropertyCardsOnTable = cardsOnTable;
             }
         }
 
         private void ProcessTurn(ForSaleGameTurn turn)
         {
-            if (State.PropertyCardsOnTable.Any())
+            if (_state.PropertyCardsOnTable.Any())
             {
                 ProcessPropertyBidTurn(turn);
             }
@@ -120,7 +123,7 @@ namespace autoCardboard.ForSale.Domain
 
         private void ProcessPropertyFlippingTurn(ForSaleGameTurn turn)
         {
-            var playerState = State.PlayerStates[turn.CurrentPlayerId];
+            var playerState = _state.PlayerStates[turn.CurrentPlayerId];
             var propertyBeingFlipped = playerState.PropertyCards.SingleOrDefault(p => p.Value == turn.PropertyToFlip.Value);
             if (propertyBeingFlipped != null && playerState.PropertyCards.Remove(propertyBeingFlipped))
             {
@@ -142,11 +145,11 @@ namespace autoCardboard.ForSale.Domain
 
         private void ProcessPassingTurn(int playerId)
         {
-            var playerState = State.PlayerStates[playerId];
+            var playerState = _state.PlayerStates[playerId];
 
-            var cardsOnTable = State.PropertyCardsOnTable.ToList();
+            var cardsOnTable = _state.PropertyCardsOnTable.ToList();
             var lowestPropertyIdOnTable = cardsOnTable.Min(c => c.Value);
-            var cardToTake = State.PropertyCardsOnTable.SingleOrDefault(c => c.Value.Equals(lowestPropertyIdOnTable));
+            var cardToTake = _state.PropertyCardsOnTable.SingleOrDefault(c => c.Value.Equals(lowestPropertyIdOnTable));
          
             if ( cardsOnTable.Remove(cardToTake) )
             {
@@ -157,13 +160,13 @@ namespace autoCardboard.ForSale.Domain
                 playerState.CoinsBid = 0;
                 // Remove lowest property card and give to this player
                 playerState.PropertyCards.Add(cardToTake);
-                State.PropertyCardsOnTable = cardsOnTable;
+                _state.PropertyCardsOnTable = cardsOnTable;
             }
         }
 
         private void ProcessBiddingTurn(int playerId, int bidAmount)
         {
-            var playerState = State.PlayerStates[playerId];
+            var playerState = _state.PlayerStates[playerId];
 
             if (bidAmount > playerState.CoinsBid + playerState.CoinBalance)
             {
@@ -175,27 +178,27 @@ namespace autoCardboard.ForSale.Domain
             playerState.CoinBalance = playerState.CoinBalance - (bidAmount - oldBid);
         }
 
-        private void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        public void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
         {
-            State.PropertyDeck = new CardDeck<Card>();
+            _state.PropertyDeck = new CardDeck<Card>();
             for (var cardNumber = 1; cardNumber <= 30; cardNumber++)
             {
-                State.PropertyDeck.AddCard(new Card { Value = cardNumber, Name = cardNumber.ToString() });
+                _state.PropertyDeck.AddCard(new Card { Value = cardNumber, Name = cardNumber.ToString() });
             }
-            State.PropertyDeck.Shuffle();
+            _state.PropertyDeck.Shuffle();
 
-            State.ChequeDeck = new CardDeck<Card>();
-            State.ChequeDeck.AddCard(new Card { Value = 0, Name = "0" });
-            State.ChequeDeck.AddCard(new Card { Value = 0, Name = "0" });
+            _state.ChequeDeck = new CardDeck<Card>();
+            _state.ChequeDeck.AddCard(new Card { Value = 0, Name = "0" });
+            _state.ChequeDeck.AddCard(new Card { Value = 0, Name = "0" });
             for (var chequeThousandsAmount = 2; chequeThousandsAmount <= 15; chequeThousandsAmount++)
             {
-                State.ChequeDeck.AddCard(new Card { Value = chequeThousandsAmount, Name = chequeThousandsAmount.ToString() });
-                State.ChequeDeck.AddCard(new Card { Value = chequeThousandsAmount, Name = chequeThousandsAmount.ToString() });
+                _state.ChequeDeck.AddCard(new Card { Value = chequeThousandsAmount, Name = chequeThousandsAmount.ToString() });
+                _state.ChequeDeck.AddCard(new Card { Value = chequeThousandsAmount, Name = chequeThousandsAmount.ToString() });
             }
-            State.ChequeDeck.Shuffle();
+            _state.ChequeDeck.Shuffle();
 
-            State.PropertyCardsOnTable = new List<ICard>();
-            State.ChequesOnTable = new List<ICard>();
+            _state.PropertyCardsOnTable = new List<ICard>();
+            _state.ChequesOnTable = new List<ICard>();
             Players = players;
 
             SetupPlayerStates();
@@ -203,10 +206,10 @@ namespace autoCardboard.ForSale.Domain
 
         private void SetupPlayerStates()
         {
-            State.PlayerStates = new Dictionary<int, ForSalePlayerState>();
+            _state.PlayerStates = new Dictionary<int, ForSalePlayerState>();
             foreach(var player in Players)
             {
-                State.PlayerStates[player.Id] = new ForSalePlayerState
+                _state.PlayerStates[player.Id] = new ForSalePlayerState
                 {
                     PropertyCards = new List<ICard>(),
                     ChequeCards = new List<ICard>(),
