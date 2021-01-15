@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class PlayerFactory : IPlayerFactory<ForSaleGameTurn>
+    public class PlayerFactory : IPlayerFactory<IForSaleGameTurn>
     {
-        public IEnumerable<IPlayer<ForSaleGameTurn>> CreatePlayers(int playerCount)
+        public IEnumerable<IPlayer<IForSaleGameTurn>> CreatePlayers(int playerCount)
         {
-            List<IPlayer<ForSaleGameTurn>> players = new List<IPlayer<ForSaleGameTurn>>();
+            var players = new List<IPlayer<IForSaleGameTurn>>();
             for (int player = 1; player <= playerCount; player++)
             {
                 var newPlayer = new ForSalePlayer

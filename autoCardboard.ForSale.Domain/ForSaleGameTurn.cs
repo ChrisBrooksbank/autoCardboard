@@ -1,11 +1,10 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
 using System;
-using autoCardboard.Common.Domain;
 
 namespace autoCardboard.ForSale.Domain
 {
     [Serializable]
-    public class ForSaleGameTurn : IGameTurn
+    public class ForSaleGameTurn : IForSaleGameTurn
     {
         // _state is a clone of the game state ( so any changes to it by player are ignored )
         private ForSaleGameState _state;

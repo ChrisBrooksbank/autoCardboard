@@ -6,18 +6,18 @@ using autoCardboard.Common.Domain.Cards;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSaleGame : IGame<ForSaleGameState, ForSaleGameTurn>
+    public class ForSaleGame : IGame<ForSaleGameState, IForSaleGameTurn>
     {
         private readonly ForSaleGameState _state;
 
-        public IEnumerable<IPlayer<ForSaleGameTurn>> Players { get; set; }
+        public IEnumerable<IPlayer<IForSaleGameTurn>> Players { get; set; }
 
         public ForSaleGame()
         {
             _state = new ForSaleGameState();
         }
 
-        public void Play(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        public void Play(IEnumerable<IPlayer<IForSaleGameTurn>> players)
         {
             Setup(players);
 
@@ -178,7 +178,7 @@ namespace autoCardboard.ForSale.Domain
             playerState.CoinBalance = playerState.CoinBalance - (bidAmount - oldBid);
         }
 
-        public void Setup(IEnumerable<IPlayer<ForSaleGameTurn>> players)
+        public void Setup(IEnumerable<IPlayer<IForSaleGameTurn>> players)
         {
             _state.PropertyDeck = new CardDeck<Card>();
             for (var cardNumber = 1; cardNumber <= 30; cardNumber++)

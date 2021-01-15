@@ -4,7 +4,7 @@ using autoCardboard.Common.Domain.Dice;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSalePlayer : IPlayer<ForSaleGameTurn>
+    public class ForSalePlayer : IPlayer<IForSaleGameTurn>
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -16,7 +16,7 @@ namespace autoCardboard.ForSale.Domain
         /// any changes made to turn.State are ignored
         /// </summary>
         /// <param name="turn"></param>
-        public void GetTurn(ForSaleGameTurn turn)
+        public void GetTurn(IForSaleGameTurn turn)
         {
             if (turn.State.PropertyCardsOnTable.Any())
             {
@@ -29,7 +29,7 @@ namespace autoCardboard.ForSale.Domain
            
         }
 
-        private void GetPropertyBiddingTurn(ForSaleGameTurn turn)
+        private void GetPropertyBiddingTurn(IForSaleGameTurn turn)
         {
             var playerState = turn.State.PlayerStates[Id];
             var currentHighestBid = turn.State.PlayerStates.Max(p => p.Value.CoinsBid);
@@ -45,19 +45,19 @@ namespace autoCardboard.ForSale.Domain
             }
         }
 
-        private void GetPropertyFlippingTurn(ForSaleGameTurn turn)
+        private void GetPropertyFlippingTurn(IForSaleGameTurn turn)
         {
             var playerState = turn.State.PlayerStates[turn.CurrentPlayerId];
             var die = new Die(playerState.PropertyCards.Count);
             turn.PropertyToFlip = playerState.PropertyCards[die.Roll() -1];
         }
 
-        private bool FuzzyDecideIfIWantToPass(ForSaleGameTurn turn)
+        private bool FuzzyDecideIfIWantToPass(IForSaleGameTurn turn)
         {
             return _d100.Roll() > GetPercentageRoundDone(turn);
         }
 
-        private float GetPercentageRoundDone(ForSaleGameTurn turn)
+        private float GetPercentageRoundDone(IForSaleGameTurn turn)
         {
             var totalTurns = 30 / turn.State.PlayerStates.Count();
             var turnsRemaining = turn.State.PropertyDeck.CardCount / turn.State.PlayerStates.Count();
