@@ -3,10 +3,12 @@ using autoCardboard.Common.Domain;
 using System.Collections.Generic;
 using autoCardboard.Common.Domain.Cards;
 using System.Linq;
+using autoCardboard.Common.Domain.Interfaces;
 
 namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
+    /// Represents the game state of a game of Pandemic
     public class PandemicGameState: GameState
     {
         public Dictionary<int, PandemicPlayerState> PlayerStates { get; set; }
@@ -113,10 +115,27 @@ namespace autoCardboard.Pandemic.Domain
             };
         }
 
-        public void Setup(int pandemicCardCount = 6)
+        public void Setup(IEnumerable<IPlayer<PandemicTurn>> players, int pandemicCardCount = 6)
         {
             Clear();
+            SetupPlayerStates(players);
             PerformInitialInfections();
+        }
+
+        private void SetupPlayerStates(IEnumerable<IPlayer<PandemicTurn>> players)
+        {
+            var roleDeck = new RoleDeck();
+
+            PlayerStates = new Dictionary<int, PandemicPlayerState>();
+            foreach (var player in players)
+            {
+                PlayerStates[player.Id] = new PandemicPlayerState
+                {
+                    PlayerHand = new List<PandemicPlayerCard>(), // TODO start with 4 cards
+                    Location = City.Atlanta,
+                    PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
+                };
+            }
         }
 
         private void PerformInitialInfections()
@@ -145,21 +164,6 @@ namespace autoCardboard.Pandemic.Domain
             }
 
             Console.WriteLine("Finished initial infections");
-        }
-
-        // TODO what if disease is cured, you then remove all
-        // what if player role allows removal of all cubes
-        public void TreatDisease(Disease disease, City city)
-        {
-            var node = Cities.Single(c => c.City == city);
-
-            if (disease == 0)
-            {
-                return;
-            }
-
-            node.DiseaseCubes[disease]--;
-            _diseaseCubeStock[disease]++;
         }
 
         public void AddDiseaseCubes(City city, int count = 1)

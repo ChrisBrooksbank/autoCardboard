@@ -3,6 +3,12 @@ using System.Linq;
 
 namespace autoCardboard.Pandemic.Domain
 {
+
+    /// <summary>
+    /// This class is responsible for validating that players actions are valid.
+    /// Its called when a player is indicating their actions, using a PandemicTurn.
+    /// Its also called by the PandemicGame to do the same validation before updating the actual game state.
+    /// </summary>
     public class PandemicTurnValidator
     {
         private PandemicGameState _state;

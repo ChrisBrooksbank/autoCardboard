@@ -6,10 +6,9 @@ using System.Linq;
 namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
-    // TODO add operations for available play actions
-    // each player has four actions
-
-    // TODO move validation logic to a validator interface/class for sharing with Game type
+    // This class is responsible for presenting the choices to a IPlayer that they have in making a turn in a way thats easy to understand.
+    // The state class in here is a clone of the game state as players dont have ability to directly modify the game state.
+    // It performs some validation to prevent invalid player turns being presented back to the game.
     public class PandemicTurn : IGameTurn
     {
         // _state is a clone of the game state 
@@ -137,10 +136,10 @@ namespace autoCardboard.Pandemic.Domain
             _playerActions.Add(newPlayerTurn);
         }
 
-        public void TreatDisease()
+        public void TreatDisease(Disease disease)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
-            _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.TreatDisease, City = playerState.Location });
+            _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.TreatDisease, City = playerState.Location, Disease = disease });
         }
 
         public void ShareKnowledge(City shareCity, int playerId)

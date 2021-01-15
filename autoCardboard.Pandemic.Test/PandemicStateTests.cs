@@ -1,10 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using autoCardboard.Pandemic.Domain;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test
 {
-    class PandemicBoardTests
+    class PandemicStateTests
     {
         private PandemicGameState _gameState;
 
@@ -63,14 +64,6 @@ namespace autoCardboard.Pandemic.Test
         }
 
         [Test]
-        public void TreatingDiseaseIncrementsDiseaseCubeStock()
-        {
-            _gameState.AddDiseaseCube(Disease.Blue, City.Montreal);
-            _gameState.TreatDisease(Disease.Blue, City.Montreal);
-            Assert.AreEqual(_gameState.DiseaseCubeStock[Disease.Blue], 24);
-        }
-
-        [Test]
         public void DoubleOutbreakSetsDiseaseCubeStockOk()
         {
             _gameState.AddDiseaseCube(Disease.Blue, City.Montreal);
@@ -108,7 +101,8 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void InitialInfectionDepletesDiseaseStockpile()
         {
-            _gameState.Setup();
+            var players = new List<PandemicPlayer>();
+            _gameState.Setup(players);
 
             var diseaseCubesInStockpile = _gameState.DiseaseCubeStock[Disease.Blue]
                                           + _gameState.DiseaseCubeStock[Disease.Black]
@@ -120,7 +114,8 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void InitialInfectionInfectsCities()
         {
-            _gameState.Setup();
+            var players = new List<PandemicPlayer>();
+            _gameState.Setup(players);
 
             var infectedCities = _gameState.Cities.Where(c => c.DiseaseCubeCount > 0);
 

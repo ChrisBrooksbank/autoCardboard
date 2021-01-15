@@ -68,37 +68,19 @@ namespace autoCardboard.Pandemic.Domain
         {
            // TODO
            var playerId = turn.CurrentPlayerId;
-
         }
 
         private void ProcessDiscardToHandLimitTurn(PandemicTurn turn)
         {
             // TODO
             var playerId = turn.CurrentPlayerId;
-
         }
 
-        private void Setup(IEnumerable<IPlayer<PandemicTurn>> players)
+        public void Setup(IEnumerable<IPlayer<PandemicTurn>> players)
         {
-            State.Setup();
+            State.Setup(players); 
             Players = players;
-            SetupPlayerStates();
         }
 
-        private void SetupPlayerStates()
-        {
-            var roleDeck = new RoleDeck();
-            
-            State.PlayerStates = new Dictionary<int, PandemicPlayerState>();
-            foreach (var player in Players)
-            {
-                State.PlayerStates[player.Id] = new PandemicPlayerState
-                {
-                    PlayerHand = new List<PandemicPlayerCard>(), // TODO start with 4 cards
-                    Location = City.Atlanta,
-                    PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
-                };
-            }
-        }
     }
 }
