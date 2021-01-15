@@ -9,6 +9,8 @@ namespace autoCardboard.Pandemic.Domain
     // This class is responsible for presenting the choices to a IPlayer that they have in making a turn in a way thats easy to understand.
     // The state class in here is a clone of the game state as players dont have ability to directly modify the game state.
     // It performs some validation to prevent invalid player turns being presented back to the game.
+
+    // TODO move code out e.g. => PandemicTurnHandler, e.g. for DriveOrFerry, keep calls to validator in here ???
     public class PandemicTurn : IGameTurn
     {
         // _state is a clone of the game state 

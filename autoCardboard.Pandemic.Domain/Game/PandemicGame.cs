@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 namespace autoCardboard.Pandemic.Domain
 {
+
+    /// <summary>
+    /// Implements game of pandemic
+    /// </summary>
     public class PandemicGame : Game<PandemicGameState, PandemicTurn>
     {
         public PandemicGame()

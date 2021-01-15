@@ -9,6 +9,7 @@ namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
     /// Represents the game state of a game of Pandemic
+    /// TODO consider if should move code out such as Epidemic(), InfectCities(), PerformInitialInfections(), AddDiseaseCubes() somewhere else... or leave here
     public class PandemicGameState: GameState
     {
         public Dictionary<int, PandemicPlayerState> PlayerStates { get; set; }
