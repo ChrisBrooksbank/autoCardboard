@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace autoCardboard.Pandemic.Domain
+namespace autoCardboard.Pandemic.Domain.State
 {
     public class DiseaseAttribute:Attribute
     {

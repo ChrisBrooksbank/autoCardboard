@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using autoCardboard.Pandemic.Domain;
+using autoCardboard.Pandemic.Domain.State;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test
 {
     public class InfectionDeckTests
     {
-        private PandemicGameState _gameState;
+        private IPandemicGameState _gameState;
 
         [SetUp]
         public void Setup()

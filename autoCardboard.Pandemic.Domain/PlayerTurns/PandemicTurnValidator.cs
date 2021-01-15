@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using autoCardboard.Pandemic.Domain.State;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace autoCardboard.Pandemic.Domain
@@ -11,16 +12,16 @@ namespace autoCardboard.Pandemic.Domain
     /// </summary>
     public class PandemicTurnValidator
     {
-        private PandemicGameState _state;
+        private IPandemicGameState _state;
         private int _playerId;
         private PandemicPlayerState _pandemicPlayerState;
         private MapNode _currentMapLocation;
 
         // TODO change ( cloned ) state as each action in series is validated
 
-        public IEnumerable<string> ValidatePlayerTurns(int playerId, PandemicGameState state, IEnumerable<PlayerActionWithCity> proposedTurns, PlayerActionWithCity newProposedTurn)
+        public IEnumerable<string> ValidatePlayerTurns(int playerId, IPandemicGameState state, IEnumerable<PlayerActionWithCity> proposedTurns, PlayerActionWithCity newProposedTurn)
         {
-            _state = state.Clone() as PandemicGameState;
+            _state = state.Clone() as IPandemicGameState;
             _playerId = playerId;
             _pandemicPlayerState = state.PlayerStates[_playerId];
             _currentMapLocation = state.Cities.Single(n => n.City == _pandemicPlayerState.Location);

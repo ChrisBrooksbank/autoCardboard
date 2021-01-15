@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using autoCardboard.ForSale.Domain;
 using autoCardboard.Pandemic.Domain;
+using autoCardboard.Pandemic.Domain.State;
 using forSalePlayerFactory = autoCardboard.ForSale.Domain.PlayerFactory;
 using pandemicPlayerFactory = autoCardboard.Pandemic.Domain.PlayerFactory;
 
@@ -10,7 +11,7 @@ namespace autoCardboard.ConsoleApp
     {
         static void Main(string[] args)
         {
-            var pandemicGame = new PandemicGame();
+            var pandemicGame = new PandemicGame( new PandemicGameState());
             var pandemicPlayerFactory = new pandemicPlayerFactory();
             var pandemicPlayers = pandemicPlayerFactory.CreatePlayers(2).ToList();
             pandemicGame.Play(pandemicPlayers);

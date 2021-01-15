@@ -2,6 +2,7 @@
 using autoCardboard.Common.Domain;
 using autoCardboard.Common.Domain.Interfaces;
 using System.Collections.Generic;
+using autoCardboard.Pandemic.Domain.State;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -9,11 +10,13 @@ namespace autoCardboard.Pandemic.Domain
     /// <summary>
     /// Implements game of pandemic
     /// </summary>
-    public class PandemicGame : Game<PandemicGameState, PandemicTurn>
+    public class PandemicGame : Game<IPandemicGameState, PandemicTurn>
     {
-        public PandemicGame()
+
+        // TODO get this DI working
+        public PandemicGame(IPandemicGameState gamestate)
         {
-            State = new PandemicGameState();
+            State = gamestate;
         }
 
         public override void Play(IEnumerable<IPlayer<PandemicTurn>> players)

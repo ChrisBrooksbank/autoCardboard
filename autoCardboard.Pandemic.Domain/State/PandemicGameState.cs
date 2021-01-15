@@ -5,12 +5,12 @@ using autoCardboard.Common.Domain.Cards;
 using System.Linq;
 using autoCardboard.Common.Domain.Interfaces;
 
-namespace autoCardboard.Pandemic.Domain
+namespace autoCardboard.Pandemic.Domain.State
 {
     [Serializable]
     /// Represents the game state of a game of Pandemic
     /// TODO consider if should move code out such as Epidemic(), InfectCities(), PerformInitialInfections(), AddDiseaseCubes() somewhere else... or leave here
-    public class PandemicGameState: GameState
+    public class PandemicGameState: GameState, IPandemicGameState
     {
         public Dictionary<int, PandemicPlayerState> PlayerStates { get; set; }
 

@@ -1,4 +1,6 @@
-﻿namespace autoCardboard.Pandemic.Domain
+﻿using autoCardboard.Pandemic.Domain.State;
+
+namespace autoCardboard.Pandemic.Domain
 {
     public class PlayerActionWithCity
     {

@@ -1,4 +1,4 @@
-﻿namespace autoCardboard.Pandemic.Domain
+﻿namespace autoCardboard.Pandemic.Domain.State
 {
     public enum Disease
     {

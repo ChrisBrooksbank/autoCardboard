@@ -1,4 +1,5 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Pandemic.Domain.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace autoCardboard.Pandemic.Domain
 
         public IEnumerable<PlayerActionWithCity> ActionsTaken => _playerActions;
 
-        public PandemicGameState State
+        public IPandemicGameState State
         {
             get
             {

@@ -1,14 +1,15 @@
 ﻿using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Pandemic.Domain.State;
 using System.Linq;
 
 namespace autoCardboard.Pandemic.Domain
 {
     // Responsible for modifying a PandemicGameState by applying a PandemicTurn
-    public class PandemicTurnHandler : IGameTurnHandler<PandemicGameState, PandemicTurn>
+    public class PandemicTurnHandler : IGameTurnHandler<IPandemicGameState, PandemicTurn>
     {
-        private PandemicGameState _state;
+        private IPandemicGameState _state;
 
-        public void TakeTurn(PandemicGameState state, PandemicTurn turn)
+        public void TakeTurn(IPandemicGameState state, PandemicTurn turn)
         {
             _state = state;
             foreach (var action in turn.ActionsTaken)

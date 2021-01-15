@@ -1,4 +1,5 @@
 ﻿using autoCardboard.Pandemic.Domain;
+using autoCardboard.Pandemic.Domain.State;
 using NUnit.Framework;
 using System.Linq;
 using pandemicPlayerFactory = autoCardboard.Pandemic.Domain.PlayerFactory;
@@ -7,7 +8,7 @@ namespace autoCardboard.Pandemic.Test
 {
     class PandemicTurnHandlerTests
     {
-        private PandemicGameState _gameState;
+        private IPandemicGameState _gameState;
         private PandemicTurnHandler _turnHandler;
         private PandemicTurn _turn;
 
