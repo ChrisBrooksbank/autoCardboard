@@ -1,4 +1,4 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Pandemic.Domain.PlayerTurns;
 using autoCardboard.Pandemic.Domain.State;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace autoCardboard.Pandemic.Domain
     // It performs some validation to prevent invalid player turns being presented back to the game.
 
     // TODO move code out e.g. => PandemicTurnHandler, e.g. for DriveOrFerry, keep calls to validator in here ???
-    public class PandemicTurn : IGameTurn
+    public class PandemicTurn : IPandemicTurn
     {
         // _state is a clone of the game state 
         // game state can only be permanently changed by game, not by players, otherwise they could cheat

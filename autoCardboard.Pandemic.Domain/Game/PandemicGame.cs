@@ -2,6 +2,7 @@
 using autoCardboard.Common.Domain.Interfaces;
 using System.Collections.Generic;
 using autoCardboard.Pandemic.Domain.State;
+using autoCardboard.Pandemic.Domain.PlayerTurns;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -9,11 +10,11 @@ namespace autoCardboard.Pandemic.Domain
     /// <summary>
     /// Implements game of pandemic
     /// </summary>
-    public class PandemicGame : IGame<IPandemicGameState, PandemicTurn>
+    public class PandemicGame : IGame<IPandemicGameState, IPandemicTurn>
     {
         private readonly IPandemicGameState _state;
 
-        public IEnumerable<IPlayer<PandemicTurn>> Players { get; set; }
+        public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
         // TODO get this DI working
         public PandemicGame(IPandemicGameState gamestate)
@@ -21,7 +22,7 @@ namespace autoCardboard.Pandemic.Domain
             _state = gamestate;
         }
 
-        public void Play(IEnumerable<IPlayer<PandemicTurn>> players)
+        public void Play(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
             Setup(players);
 
@@ -73,19 +74,19 @@ namespace autoCardboard.Pandemic.Domain
             Console.WriteLine("GAME OVER !!!");
         }
 
-        private void ProcessTurn(PandemicTurn turn)
+        private void ProcessTurn(IPandemicTurn turn)
         {
            // TODO
            var playerId = turn.CurrentPlayerId;
         }
 
-        private void ProcessDiscardToHandLimitTurn(PandemicTurn turn)
+        private void ProcessDiscardToHandLimitTurn(IPandemicTurn turn)
         {
             // TODO
             var playerId = turn.CurrentPlayerId;
         }
 
-        public void Setup(IEnumerable<IPlayer<PandemicTurn>> players)
+        public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
             _state.Setup(players); 
             Players = players;

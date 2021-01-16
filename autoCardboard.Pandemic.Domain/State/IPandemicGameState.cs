@@ -1,5 +1,6 @@
 ﻿using autoCardboard.Common.Domain.Cards;
 using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Pandemic.Domain.PlayerTurns;
 using System;
 using System.Collections.Generic;
 
@@ -29,6 +30,6 @@ namespace autoCardboard.Pandemic.Domain.State
         void Epidemic();
         void InfectCities();
      
-        void Setup(IEnumerable<IPlayer<PandemicTurn>> players, int pandemicCardCount = 6);
+        void Setup(IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6);
     }
 }

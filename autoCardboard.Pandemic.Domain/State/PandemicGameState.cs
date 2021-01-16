@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using autoCardboard.Common.Domain.Cards;
 using System.Linq;
 using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Pandemic.Domain.PlayerTurns;
 
 namespace autoCardboard.Pandemic.Domain.State
 {
@@ -116,14 +117,14 @@ namespace autoCardboard.Pandemic.Domain.State
             };
         }
 
-        public void Setup(IEnumerable<IPlayer<PandemicTurn>> players, int pandemicCardCount = 6)
+        public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
         {
             Clear();
             SetupPlayerStates(players);
             PerformInitialInfections();
         }
 
-        private void SetupPlayerStates(IEnumerable<IPlayer<PandemicTurn>> players)
+        private void SetupPlayerStates(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
             var roleDeck = new RoleDeck();
 
