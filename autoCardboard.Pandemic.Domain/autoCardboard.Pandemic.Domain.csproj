@@ -8,4 +8,12 @@
     <ProjectReference Include="..\autoCardboard.Common.Domain\autoCardboard.Common.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="PlayerActionValidators\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+  </ItemGroup>
+
 </Project>

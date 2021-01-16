@@ -1,6 +1,7 @@
 ﻿using System;
 using autoCardboard.Common.Domain.Interfaces;
 using System.Collections.Generic;
+using autoCardboard.Pandemic.Domain.Game;
 using autoCardboard.Pandemic.Domain.State;
 using autoCardboard.Pandemic.Domain.PlayerTurns;
 
@@ -16,7 +17,6 @@ namespace autoCardboard.Pandemic.Domain
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        // TODO get this DI working
         public PandemicGame(IPandemicGameState gamestate)
         {
             _state = gamestate;

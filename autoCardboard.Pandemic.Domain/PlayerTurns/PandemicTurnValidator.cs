@@ -17,7 +17,7 @@ namespace autoCardboard.Pandemic.Domain
         private PandemicPlayerState _pandemicPlayerState;
         private MapNode _currentMapLocation;
 
-        // TODO change ( cloned ) state as each action in series is validated
+        // TODO change ( cloned ) state as each action in series is validated, use PandemicTurnHandler
 
         public IEnumerable<string> ValidatePlayerTurns(int playerId, IPandemicGameState state, IEnumerable<PlayerActionWithCity> proposedTurns, PlayerActionWithCity newProposedTurn)
         {
@@ -55,6 +55,8 @@ namespace autoCardboard.Pandemic.Domain
         {
             var _playerTurnCity = _state.Cities.Single(n => n.City == proposedTurn.City);
             var _playersAtSameLocation = _state.PlayerStates.Where(p => p.Value.Location == _currentMapLocation.City && p.Key != _playerId).ToList();
+
+            // TODO SOLID, inject IEnumerable<IActionValidator>
 
             if (proposedTurn.PlayerAction == PlayerStandardAction.DriveOrFerry)
             {
@@ -119,7 +121,11 @@ namespace autoCardboard.Pandemic.Domain
                 {
                     return "Doesnt have city card";
                 }
+                
+                
                 // TODO check that another player at same location, has current location city card in hand
+
+
             }
 
             if ( proposedTurn.PlayerAction == PlayerStandardAction.DiscoverCure )

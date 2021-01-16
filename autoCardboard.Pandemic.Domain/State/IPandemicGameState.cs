@@ -8,7 +8,7 @@ namespace autoCardboard.Pandemic.Domain.State
 {
     public interface IPandemicGameState : IGameState
     {
-        Boolean IsGameOver { get; set; }
+        bool IsGameOver { get; set; }
         PlayerDeck PlayerDeck { get; set; }
         PlayerDeck PlayerDiscardPile { get; set; }
         InfectionDeck InfectionDeck { get; set; }
@@ -26,7 +26,7 @@ namespace autoCardboard.Pandemic.Domain.State
         void AddDiseaseCubes(City city, int count = 1);
         void AddDiseaseCube(Disease disease, City city, List<City> ignoreCities = null);
 
-    void Clear(int pandemicCardCount = 6);
+        void Clear(int pandemicCardCount = 6);
         void Epidemic();
         void InfectCities();
      

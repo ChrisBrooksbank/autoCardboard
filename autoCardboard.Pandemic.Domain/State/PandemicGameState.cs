@@ -178,16 +178,37 @@ namespace autoCardboard.Pandemic.Domain.State
             }
         }
 
+        private PandemicPlayerState GetPlayerStateByRole(PlayerRole playerRole)
+        {
+            foreach (var playerState in PlayerStates)
+            {
+                if (playerState.Value.PlayerRole == playerRole)
+                {
+                    return playerState.Value;
+                }
+            }
+            return null;
+        }
+
         public void AddDiseaseCube(Disease disease, City city, List<City> ignoreCities = null)
         {
-            // TODO dont place cubes if there is a QuarantineSpecialist on this or a connected city
-            // var quarantineSpecialists = 
+            var node = Cities.Single(n => n.City == city);
+
+
+            // Dont place disease if quarantineSpecialist is here or in neighbouring city
+            var quarantineSpecialist = GetPlayerStateByRole(PlayerRole.QuarantineSpecialist);
+            if (quarantineSpecialist != null)
+            {
+                if (quarantineSpecialist.Location == city || Cities.Single(n => n.City == quarantineSpecialist.Location).ConnectedCities.Contains(city))
+                {
+                    Console.WriteLine($"quarantineSpecialist in {quarantineSpecialist.Location} prevented {disease} in {city}");
+                    return;
+                }
+            }
 
             Console.WriteLine($"Adding {disease} to {city}");
 
             ignoreCities = ignoreCities ?? new List<City>();
-
-            var node = Cities.Single(n => n.City == city);
 
             if (node.DiseaseCubes[disease] < 3)
             {
