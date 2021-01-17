@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="PlayerActionValidators\**" />
+    <EmbeddedResource Remove="PlayerActionValidators\**" />
+    <None Remove="PlayerActionValidators\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
+  </ItemGroup>
+
+</Project>

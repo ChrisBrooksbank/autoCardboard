@@ -1,5 +1,4 @@
 using System;
-using autoCardboard.Pandemic.Domain;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test

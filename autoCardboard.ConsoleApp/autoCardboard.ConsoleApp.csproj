@@ -10,8 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\autoCardboard.ForSale.Domain\autoCardboard.ForSale.Domain.csproj" />
-    <ProjectReference Include="..\autoCardboard.Pandemic.Domain\autoCardboard.Pandemic.Domain.csproj" />
+    <ProjectReference Include="..\autoCardboard.ForSale\autoCardboard.ForSale.csproj" />
+    <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
+    <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.csproj" />
   </ItemGroup>
 
 </Project>

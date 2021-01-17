@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using autoCardboard.Pandemic.Domain;
 using NUnit.Framework;
 using System.Linq;
-using pandemicPlayerFactory = autoCardboard.Pandemic.Domain.PlayerFactory;
+using pandemicPlayerFactory = autoCardboard.Pandemic.PandemicPlayerFactory;
 
 namespace autoCardboard.Pandemic.Test
 {
@@ -33,7 +32,7 @@ namespace autoCardboard.Pandemic.Test
         public void TreatingDiseaseIncrementsDiseaseCubeStock()
         {
             _gameState.Clear();
-            _gameState.AddDiseaseCube(Disease.Blue, City.Atlanta);
+            _gameState.AddDiseaseCube(Disease.Blue, City.StPetersburg);
             _turn.TreatDisease(Disease.Blue);
             _turnHandler.TakeTurn(_gameState, _turn);
 

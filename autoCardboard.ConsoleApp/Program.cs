@@ -1,7 +1,7 @@
-﻿using autoCardboard.Common;
-using autoCardboard.ConsoleApp.Infrastructure;
-using autoCardboard.ForSale.Domain;
-using autoCardboard.Pandemic.Domain;
+﻿using autoCardboard.Infrastructure;
+using autoCardboard.Common;
+using autoCardboard.ForSale;
+using autoCardboard.Pandemic;
 
 namespace autoCardboard.ConsoleApp
 {
