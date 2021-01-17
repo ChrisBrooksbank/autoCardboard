@@ -5,10 +5,10 @@ namespace autoCardboard.Pandemic
 {
     public class PandemicPlayerFactory : IPlayerFactory<IPandemicTurn>
     {
-        public IEnumerable<IPlayer<IPandemicTurn>> CreatePlayers(int playerCount)
+        public IEnumerable<IPlayer<IPandemicTurn>> CreatePlayers(PlayerConfiguration playerConfiguration)
         {
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
-            for (int player = 1; player <= playerCount; player++)
+            for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
                 var newPlayer = new PandemicPlayer()
                 {

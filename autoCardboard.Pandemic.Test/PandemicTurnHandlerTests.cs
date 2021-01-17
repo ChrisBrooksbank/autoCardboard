@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Linq;
 using pandemicPlayerFactory = autoCardboard.Pandemic.PandemicPlayerFactory;
+using autoCardboard.Common;
 
 namespace autoCardboard.Pandemic.Test
 {
@@ -18,7 +19,7 @@ namespace autoCardboard.Pandemic.Test
             _gameState.Clear();
 
             var pandemicPlayerFactory = new pandemicPlayerFactory();
-            var pandemicPlayers = pandemicPlayerFactory.CreatePlayers(2).ToList();
+            var pandemicPlayers = pandemicPlayerFactory.CreatePlayers(new PlayerConfiguration { PlayerCount = 2}).ToList();
             _gameState.Setup(pandemicPlayers);
 
             _turnHandler = new PandemicTurnHandler(new List<IPlayerActionHandler>());
