@@ -1,7 +1,5 @@
-﻿using autoCardboard.Pandemic.Domain.State;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
 
 namespace autoCardboard.Pandemic.Domain
 {

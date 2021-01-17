@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace autoCardboard.Common.Domain.Interfaces
+namespace autoCardboard.Common
 {
     public interface IGameState: ICloneable
     {

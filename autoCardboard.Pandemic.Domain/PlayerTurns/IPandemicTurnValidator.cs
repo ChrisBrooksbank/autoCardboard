@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using autoCardboard.Pandemic.Domain.State;
 
-namespace autoCardboard.Pandemic.Domain.PlayerTurns
+namespace autoCardboard.Pandemic.Domain
 {
     public interface IPandemicTurnValidator
     {

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using autoCardboard.Pandemic.Domain.State;
+using autoCardboard.Pandemic.Domain;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test

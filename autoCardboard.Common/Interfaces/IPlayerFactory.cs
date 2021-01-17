@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace autoCardboard.Common.Domain.Interfaces
+namespace autoCardboard.Common
 {
     public interface IPlayerFactory<TGameTurn> where TGameTurn: IGameTurn
     {

@@ -1,4 +1,4 @@
-﻿namespace autoCardboard.Common.Domain.StandardPlayingCards
+﻿namespace autoCardboard.Common
 {
     public enum PlayingCardRank
     {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
-using autoCardboard.Common.Domain.Cards;
-using autoCardboard.Pandemic.Domain.State;
+using autoCardboard.Common;
 
 namespace autoCardboard.Pandemic.Domain
 {

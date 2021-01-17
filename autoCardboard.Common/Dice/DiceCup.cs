@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace autoCardboard.Common.Domain.Dice
+namespace autoCardboard.Common
 {
     public class DiceCup
     {

@@ -1,12 +1,9 @@
 ﻿using System;
-using autoCardboard.Common.Domain;
+using autoCardboard.Common;
 using System.Collections.Generic;
-using autoCardboard.Common.Domain.Cards;
 using System.Linq;
-using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
 
-namespace autoCardboard.Pandemic.Domain.State
+namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
     /// Represents the game state of a game of Pandemic
@@ -114,6 +111,14 @@ namespace autoCardboard.Pandemic.Domain.State
                 {Disease.Black, 24},
                 {Disease.Red, 24 },
                 {Disease.Yellow, 24}
+            };
+
+            DiscoveredCures = new Dictionary<Disease, DiseaseState>
+            {
+                {Disease.Blue, DiseaseState.NotCured},
+                {Disease.Black, DiseaseState.NotCured},
+                {Disease.Red, DiseaseState.NotCured },
+                {Disease.Yellow, DiseaseState.NotCured}
             };
         }
 

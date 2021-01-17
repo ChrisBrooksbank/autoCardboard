@@ -1,7 +1,4 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.Pandemic.Domain.PlayerActionHandlers;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
-using autoCardboard.Pandemic.Domain.State;
+﻿using autoCardboard.Common;
 using System.Collections.Generic;
 using System.Linq;
 

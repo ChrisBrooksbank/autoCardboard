@@ -1,9 +1,6 @@
 ﻿using System;
-using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Common;
 using System.Collections.Generic;
-using autoCardboard.Pandemic.Domain.Game;
-using autoCardboard.Pandemic.Domain.State;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
 
 namespace autoCardboard.Pandemic.Domain
 {

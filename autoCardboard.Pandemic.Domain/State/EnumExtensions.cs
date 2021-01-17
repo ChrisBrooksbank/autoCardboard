@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace autoCardboard.Pandemic.Domain.State
+namespace autoCardboard.Pandemic.Domain
 {
     public static class EnumExtensions
     {

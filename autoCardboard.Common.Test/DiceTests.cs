@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using autoCardboard.Common.Domain.Dice;
+using autoCardboard.Common;
 using NUnit.Framework;
 
 namespace autoCardboard.Common.Test

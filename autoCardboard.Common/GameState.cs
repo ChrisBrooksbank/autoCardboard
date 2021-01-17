@@ -1,9 +1,8 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace autoCardboard.Common.Domain
+namespace autoCardboard.Common
 {
     [Serializable]
     public class GameState: IGameState

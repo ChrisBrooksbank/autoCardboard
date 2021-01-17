@@ -1,5 +1,5 @@
 using System.Linq;
-using autoCardboard.Common.Domain.Cards;
+using autoCardboard.Common;
 using NUnit.Framework;
 
 namespace autoCardboard.Common.Test

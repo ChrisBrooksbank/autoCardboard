@@ -1,10 +1,7 @@
-﻿using autoCardboard.Common.Domain.Cards;
-using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
-using System;
+﻿using autoCardboard.Common;
 using System.Collections.Generic;
 
-namespace autoCardboard.Pandemic.Domain.State
+namespace autoCardboard.Pandemic.Domain
 {
     public interface IPandemicGameState : IGameState
     {

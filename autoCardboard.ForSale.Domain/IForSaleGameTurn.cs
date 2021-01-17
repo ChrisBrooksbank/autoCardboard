@@ -1,4 +1,4 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Common;
 
 namespace autoCardboard.ForSale.Domain
 {

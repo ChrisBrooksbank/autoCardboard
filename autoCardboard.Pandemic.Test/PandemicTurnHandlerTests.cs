@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using autoCardboard.Pandemic.Domain;
-using autoCardboard.Pandemic.Domain.State;
 using NUnit.Framework;
 using System.Linq;
-using autoCardboard.Pandemic.Domain.PlayerActionHandlers;
 using pandemicPlayerFactory = autoCardboard.Pandemic.Domain.PlayerFactory;
 
 namespace autoCardboard.Pandemic.Test

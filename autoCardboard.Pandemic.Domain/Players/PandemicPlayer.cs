@@ -1,5 +1,4 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
+﻿using autoCardboard.Common;
 
 namespace autoCardboard.Pandemic.Domain
 {

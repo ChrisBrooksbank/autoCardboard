@@ -1,8 +1,6 @@
-﻿using autoCardboard.Common.Domain;
-using autoCardboard.Common.Domain.Interfaces;
-using autoCardboard.Pandemic.Domain.State;
+﻿using autoCardboard.Common;
 
-namespace autoCardboard.Pandemic.Domain.Game
+namespace autoCardboard.Pandemic.Domain
 {
     public interface IPandemicGame : IGame<IPandemicGameState, PandemicTurn>
     {

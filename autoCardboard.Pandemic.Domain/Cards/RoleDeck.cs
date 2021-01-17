@@ -1,5 +1,5 @@
 ﻿using System;
-using autoCardboard.Common.Domain.Cards;
+using autoCardboard.Common;
 
 namespace autoCardboard.Pandemic.Domain
 {

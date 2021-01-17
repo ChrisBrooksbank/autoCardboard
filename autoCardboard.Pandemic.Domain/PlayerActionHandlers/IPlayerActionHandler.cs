@@ -1,6 +1,4 @@
-﻿using autoCardboard.Pandemic.Domain.State;
-
-namespace autoCardboard.Pandemic.Domain.PlayerActionHandlers
+﻿namespace autoCardboard.Pandemic.Domain
 {
     public interface IPlayerActionHandler
     {

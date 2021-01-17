@@ -1,6 +1,4 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
-
-namespace autoCardboard.Common.Domain.Players
+﻿namespace autoCardboard.Common
 {
     public abstract class Player<TGameTurn> : IPlayer<TGameTurn>
         where TGameTurn: IGameTurn

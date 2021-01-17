@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using autoCardboard.Common.Domain.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace autoCardboard.Common.Domain.Games
+namespace autoCardboard.Common
 {
     public class GameFactory
     {

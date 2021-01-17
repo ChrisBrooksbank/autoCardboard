@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common.Domain", "autoCardboard.Common.Domain\autoCardboard.Common.Domain.csproj", "{776514EB-CE32-4727-8A59-349CCDB7A1C8}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale.Domain", "autoCardboard.ForSale.Domain\autoCardboard.ForSale.Domain.csproj", "{B3F12462-BAA5-4C85-8D76-7DBF32EE7935}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ConsoleApp", "autoCardboard.ConsoleApp\autoCardboard.ConsoleApp.csproj", "{FA05777B-B40C-45BA-9935-9D924435C359}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Domain", "autoCardboard.Pandemic.Domain\autoCardboard.Pandemic.Domain.csproj", "{415830A3-3F53-4B13-A835-6BDF18389679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.Pandemic.Test", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.csproj", "{D278AC30-926B-409E-9A9E-03C6A83464B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Test", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.csproj", "{D278AC30-926B-409E-9A9E-03C6A83464B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.ForSale.Test", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.csproj", "{29B5E25C-8DF9-4241-BF02-950B8F94515F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale.Test", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.csproj", "{29B5E25C-8DF9-4241-BF02-950B8F94515F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.Common.Test", "autoCardboard.Common.Test\autoCardboard.Common.Test.csproj", "{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common.Test", "autoCardboard.Common.Test\autoCardboard.Common.Test.csproj", "{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common", "autoCardboard.Common\autoCardboard.Common.csproj", "{F2D5D442-055A-4C59-BA8A-743778AFDF8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{776514EB-CE32-4727-8A59-349CCDB7A1C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{776514EB-CE32-4727-8A59-349CCDB7A1C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{776514EB-CE32-4727-8A59-349CCDB7A1C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{776514EB-CE32-4727-8A59-349CCDB7A1C8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3F12462-BAA5-4C85-8D76-7DBF32EE7935}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B3F12462-BAA5-4C85-8D76-7DBF32EE7935}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3F12462-BAA5-4C85-8D76-7DBF32EE7935}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +47,10 @@ Global
 		{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using autoCardboard.Common.Domain.Cards;
 
-namespace autoCardboard.Common.Domain.Interfaces
+namespace autoCardboard.Common
 {
     public interface ICardDeck<TCardType> where TCardType: ICard
     {

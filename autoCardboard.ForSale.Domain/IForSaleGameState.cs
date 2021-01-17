@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using autoCardboard.Common.Domain.Cards;
-using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Common;
 
 namespace autoCardboard.ForSale.Domain
 {

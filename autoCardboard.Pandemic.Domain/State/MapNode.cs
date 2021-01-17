@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace autoCardboard.Pandemic.Domain.State
+namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
     public class MapNode

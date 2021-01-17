@@ -1,4 +1,4 @@
-﻿namespace autoCardboard.Common.Domain.Interfaces
+﻿namespace autoCardboard.Common
 {
     /// <summary>
     /// A player is a piece of code which :

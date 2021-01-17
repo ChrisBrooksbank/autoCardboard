@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\autoCardboard.Common.Domain\autoCardboard.Common.Domain.csproj" />
+    <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
   </ItemGroup>
 
 </Project>

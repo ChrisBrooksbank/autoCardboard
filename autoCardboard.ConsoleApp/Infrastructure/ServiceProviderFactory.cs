@@ -1,9 +1,7 @@
 ﻿using System;
-using autoCardboard.Common.Domain.Interfaces;
+using autoCardboard.Common;
 using autoCardboard.ForSale.Domain;
 using autoCardboard.Pandemic.Domain;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
-using autoCardboard.Pandemic.Domain.State;
 using Microsoft.Extensions.DependencyInjection;
 using PlayerFactory = autoCardboard.ForSale.Domain.PlayerFactory;
 

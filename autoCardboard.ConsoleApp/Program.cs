@@ -1,8 +1,7 @@
-﻿using autoCardboard.Common.Domain.Games;
+﻿using autoCardboard.Common;
 using autoCardboard.ConsoleApp.Infrastructure;
 using autoCardboard.ForSale.Domain;
-using autoCardboard.Pandemic.Domain.PlayerTurns;
-using autoCardboard.Pandemic.Domain.State;
+using autoCardboard.Pandemic.Domain;
 
 namespace autoCardboard.ConsoleApp
 {

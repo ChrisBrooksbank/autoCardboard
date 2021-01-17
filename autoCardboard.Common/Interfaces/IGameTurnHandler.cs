@@ -1,4 +1,4 @@
-﻿namespace autoCardboard.Common.Domain.Interfaces
+﻿namespace autoCardboard.Common
 {
     // modify the IGameState in accordance with the IGameTurn ( turn was selected by a IPlayer )
     public interface IGameTurnHandler<TGameState,TGameTurn>

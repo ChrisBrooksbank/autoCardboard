@@ -1,4 +1,4 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

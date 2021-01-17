@@ -1,6 +1,4 @@
-﻿using autoCardboard.Pandemic.Domain.PlayerTurns;
-using autoCardboard.Pandemic.Domain.State;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using autoCardboard.Common.Domain.Interfaces;
 
-namespace autoCardboard.Common.Domain.Cards
+namespace autoCardboard.Common
 {
     [Serializable]
     public class CardDeck<TCardType>: ICardDeck<TCardType> where TCardType: ICard

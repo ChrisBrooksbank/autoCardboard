@@ -1,6 +1,4 @@
-﻿using autoCardboard.Common.Domain.Cards;
-
-namespace autoCardboard.Common.Domain.StandardPlayingCards
+﻿namespace autoCardboard.Common
 {
     public class PlayingCard: Card
     {

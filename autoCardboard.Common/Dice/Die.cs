@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace autoCardboard.Common.Domain.Dice
+namespace autoCardboard.Common
 {
     /// <summary>
     /// Throw a die, with any number of sides

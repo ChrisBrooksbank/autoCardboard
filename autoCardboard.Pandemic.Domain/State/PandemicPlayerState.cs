@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace autoCardboard.Pandemic.Domain.State
+namespace autoCardboard.Pandemic.Domain
 {
     [Serializable]
     public class PandemicPlayerState

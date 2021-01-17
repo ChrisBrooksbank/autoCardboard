@@ -1,7 +1,7 @@
-﻿using autoCardboard.Common.Domain.Interfaces;
+﻿using autoCardboard.Common;
 using System.Collections.Generic;
 
-namespace autoCardboard.Pandemic.Domain.PlayerTurns
+namespace autoCardboard.Pandemic.Domain
 {
     public interface IPandemicTurn : IGameTurn
     {

@@ -1,4 +1,4 @@
-﻿namespace autoCardboard.Common.Domain.Cards
+﻿namespace autoCardboard.Common
 {
     public enum CardDeckPosition
     {
