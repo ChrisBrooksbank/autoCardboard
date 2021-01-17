@@ -20,7 +20,7 @@ namespace autoCardboard.Pandemic.Domain
 
         private List<PlayerActionWithCity> _playerActions = new List<PlayerActionWithCity>();
 
-        private readonly PandemicTurnValidator _validator;
+        private readonly IPandemicTurnValidator _validator;
 
         public int CurrentPlayerId { get; set; }
 
@@ -40,9 +40,9 @@ namespace autoCardboard.Pandemic.Domain
             }
         }
 
-        public PandemicTurn()
+        public PandemicTurn(IPandemicTurnValidator validator)
         {
-            _validator = new PandemicTurnValidator();
+            _validator = validator;
         }
 
         public void DriveOrFerry(City toConnectedCity)

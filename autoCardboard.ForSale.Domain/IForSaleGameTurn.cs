@@ -9,6 +9,6 @@ namespace autoCardboard.ForSale.Domain
         void Bid(int amount);
         ICard PropertyToFlip { get; set; }
         int CurrentPlayerId { get; set; }
-        ForSaleGameState State {get; set;}
+        IForSaleGameState State {get; set;}
     }
 }

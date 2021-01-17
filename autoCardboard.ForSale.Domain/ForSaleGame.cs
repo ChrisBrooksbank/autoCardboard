@@ -6,29 +6,29 @@ using autoCardboard.Common.Domain.Cards;
 
 namespace autoCardboard.ForSale.Domain
 {
-    public class ForSaleGame : IGame<ForSaleGameState, IForSaleGameTurn>
+    public class ForSaleGame : IGame<IForSaleGameState, IForSaleGameTurn>
     {
-        private readonly ForSaleGameState _state;
+        private readonly IForSaleGameState _state;
 
         public IEnumerable<IPlayer<IForSaleGameTurn>> Players { get; set; }
 
-        public ForSaleGame()
+        public ForSaleGame(IForSaleGameState gameState)
         {
-            _state = new ForSaleGameState();
+            _state = gameState;
         }
 
-        public void Play(IEnumerable<IPlayer<IForSaleGameTurn>> players)
+        public void Play()
         {
-            Setup(players);
+            Setup(Players);
 
             // Property bidding rounds
-            while (_state.PropertyDeck.CardCount >= players.Count())
+            while (_state.PropertyDeck.CardCount >= Players.Count())
             {
                 PlayPropertyBidRound();
             }
 
             // Property flipping rounds
-            while (_state.ChequeDeck.CardCount >= players.Count())
+            while (_state.ChequeDeck.CardCount >= Players.Count())
             {
                 PlayPropertyFlippingRound();
             }

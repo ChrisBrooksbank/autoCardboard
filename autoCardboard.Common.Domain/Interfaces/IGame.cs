@@ -19,6 +19,6 @@ namespace autoCardboard.Common.Domain.Interfaces
         /// Verifies each turn is legal
         /// Detects when game is finished and which player won
         /// </summary>
-        void Play(IEnumerable<IPlayer<TGameTurn>> players);
+        void Play();
     }
 }

@@ -1,7 +1,9 @@
-﻿using autoCardboard.Pandemic.Domain;
+﻿using System.Collections.Generic;
+using autoCardboard.Pandemic.Domain;
 using autoCardboard.Pandemic.Domain.State;
 using NUnit.Framework;
 using System.Linq;
+using autoCardboard.Pandemic.Domain.PlayerActionHandlers;
 using pandemicPlayerFactory = autoCardboard.Pandemic.Domain.PlayerFactory;
 
 namespace autoCardboard.Pandemic.Test
@@ -22,9 +24,9 @@ namespace autoCardboard.Pandemic.Test
             var pandemicPlayers = pandemicPlayerFactory.CreatePlayers(2).ToList();
             _gameState.Setup(pandemicPlayers);
 
-            _turnHandler = new PandemicTurnHandler();
+            _turnHandler = new PandemicTurnHandler(new List<IPlayerActionHandler>());
 
-            _turn = new PandemicTurn();
+            _turn = new PandemicTurn(new PandemicTurnValidator());
             _turn.CurrentPlayerId = pandemicPlayers[0].Id;
             _turn.State = _gameState;
         }

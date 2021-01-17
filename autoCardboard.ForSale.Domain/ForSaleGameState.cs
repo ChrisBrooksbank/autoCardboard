@@ -11,7 +11,7 @@ namespace autoCardboard.ForSale.Domain
     /// </summary>
     /// 
     [Serializable]
-    public class ForSaleGameState: GameState
+    public class ForSaleGameState: GameState, IForSaleGameState
     {
         public CardDeck<Card> PropertyDeck { get; set; }
         public CardDeck<Card> ChequeDeck { get; set; }

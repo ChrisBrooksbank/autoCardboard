@@ -14,17 +14,19 @@ namespace autoCardboard.Pandemic.Domain
     public class PandemicGame : IGame<IPandemicGameState, IPandemicTurn>
     {
         private readonly IPandemicGameState _state;
+        private readonly IPandemicTurnValidator _validator;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        public PandemicGame(IPandemicGameState gamestate)
+        public PandemicGame(IPandemicGameState gamestate, IPandemicTurnValidator validator)
         {
             _state = gamestate;
+            _validator = validator;
         }
 
-        public void Play(IEnumerable<IPlayer<IPandemicTurn>> players)
+        public void Play()
         {
-            Setup(players);
+            Setup(Players);
 
             while (!_state.IsGameOver)
             {
@@ -35,7 +37,7 @@ namespace autoCardboard.Pandemic.Domain
                         break;
                     }
 
-                    var turn = new PandemicTurn() { CurrentPlayerId = player.Id, State = _state };
+                    var turn = new PandemicTurn(_validator) { CurrentPlayerId = player.Id, State = _state };
                     player.GetTurn(turn);
                     ProcessTurn(turn);
 

@@ -7,7 +7,7 @@ namespace autoCardboard.ForSale.Domain
     public class ForSaleGameTurn : IForSaleGameTurn
     {
         // _state is a clone of the game state ( so any changes to it by player are ignored )
-        private ForSaleGameState _state;
+        private IForSaleGameState _state;
 
         public int CurrentPlayerId { get; set; }
 
@@ -15,7 +15,7 @@ namespace autoCardboard.ForSale.Domain
         public int BidAmount;
         public ICard PropertyToFlip { get; set; }
 
-        public ForSaleGameState State
+        public IForSaleGameState State
         {
             get
             {
@@ -24,7 +24,7 @@ namespace autoCardboard.ForSale.Domain
 
             set
             {
-                _state = value.Clone() as ForSaleGameState;
+                _state = value.Clone() as IForSaleGameState;
             }
         }
        

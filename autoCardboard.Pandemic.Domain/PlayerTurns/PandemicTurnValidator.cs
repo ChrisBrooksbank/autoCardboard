@@ -1,6 +1,7 @@
 ﻿using autoCardboard.Pandemic.Domain.State;
 using System.Collections.Generic;
 using System.Linq;
+using autoCardboard.Pandemic.Domain.PlayerTurns;
 
 namespace autoCardboard.Pandemic.Domain
 {
@@ -10,7 +11,7 @@ namespace autoCardboard.Pandemic.Domain
     /// Its called when a player is indicating their actions, using a PandemicTurn.
     /// Its also called by the PandemicGame to do the same validation before updating the actual game state.
     /// </summary>
-    public class PandemicTurnValidator
+    public class PandemicTurnValidator: IPandemicTurnValidator
     {
         private IPandemicGameState _state;
         private int _playerId;
