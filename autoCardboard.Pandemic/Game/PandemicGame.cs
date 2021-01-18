@@ -1,6 +1,6 @@
-﻿using System;
-using autoCardboard.Common;
+﻿using autoCardboard.Common;
 using System.Collections.Generic;
+using autoCardboard.Infrastructure;
 
 namespace autoCardboard.Pandemic
 {
@@ -10,13 +10,15 @@ namespace autoCardboard.Pandemic
     /// </summary>
     public class PandemicGame : IGame<IPandemicGameState, IPandemicTurn>
     {
+        private readonly ICardboardLogger _logger;
         private readonly IPandemicGameState _state;
         private readonly IPandemicTurnValidator _validator;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        public PandemicGame(IPandemicGameState gamestate, IPandemicTurnValidator validator)
+        public PandemicGame(ICardboardLogger logger, IPandemicGameState gamestate, IPandemicTurnValidator validator)
         {
+            _logger = logger;
             _state = gamestate;
             _validator = validator;
         }
@@ -70,7 +72,7 @@ namespace autoCardboard.Pandemic
                 }
             }
 
-            Console.WriteLine("GAME OVER !!!");
+            _logger.Information("Game Over !");
         }
 
         private void ProcessTurn(IPandemicTurn turn)

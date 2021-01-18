@@ -1,5 +1,5 @@
-﻿using autoCardboard.Infrastructure;
-using autoCardboard.Common;
+﻿using autoCardboard.Common;
+using autoCardboard.DependencyInjection;
 using autoCardboard.ForSale;
 using autoCardboard.Pandemic;
 

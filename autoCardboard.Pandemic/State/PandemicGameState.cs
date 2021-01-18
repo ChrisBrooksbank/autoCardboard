@@ -2,6 +2,7 @@
 using autoCardboard.Common;
 using System.Collections.Generic;
 using System.Linq;
+using autoCardboard.Infrastructure;
 
 namespace autoCardboard.Pandemic
 {
@@ -10,6 +11,9 @@ namespace autoCardboard.Pandemic
     /// TODO consider if should move code out such as Epidemic(), InfectCities(), PerformInitialInfections(), AddDiseaseCubes() somewhere else... or leave here
     public class PandemicGameState: GameState, IPandemicGameState
     {
+        [NonSerialized]
+        private ICardboardLogger _logger;
+
         public Dictionary<int, PandemicPlayerState> PlayerStates { get; set; }
 
         private int _outbreakCount;
@@ -33,8 +37,9 @@ namespace autoCardboard.Pandemic
 
         public Boolean IsGameOver { get; set; }
 
-        public PandemicGameState()
+        public PandemicGameState(ICardboardLogger logger)
         {
+            _logger = logger;
             PlayerStates = new Dictionary<int, PandemicPlayerState>();
         }
 
@@ -42,7 +47,7 @@ namespace autoCardboard.Pandemic
         {
             if (PlayerDeck.CardCount < 2)
             {
-                Console.WriteLine("Game over. Empty playerdeck");
+                _logger.Information("Game over. Empty playerdeck");
                 IsGameOver = true;
                 return new List<PandemicPlayerCard>();
             }
@@ -53,7 +58,7 @@ namespace autoCardboard.Pandemic
         public void Epidemic()
         {
             var bottomCard = InfectionDeck.DrawBottom();
-            Console.WriteLine($"Epidemic in {(City)bottomCard.Value}");
+            _logger.Information($"Epidemic in {(City)bottomCard.Value}");
             InfectionDiscardPile.AddCard(bottomCard);
             AddDiseaseCubes((City)bottomCard.Value, 3);
 
@@ -147,7 +152,7 @@ namespace autoCardboard.Pandemic
 
         private void PerformInitialInfections()
         {
-            Console.WriteLine("Starting initial infections");
+            _logger.Information("Starting initial infections");
 
             var infectionCards = InfectionDeck.Draw(3).ToList();
             InfectionDiscardPile.AddCards(infectionCards);
@@ -170,7 +175,7 @@ namespace autoCardboard.Pandemic
                 AddDiseaseCubes((City)infectionCard.Value, 1);
             }
 
-            Console.WriteLine("Finished initial infections");
+            _logger.Information("Finished initial infections");
         }
 
         public void AddDiseaseCubes(City city, int count = 1)
@@ -206,12 +211,12 @@ namespace autoCardboard.Pandemic
             {
                 if (quarantineSpecialist.Location == city || Cities.Single(n => n.City == quarantineSpecialist.Location).ConnectedCities.Contains(city))
                 {
-                    Console.WriteLine($"quarantineSpecialist in {quarantineSpecialist.Location} prevented {disease} in {city}");
+                    _logger.Information($"quarantineSpecialist in {quarantineSpecialist.Location} prevented {disease} in {city}");
                     return;
                 }
             }
 
-            Console.WriteLine($"Adding {disease} to {city}");
+            _logger.Information($"Adding {disease} to {city}");
 
             ignoreCities = ignoreCities ?? new List<City>();
 
@@ -219,7 +224,7 @@ namespace autoCardboard.Pandemic
             {
                 if (_diseaseCubeStock[disease] == 0)
                 {
-                    Console.WriteLine($"Game over. No cubes left for {disease}");
+                    _logger.Information($"Game over. No cubes left for {disease}");
                     IsGameOver = true;
                     return;
                 }
@@ -230,12 +235,12 @@ namespace autoCardboard.Pandemic
                 return;
             }
 
-            Console.WriteLine($"Outbreak in {node.City}");
+            _logger.Information($"Outbreak in {node.City}");
             _outbreakCount++;
 
             if (_outbreakCount > 7)
             {
-                Console.WriteLine($"Game over. Too many outbreaks");
+                _logger.Information($"Game over. Too many outbreaks");
                 IsGameOver = true;
                 return;
             }
@@ -246,7 +251,7 @@ namespace autoCardboard.Pandemic
                 AddDiseaseCube(disease, connectedCity, ignoreCities);
             }
 
-            Console.WriteLine($"Finished adding {disease} to {city}");
+            _logger.Information($"Finished adding {disease} to {city}");
         }
 
     }
