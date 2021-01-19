@@ -14,6 +14,7 @@ namespace autoCardboard.Pandemic.Test
         public void Setup()
         {
             _gameState = new PandemicState();
+            _stateEditor = new PandemicStateEditor(new CardboardLogger());
             _stateEditor.State = _gameState;
             _stateEditor.Clear();
         }
