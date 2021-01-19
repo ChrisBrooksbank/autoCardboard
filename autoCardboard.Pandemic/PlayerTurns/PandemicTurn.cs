@@ -1,4 +1,6 @@
-﻿using System;
+﻿using autoCardboard.Infrastructure;
+using autoCardboard.Infrastructure.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,6 +14,8 @@ namespace autoCardboard.Pandemic
     // TODO move code out e.g. => PandemicTurnHandler, e.g. for DriveOrFerry, keep calls to validator in here ???
     public class PandemicTurn : IPandemicTurn
     {
+        private readonly ICardboardLogger _log;
+
         // _state is a clone of the game state 
         // game state can only be permanently changed by game, not by players, otherwise they could cheat
         private PandemicGameState _state;
@@ -38,8 +42,9 @@ namespace autoCardboard.Pandemic
             }
         }
 
-        public PandemicTurn(IPandemicTurnValidator validator)
+        public PandemicTurn(ICardboardLogger log, IPandemicTurnValidator validator)
         {
+            _log = log;
             _validator = validator;
         }
 
@@ -50,8 +55,10 @@ namespace autoCardboard.Pandemic
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
+                throw new CardboardException(validationFailures[0]);
             }
+
+            _log.Information($"Driving/Ferry to {toConnectedCity}.");
 
             _playerActions.Add(playerAction);
         }
@@ -65,7 +72,7 @@ namespace autoCardboard.Pandemic
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
+                throw new CardboardException(validationFailures[0]);
             }
 
             playerState.Location = discardCityCardOfDestination;
@@ -85,7 +92,7 @@ namespace autoCardboard.Pandemic
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
+                throw new CardboardException(validationFailures[0]);
             }
 
             currentMapLocation.HasResearchStation = true;
@@ -107,7 +114,7 @@ namespace autoCardboard.Pandemic
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
+                throw new CardboardException(validationFailures[0]);
             }
 
             playerState.Location = anyCityAsDestination;
@@ -130,7 +137,7 @@ namespace autoCardboard.Pandemic
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
+                throw new CardboardException(validationFailures[0]);
             }
 
             playerState.Location = anyCityAlsoWithResearchStation;
@@ -139,6 +146,7 @@ namespace autoCardboard.Pandemic
 
         public void TreatDisease(Disease disease)
         {
+            _log.Information($"Treating {disease}");
             var playerState = State.PlayerStates[CurrentPlayerId];
             _playerActions.Add(new PlayerActionWithCity { PlayerAction = PlayerStandardAction.TreatDisease, City = playerState.Location, Disease = disease });
         }
@@ -147,40 +155,28 @@ namespace autoCardboard.Pandemic
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
 
-            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
-            var playersAtSameLocation = State.PlayerStates.Where(p => p.Value.Location == currentMapLocation.City && p.Key != CurrentPlayerId).ToList();
             var newPlayerTurn = new PlayerActionWithCity { PlayerAction = PlayerStandardAction.ShareKnowledge, City = playerState.Location };
 
             var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
-            }
-           
-            var currentPlayerHasCityCard = playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == currentMapLocation.City);
-            if (currentPlayerHasCityCard)
-            {
-                _playerActions.Add(newPlayerTurn);
-            }
-            else
-            {
-                // TODO check that another player at same location, has current location city card in hand
+                throw new CardboardException(validationFailures[0]);
             }
 
+            _playerActions.Add(newPlayerTurn);
         }
 
         public void DiscoverACure(Disease disease)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
-            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
             var newPlayerTurn = new PlayerActionWithCity { PlayerAction = PlayerStandardAction.DiscoverCure, City = playerState.Location, Disease = disease };
 
             var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
-                throw new ApplicationException(validationFailures[0]);
+                throw new CardboardException(validationFailures[0]);
             }
 
             _playerActions.Add(newPlayerTurn);

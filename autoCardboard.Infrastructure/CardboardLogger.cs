@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Serilog.Core;
+using System;
 
 namespace autoCardboard.Infrastructure
 {
@@ -10,7 +11,6 @@ namespace autoCardboard.Infrastructure
         public CardboardLogger()
         {
             _logger = new LoggerConfiguration()
-             .WriteTo.Console()
              .WriteTo.File("logs\\autoCardboard.log", rollingInterval: RollingInterval.Day)
              .CreateLogger();
 
@@ -20,6 +20,7 @@ namespace autoCardboard.Infrastructure
         public void Information(string message)
         {
             _logger.Information(message);
+            Console.WriteLine(message);
         }
     }
 }

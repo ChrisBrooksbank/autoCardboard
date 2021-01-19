@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
+using autoCardboard.Infrastructure;
 
 namespace autoCardboard.ForSale
 {
     public class ForSaleGame : IGame<IForSaleGameState, IForSaleGameTurn>
     {
+        private readonly ICardboardLogger _logger;
         private readonly IForSaleGameState _state;
 
         public IEnumerable<IPlayer<IForSaleGameTurn>> Players { get; set; }
 
-        public ForSaleGame(IForSaleGameState gameState)
+        public ForSaleGame(ICardboardLogger logger, IForSaleGameState gameState)
         {
+            _logger = logger;
             _state = gameState;
         }
 
@@ -36,6 +39,8 @@ namespace autoCardboard.ForSale
         private void PlayPropertyBidRound()
         {
             _state.PropertyCardsOnTable = _state.PropertyDeck.Draw(Players.Count()).OrderBy(c => c.Value).ToList();
+
+            _logger.Information($"Property cards drawn for bidding round");
 
             var passedPlayers = new List<int>();
 

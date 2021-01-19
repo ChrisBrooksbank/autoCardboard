@@ -1,4 +1,5 @@
 ﻿using autoCardboard.Common;
+using autoCardboard.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,13 +8,15 @@ namespace autoCardboard.Pandemic
     // Responsible for modifying a PandemicGameState by applying a PandemicTurn
     public class PandemicTurnHandler : IGameTurnHandler<IPandemicGameState, IPandemicTurn>
     {
-        readonly List<IPlayerActionHandler> _actionHandlers;
+        private readonly ICardboardLogger _log;
+        private readonly List<IPlayerActionHandler> _actionHandlers;
 
         private IPandemicGameState _state;
         private int _currentPlayerId;
 
-        public PandemicTurnHandler(IEnumerable<IPlayerActionHandler> actionHandlers)
+        public PandemicTurnHandler(ICardboardLogger logger, IEnumerable<IPlayerActionHandler> actionHandlers)
         {
+            _log = logger;
             _actionHandlers = actionHandlers.ToList();
         }
 
@@ -27,6 +30,13 @@ namespace autoCardboard.Pandemic
             }
         }
 
+        // TODO complete and refactor somewhere more sensible
+        private void OutputGameState()
+        {
+            //_log.Information("Game State : ");
+        }
+
+
         private void TakeAction(PlayerActionWithCity action)
         {
             // TODO solid, inject IEnumerable<IPlayerActionHandler>
@@ -35,7 +45,21 @@ namespace autoCardboard.Pandemic
                 case PlayerStandardAction.TreatDisease:
                     TreatDisease(action.City, action.Disease);
                     break;
+                case PlayerStandardAction.DriveOrFerry:
+                    DriveOrFerry(action.City);
+                    break;
             }
+
+            OutputGameState();
+        }
+
+        // TODO move to PandemicGameState ?
+
+        private void DriveOrFerry(City city)
+        {
+            var node = _state.Cities.Single(c => c.City == city);
+            var playerState = _state.PlayerStates[_currentPlayerId];
+            playerState.Location = city;
         }
 
         private void TreatDisease(City city, Disease disease)

@@ -16,6 +16,7 @@ namespace autoCardboard.DependencyInjection
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()
+                .AddScoped<IGameTurnHandler<IPandemicGameState, IPandemicTurn>, PandemicTurnHandler>()
 
                 .AddScoped<IPandemicGameState, PandemicGameState>()
                 .AddScoped<IGame<IPandemicGameState, IPandemicTurn>, PandemicGame>()

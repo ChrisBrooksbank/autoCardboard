@@ -13,14 +13,17 @@ namespace autoCardboard.Pandemic
         private readonly ICardboardLogger _logger;
         private readonly IPandemicGameState _state;
         private readonly IPandemicTurnValidator _validator;
+        private readonly IGameTurnHandler<IPandemicGameState, IPandemicTurn> _turnHandler;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        public PandemicGame(ICardboardLogger logger, IPandemicGameState gamestate, IPandemicTurnValidator validator)
+        public PandemicGame(ICardboardLogger logger, IPandemicGameState gamestate, IPandemicTurnValidator validator,
+            IGameTurnHandler<IPandemicGameState, IPandemicTurn> turnHandler)
         {
             _logger = logger;
             _state = gamestate;
             _validator = validator;
+            _turnHandler = turnHandler;
         }
 
         public void Play()
@@ -36,7 +39,7 @@ namespace autoCardboard.Pandemic
                         break;
                     }
 
-                    var turn = new PandemicTurn(_validator) { CurrentPlayerId = player.Id, State = _state };
+                    var turn = new PandemicTurn(_logger, _validator) { CurrentPlayerId = player.Id, State = _state };
                     player.GetTurn(turn);
                     ProcessTurn(turn);
 
@@ -77,8 +80,7 @@ namespace autoCardboard.Pandemic
 
         private void ProcessTurn(IPandemicTurn turn)
         {
-           // TODO
-           var playerId = turn.CurrentPlayerId;
+            _turnHandler.TakeTurn(_state, turn);
         }
 
         private void ProcessDiscardToHandLimitTurn(IPandemicTurn turn)

@@ -7,6 +7,7 @@ using autoCardboard.Infrastructure;
 namespace autoCardboard.Pandemic
 {
     [Serializable]
+    // TODO maybe add more methods here, TreatDisease(), ....
     /// Represents the game state of a game of Pandemic
     /// TODO consider if should move code out such as Epidemic(), InfectCities(), PerformInitialInfections(), AddDiseaseCubes() somewhere else... or leave here
     public class PandemicGameState: GameState, IPandemicGameState
