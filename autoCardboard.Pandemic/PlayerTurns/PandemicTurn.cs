@@ -18,7 +18,7 @@ namespace autoCardboard.Pandemic
 
         // _state is a clone of the game state 
         // game state can only be permanently changed by game, not by players, otherwise they could cheat
-        private PandemicGameState _state;
+        private PandemicState _state;
 
         private List<PlayerActionWithCity> _playerActions = new List<PlayerActionWithCity>();
 
@@ -28,7 +28,7 @@ namespace autoCardboard.Pandemic
 
         public IEnumerable<PlayerActionWithCity> ActionsTaken => _playerActions;
 
-        public IPandemicGameState State
+        public IPandemicState State
         {
             get
             {
@@ -38,7 +38,7 @@ namespace autoCardboard.Pandemic
             set
             {
                 // Clone the game state, so if a inmemory player modifies it, this doesnt modify the actual game state
-                _state = value.Clone() as PandemicGameState;
+                _state = value.Clone() as PandemicState;
             }
         }
 

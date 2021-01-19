@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\autoCardboard.ForSale.Domain\autoCardboard.ForSale.csproj" />
+    <ProjectReference Include="..\autoCardboard.ForSale\autoCardboard.ForSale.csproj" />
   </ItemGroup>
 
 </Project>

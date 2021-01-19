@@ -8,22 +8,23 @@ namespace autoCardboard.Pandemic
     /// <summary>
     /// Implements game of pandemic
     /// </summary>
-    public class PandemicGame : IGame<IPandemicGameState, IPandemicTurn>
+    public class PandemicGame : IGame<IPandemicState, IPandemicTurn>
     {
         private readonly ICardboardLogger _logger;
-        private readonly IPandemicGameState _state;
+        private readonly IPandemicState _state;
+        private readonly IPandemicStateEditor _stateEditor;
         private readonly IPandemicTurnValidator _validator;
-        private readonly IGameTurnHandler<IPandemicGameState, IPandemicTurn> _turnHandler;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        public PandemicGame(ICardboardLogger logger, IPandemicGameState gamestate, IPandemicTurnValidator validator,
-            IGameTurnHandler<IPandemicGameState, IPandemicTurn> turnHandler)
+        public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor, 
+            IPandemicTurnValidator validator)
         {
             _logger = logger;
             _state = gamestate;
+            _stateEditor = stateEditor;
+            _stateEditor.State = _state;
             _validator = validator;
-            _turnHandler = turnHandler;
         }
 
         public void Play()
@@ -49,7 +50,7 @@ namespace autoCardboard.Pandemic
                     {
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
-                            _state.Epidemic();
+                            _stateEditor.Epidemic();
                             _state.PlayerDiscardPile.AddCard(newPlayerCard);
                         }
                         else
@@ -71,7 +72,7 @@ namespace autoCardboard.Pandemic
                         _state.PlayerDiscardPile.AddCard(cardToDiscard);
                     }
 
-                    _state.InfectCities();
+                    _stateEditor.InfectCities();
                 }
             }
 
@@ -80,7 +81,7 @@ namespace autoCardboard.Pandemic
 
         private void ProcessTurn(IPandemicTurn turn)
         {
-            _turnHandler.TakeTurn(_state, turn);
+            _stateEditor.TakeTurn(turn);
         }
 
         private void ProcessDiscardToHandLimitTurn(IPandemicTurn turn)
@@ -91,7 +92,7 @@ namespace autoCardboard.Pandemic
 
         public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
-            _state.Setup(players); 
+            _stateEditor.Setup(players); 
             Players = players;
         }
 

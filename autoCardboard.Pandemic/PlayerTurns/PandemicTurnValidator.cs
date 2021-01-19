@@ -11,16 +11,16 @@ namespace autoCardboard.Pandemic
     /// </summary>
     public class PandemicTurnValidator: IPandemicTurnValidator
     {
-        private IPandemicGameState _state;
+        private IPandemicState _state;
         private int _playerId;
         private PandemicPlayerState _pandemicPlayerState;
         private MapNode _currentMapLocation;
 
         // TODO change ( cloned ) state as each action in series is validated, use PandemicTurnHandler
 
-        public IEnumerable<string> ValidatePlayerTurns(int playerId, IPandemicGameState state, IEnumerable<PlayerActionWithCity> proposedTurns, PlayerActionWithCity newProposedTurn)
+        public IEnumerable<string> ValidatePlayerTurns(int playerId, IPandemicState state, IEnumerable<PlayerActionWithCity> proposedTurns, PlayerActionWithCity newProposedTurn)
         {
-            _state = state.Clone() as IPandemicGameState;
+            _state = state.Clone() as IPandemicState;
             _playerId = playerId;
             _pandemicPlayerState = state.PlayerStates[_playerId];
             _currentMapLocation = state.Cities.Single(n => n.City == _pandemicPlayerState.Location);

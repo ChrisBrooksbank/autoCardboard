@@ -1,17 +1,21 @@
 ﻿using System.Linq;
+using autoCardboard.Infrastructure;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test
 {
     public class InfectionDeckTests
     {
-        private IPandemicGameState _gameState;
+        private IPandemicState _gameState;
+        private IPandemicStateEditor _stateEditor;
 
         [SetUp]
         public void Setup()
         {
-            _gameState = new PandemicGameState();
-            _gameState.Clear();
+            _gameState = new PandemicState();
+            _stateEditor = new PandemicStateEditor(new CardboardLogger());
+            _stateEditor.State = _gameState;
+            _stateEditor.Clear();
         }
         
         [Test]
@@ -20,7 +24,7 @@ namespace autoCardboard.Pandemic.Test
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _gameState.Epidemic();
+            _stateEditor.Epidemic();
             Assert.AreEqual(_gameState.InfectionDeck.CardCount, 48);
         }
 
@@ -30,7 +34,7 @@ namespace autoCardboard.Pandemic.Test
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _gameState.Epidemic();
+            _stateEditor.Epidemic();
             Assert.AreEqual(_gameState.InfectionDiscardPile.CardCount, 0);
         }
 
@@ -40,7 +44,7 @@ namespace autoCardboard.Pandemic.Test
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _gameState.Epidemic();
+            _stateEditor.Epidemic();
 
             var infectedCity = _gameState.Cities.Single(c => c.DiseaseCubeCount > 0);
 
@@ -53,7 +57,7 @@ namespace autoCardboard.Pandemic.Test
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
-            _gameState.Epidemic();
+            _stateEditor.Epidemic();
             Assert.AreEqual(_gameState.InfectionRateMarker, 1);
         }
 

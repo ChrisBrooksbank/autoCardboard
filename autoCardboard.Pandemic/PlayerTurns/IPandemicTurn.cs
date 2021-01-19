@@ -7,7 +7,7 @@ namespace autoCardboard.Pandemic
     {
         int CurrentPlayerId { get; set; }
         IEnumerable<PlayerActionWithCity> ActionsTaken { get; }
-        IPandemicGameState State { get; set; }
+        IPandemicState State { get; set; }
 
         void DriveOrFerry(City toConnectedCity);
         void TreatDisease(Disease disease);

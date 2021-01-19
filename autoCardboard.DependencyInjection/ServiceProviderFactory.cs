@@ -16,10 +16,10 @@ namespace autoCardboard.DependencyInjection
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()
-                .AddScoped<IGameTurnHandler<IPandemicGameState, IPandemicTurn>, PandemicTurnHandler>()
+                .AddScoped<IPandemicStateEditor, PandemicStateEditor>()
 
-                .AddScoped<IPandemicGameState, PandemicGameState>()
-                .AddScoped<IGame<IPandemicGameState, IPandemicTurn>, PandemicGame>()
+                .AddScoped<IPandemicState, PandemicState>()
+                .AddScoped<IGame<IPandemicState, IPandemicTurn>, PandemicGame>()
                 .AddScoped<IPlayerFactory<IPandemicTurn>, Pandemic.PandemicPlayerFactory>()
                 .AddScoped<IPandemicTurnValidator, PandemicTurnValidator>()
 

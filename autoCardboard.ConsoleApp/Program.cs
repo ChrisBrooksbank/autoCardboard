@@ -11,7 +11,7 @@ namespace autoCardboard.ConsoleApp
         {
             var serviceProvider = ServiceProviderFactory.GetServiceProvider();
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
-            GameFactory.CreateGame<IPandemicGameState, IPandemicTurn>(serviceProvider, playerConfiguration).Play();
+            GameFactory.CreateGame<IPandemicState, IPandemicTurn>(serviceProvider, playerConfiguration).Play();
             GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration).Play();
         }
     }
