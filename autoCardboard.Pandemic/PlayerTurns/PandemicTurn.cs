@@ -51,7 +51,7 @@ namespace autoCardboard.Pandemic
         public void DriveOrFerry(City toConnectedCity)
         {
             var playerAction = new PlayerAction {PlayerActionType = PlayerActionType.DriveOrFerry, City = toConnectedCity};
-            var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, playerAction).ToList();
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, playerAction).ToList();
 
             if (validationFailures.Any())
             {
@@ -68,7 +68,7 @@ namespace autoCardboard.Pandemic
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerActionType = PlayerActionType.DirectFlight, City = discardCityCardOfDestination };
 
-            var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -88,7 +88,7 @@ namespace autoCardboard.Pandemic
             var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
             var newPlayerTurn = new PlayerAction { PlayerActionType = PlayerActionType.BuildResearchStation, City = playerState.Location };
 
-           var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+           var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -110,7 +110,7 @@ namespace autoCardboard.Pandemic
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerActionType = PlayerActionType.CharterFlight, City = anyCityAsDestination };
 
-            var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -133,7 +133,7 @@ namespace autoCardboard.Pandemic
             var destinationMapLocation = State.Cities.Single(n => n.City == anyCityAlsoWithResearchStation);
             var newPlayerTurn = new PlayerAction { PlayerActionType = PlayerActionType.ShuttleFlight, City = anyCityAlsoWithResearchStation };
 
-            var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -157,7 +157,7 @@ namespace autoCardboard.Pandemic
 
             var newPlayerTurn = new PlayerAction { PlayerActionType = PlayerActionType.ShareKnowledge, City = playerState.Location };
 
-            var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -172,7 +172,7 @@ namespace autoCardboard.Pandemic
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerActionType = PlayerActionType.DiscoverCure, City = playerState.Location, Disease = disease };
 
-            var validationFailures = _validator.ValidatePlayerTurns(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
