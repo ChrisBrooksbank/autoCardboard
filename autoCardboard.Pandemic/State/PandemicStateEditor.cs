@@ -29,6 +29,7 @@ namespace autoCardboard.Pandemic
 
         public void Clear()
         {
+            SetupPlayerStates(new List<IPlayer<IPandemicTurn>>());
             State.IsGameOver = false;
             State.Cities = new List<MapNode>();
 
