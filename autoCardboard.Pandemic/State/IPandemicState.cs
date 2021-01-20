@@ -20,5 +20,6 @@ namespace autoCardboard.Pandemic
         int[] InfectionRateTrack { get; set; }
         Dictionary<Disease, DiseaseState> DiscoveredCures { get; set; }
         Dictionary<Disease, int> DiseaseCubeStock { get; set; }
+        int ResearchStationStock { get; set; }
     }
 }

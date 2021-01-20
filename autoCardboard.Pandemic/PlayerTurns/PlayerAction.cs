@@ -1,8 +1,8 @@
 ﻿namespace autoCardboard.Pandemic
 {
-    public class PlayerActionWithCity
+    public class PlayerAction
     {
-        public PlayerStandardAction PlayerAction { get; set; }
+        public PlayerActionType PlayerActionType { get; set; }
         public City City { get; set; }
         public Disease Disease { get; set; }
     }

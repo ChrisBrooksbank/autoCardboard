@@ -1,6 +1,6 @@
 ﻿namespace autoCardboard.Pandemic
 {
-    public enum PlayerStandardAction
+    public enum PlayerActionType
     {
         /// <summary>
         /// Move to a city connected by a white line.

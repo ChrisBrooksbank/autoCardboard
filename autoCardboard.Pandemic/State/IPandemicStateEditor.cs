@@ -7,7 +7,7 @@ namespace autoCardboard.Pandemic
     {
         IPandemicState State { get; set; }
 
-        void Clear();
+        void Clear(int pandemicCardCount = 6);
         void Setup(IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6);
         void Epidemic();
         void InfectCities();

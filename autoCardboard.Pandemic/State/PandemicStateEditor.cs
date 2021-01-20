@@ -27,7 +27,7 @@ namespace autoCardboard.Pandemic
             PerformInitialInfections();
         }
 
-        public void Clear()
+        public void Clear(int pandemicCardCount = 6)
         {
             SetupPlayerStates(new List<IPlayer<IPandemicTurn>>());
             State.IsGameOver = false;
@@ -36,7 +36,7 @@ namespace autoCardboard.Pandemic
             State.InfectionDeck = new InfectionDeck();
             State.InfectionDiscardPile = new CardDeck<Card>();
             State.PlayerDeck = new PlayerDeck();
-            State.PandemicCardCount = 6;
+            State.PandemicCardCount = pandemicCardCount;
             State.PlayerDeck.Setup(State.PandemicCardCount);
 
             State.PlayerDiscardPile = new PlayerDeck();
@@ -52,6 +52,8 @@ namespace autoCardboard.Pandemic
             {
                 State.Cities.Add(nodeFactory.CreateMapNode((City)city));
             }
+
+            State.ResearchStationStock = 6;
 
             State.DiseaseCubeStock = new Dictionary<Disease, int>
             {
@@ -79,27 +81,90 @@ namespace autoCardboard.Pandemic
             }
         }
 
-        // TODO complete and refactor somewhere more sensible
-        private void OutputGameState()
-        {
-            //_log.Information("Game State : ");
-        }
 
-
-        private void TakeAction(PlayerActionWithCity action)
+        private void TakeAction(PlayerAction action)
         {
-            // TODO solid, inject IEnumerable<IPlayerActionHandler>
-            switch(action.PlayerAction)
+            switch(action.PlayerActionType)
             {
-                case PlayerStandardAction.TreatDisease:
+                case PlayerActionType.TreatDisease:
                     TreatDisease(action.City, action.Disease);
                     break;
-                case PlayerStandardAction.DriveOrFerry:
+                case PlayerActionType.DriveOrFerry:
                     DriveOrFerry(action.City);
+                    break;
+                case PlayerActionType.BuildResearchStation:
+                    BuildResearchStation(action.City);
+                    break;
+                case PlayerActionType.CharterFlight:
+                    CharterFlight(action.City);
+                    break;
+                case PlayerActionType.DirectFlight:
+                    DirectFlight(action.City);
+                    break;
+                case PlayerActionType.ShuttleFlight:
+                    ShuttleFlight(action.City);
+                    break;
+                case PlayerActionType.DiscoverCure:
+                    DiscoverCure(action.Disease);
+                    break;
+                case PlayerActionType.ShareKnowledge:
+                    ShareKnowledge();
                     break;
             }
 
-            OutputGameState();
+        }
+
+        // TODO
+        private void ShareKnowledge()
+        {
+                        
+        }
+
+        private void DiscoverCure(Disease disease)
+        {
+            State.DiscoveredCures[disease] = !State.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
+        }
+
+        private void ShuttleFlight(City city)
+        {
+            var node = State.Cities.Single(c => c.City == city);
+            var playerState = State.PlayerStates[_currentPlayerId];
+            var startingCity = playerState.Location;
+            playerState.Location = city;
+
+            var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == startingCity);
+            playerState.PlayerHand.Remove(cardToDiscard);
+            State.PlayerDiscardPile.AddCard(cardToDiscard);
+        }
+
+        private void DirectFlight(City city)
+        {
+            var node = State.Cities.Single(c => c.City == city);
+            var playerState = State.PlayerStates[_currentPlayerId];
+            playerState.Location = city;
+
+            var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
+            playerState.PlayerHand.Remove(cardToDiscard);
+            State.PlayerDiscardPile.AddCard(cardToDiscard);
+        }
+
+        private void CharterFlight(City city)
+        {
+            var node = State.Cities.Single(c => c.City == city);
+            var playerState = State.PlayerStates[_currentPlayerId];
+            var startingCity = playerState.Location;
+            playerState.Location = city;
+
+            var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == startingCity);
+            playerState.PlayerHand.Remove(cardToDiscard);
+            State.PlayerDiscardPile.AddCard(cardToDiscard);
+        }
+
+        private void BuildResearchStation(City city)
+        {
+            var node = State.Cities.Single(c => c.City == city);
+            node.HasResearchStation = true;
+            State.ResearchStationStock--;
         }
 
         private void DriveOrFerry(City city)

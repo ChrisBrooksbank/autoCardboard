@@ -6,7 +6,7 @@ namespace autoCardboard.Pandemic
     public interface IPandemicTurn : IGameTurn
     {
         int CurrentPlayerId { get; set; }
-        IEnumerable<PlayerActionWithCity> ActionsTaken { get; }
+        IEnumerable<PlayerAction> ActionsTaken { get; }
         IPandemicState State { get; set; }
 
         void DriveOrFerry(City toConnectedCity);

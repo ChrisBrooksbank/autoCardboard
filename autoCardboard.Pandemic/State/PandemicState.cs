@@ -14,6 +14,7 @@ namespace autoCardboard.Pandemic
         public List<MapNode> Cities { get; set; }
 
         public Dictionary<Disease, int> DiseaseCubeStock { get; set; }
+        public int ResearchStationStock { get; set; }
 
         public InfectionDeck InfectionDeck { get; set; }
         public CardDeck<Card> InfectionDiscardPile { get; set; }

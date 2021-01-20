@@ -18,7 +18,7 @@ namespace autoCardboard.Pandemic
 
         // TODO change ( cloned ) state as each action in series is validated, use PandemicTurnHandler
 
-        public IEnumerable<string> ValidatePlayerTurns(int playerId, IPandemicState state, IEnumerable<PlayerActionWithCity> proposedTurns, PlayerActionWithCity newProposedTurn)
+        public IEnumerable<string> ValidatePlayerTurns(int playerId, IPandemicState state, IEnumerable<PlayerAction> proposedTurns, PlayerAction newProposedTurn)
         {
             _state = state.Clone() as IPandemicState;
             _playerId = playerId;
@@ -50,14 +50,14 @@ namespace autoCardboard.Pandemic
             return validationFailures;
         }
 
-        private string GetTurnValidationFailure(PlayerActionWithCity proposedTurn)
+        private string GetTurnValidationFailure(PlayerAction proposedTurn)
         {
             var _playerTurnCity = _state.Cities.Single(n => n.City == proposedTurn.City);
             var _playersAtSameLocation = _state.PlayerStates.Where(p => p.Value.Location == _currentMapLocation.City && p.Key != _playerId).ToList();
 
             // TODO SOLID, inject IEnumerable<IActionValidator>
 
-            if (proposedTurn.PlayerAction == PlayerStandardAction.DriveOrFerry)
+            if (proposedTurn.PlayerActionType == PlayerActionType.DriveOrFerry)
             {
                 if(_currentMapLocation.ConnectedCities.All(c => c != proposedTurn.City))
                 {
@@ -65,7 +65,7 @@ namespace autoCardboard.Pandemic
                 }
             }
 
-            if (proposedTurn.PlayerAction == PlayerStandardAction.DirectFlight)
+            if (proposedTurn.PlayerActionType == PlayerActionType.DirectFlight)
             {
                 if (!_pandemicPlayerState.PlayerHand.Exists(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == _playerTurnCity.City))
                 {
@@ -73,7 +73,7 @@ namespace autoCardboard.Pandemic
                 }
             }
 
-            if (proposedTurn.PlayerAction == PlayerStandardAction.BuildResearchStation)
+            if (proposedTurn.PlayerActionType == PlayerActionType.BuildResearchStation)
             {
                 if (_currentMapLocation.HasResearchStation)
                 {
@@ -88,7 +88,7 @@ namespace autoCardboard.Pandemic
                 }
             }
 
-            if (proposedTurn.PlayerAction == PlayerStandardAction.CharterFlight)
+            if (proposedTurn.PlayerActionType == PlayerActionType.CharterFlight)
             {
                 if (!_pandemicPlayerState.PlayerHand.Exists(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == _currentMapLocation.City))
                 {
@@ -96,7 +96,7 @@ namespace autoCardboard.Pandemic
                 }
             }
 
-            if (proposedTurn.PlayerAction == PlayerStandardAction.ShuttleFlight)
+            if (proposedTurn.PlayerActionType == PlayerActionType.ShuttleFlight)
             {
                 if (!_currentMapLocation.HasResearchStation || !_playerTurnCity.HasResearchStation || _currentMapLocation.City == _playerTurnCity.City)
                 {
@@ -104,7 +104,7 @@ namespace autoCardboard.Pandemic
                 }
             }
 
-            if (proposedTurn.PlayerAction == PlayerStandardAction.ShareKnowledge)
+            if (proposedTurn.PlayerActionType == PlayerActionType.ShareKnowledge)
             {
                 if (!_playersAtSameLocation.Any())
                 {
@@ -127,7 +127,7 @@ namespace autoCardboard.Pandemic
 
             }
 
-            if ( proposedTurn.PlayerAction == PlayerStandardAction.DiscoverCure )
+            if ( proposedTurn.PlayerActionType == PlayerActionType.DiscoverCure )
             {
                 if (!_currentMapLocation.HasResearchStation)
                 {
