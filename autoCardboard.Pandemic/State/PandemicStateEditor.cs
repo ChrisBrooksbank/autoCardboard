@@ -165,6 +165,8 @@ namespace autoCardboard.Pandemic
             var node = State.Cities.Single(c => c.City == city);
             node.HasResearchStation = true;
             State.ResearchStationStock--;
+
+            // TODO discard city card unless operations expert
         }
 
         private void DriveOrFerry(City city)
@@ -197,11 +199,6 @@ namespace autoCardboard.Pandemic
                 State.DiseaseCubeStock[disease]++;
             }
           
-        }
-
-        public void Setup()
-        {
-            throw new System.NotImplementedException();
         }
 
         public void Epidemic()

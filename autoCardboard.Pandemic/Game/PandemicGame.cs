@@ -1,5 +1,6 @@
 ﻿using autoCardboard.Common;
 using System.Collections.Generic;
+using autoCardboard.Common.Hubs;
 using autoCardboard.Infrastructure;
 
 namespace autoCardboard.Pandemic
@@ -14,22 +15,26 @@ namespace autoCardboard.Pandemic
         private readonly IPandemicState _state;
         private readonly IPandemicStateEditor _stateEditor;
         private readonly IPandemicTurnValidator _validator;
+        private readonly IGameHub _gameHub;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
         public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor, 
-            IPandemicTurnValidator validator)
+            IPandemicTurnValidator validator, IGameHub gameHub)
         {
             _logger = logger;
             _state = gamestate;
             _stateEditor = stateEditor;
             _stateEditor.State = _state;
             _validator = validator;
+            _gameHub = gameHub;
         }
 
         public void Play()
         {
             Setup(Players);
+
+            _gameHub.SendGameState(_state);
 
             while (!_state.IsGameOver)
             {
@@ -43,6 +48,8 @@ namespace autoCardboard.Pandemic
                     var turn = new PandemicTurn(_logger, _validator) { CurrentPlayerId = player.Id, State = _state };
                     player.GetTurn(turn);
                     ProcessTurn(turn);
+
+                    _gameHub.SendGameState(_state);
 
                     // draw 2 new player cards
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
@@ -73,9 +80,11 @@ namespace autoCardboard.Pandemic
                     }
 
                     _stateEditor.InfectCities();
+                    _gameHub.SendGameState(_state);
                 }
             }
 
+            _gameHub.SendGameState(_state);
             _logger.Information("Game Over !");
         }
 
