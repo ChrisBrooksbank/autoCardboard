@@ -6,7 +6,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\autoCardboard.DependencyInjection\autoCardboard.DependencyInjection.csproj" />
+    <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />
     <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MQTTnet" Version="3.0.13" />
+    <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.13" />
   </ItemGroup>
 
 
