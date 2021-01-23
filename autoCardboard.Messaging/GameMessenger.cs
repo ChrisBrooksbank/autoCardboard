@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Threading;
 using MQTTnet;
 using MQTTnet.Client.Options;
 using MQTTnet.Extensions.ManagedClient;
 
 namespace autoCardboard.Messaging
 {
-    // https://dzone.com/articles/mqtt-publishing-and-subscribing-messages-to-mqtt-b
     public class GameMessenger
     {
-        public async void Connect()
+        private readonly IManagedMqttClient _messageClient;
+
+        public IManagedMqttClient Client => _messageClient;
+
+        public GameMessenger()
         {
             var mqttUri = "localhost";
             int mqttPort = 1884;
@@ -28,9 +32,23 @@ namespace autoCardboard.Messaging
                 .Build();
 
             var clientFactory = new MqttFactory();
-            var client = clientFactory.CreateManagedMqttClient();
+            _messageClient = clientFactory.CreateManagedMqttClient();
 
-            await client.StartAsync(managedOptions);
+            _messageClient.StartAsync(managedOptions);
+            SendMessageASync("AutoCardboard", "Started messenger client");
         }
+
+        public async void SendMessageASync(string topic, string payload)
+        {
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .WithExactlyOnceQoS()
+                .WithRetainFlag()
+                .Build();
+
+            await _messageClient.PublishAsync(message, CancellationToken.None);
+        }
+
     }
 }

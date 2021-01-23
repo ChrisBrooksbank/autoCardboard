@@ -17,7 +17,7 @@ namespace autoCardboard.Api.Controllers
         public async Task Pandemic()
         {
             var messenger = new GameMessenger();
-            messenger.Connect();
+            messenger.SendMessageASync("AutoCardboard", "Started Pandemic");
 
             var serviceProvider = ServiceProviderFactory.GetServiceProvider();
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
