@@ -1,13 +1,9 @@
 ﻿"use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("/gamehub").build();
 
-connection.on("ReceiveMessage", function (user, message) {
-    var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    var encodedMsg = user + " says " + msg;
-    var li = document.createElement("li");
-    li.textContent = encodedMsg;
-    document.getElementById("messagesList").appendChild(li);
+connection.on("ReceiveGameStatusMessage", function (statusMessage) {
+    console.log("Got game status message");
 });
 
 connection.start().then(function () {

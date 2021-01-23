@@ -55,8 +55,6 @@ namespace autoCardboard.GameWatcher
                 endpoints.MapHub<GameHub>("/gamehub");
             });
 
-            // TODO subscribe to MQTT "AutoCardboard" topic, when a message is recieved send it out on SignalR using IGameHub
-            // Then the web page will see this message and can update itself ( No CORS issues )
         }
     }
 }
