@@ -6,6 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using MQTTnet.AspNetCore;
+using MQTTnet.AspNetCore.Extensions;
 
 namespace autoCardboard.Message.WebServer
 {
@@ -22,5 +26,26 @@ namespace autoCardboard.Message.WebServer
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services
+                .AddHostedMqttServer(mqttServer => mqttServer.WithoutDefaultEndpoint())
+                .AddMqttConnectionHandler()
+                .AddConnections();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapMqtt("/mqtt");
+            });
+
+            app.UseMqttServer(server =>
+            {
+                // Todo: Do something with the server
+            });
+        }
     }
 }

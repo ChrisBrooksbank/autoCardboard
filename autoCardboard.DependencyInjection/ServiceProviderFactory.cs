@@ -1,5 +1,6 @@
 ﻿using System;
 using autoCardboard.Common;
+using autoCardboard.Common.Hubs;
 using autoCardboard.ForSale;
 using autoCardboard.Infrastructure;
 using autoCardboard.Pandemic;
@@ -13,6 +14,7 @@ namespace autoCardboard.DependencyInjection
         {
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<ICardboardLogger, CardboardLogger>()
+                .AddSingleton<IGameHub, GameHub>()
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()

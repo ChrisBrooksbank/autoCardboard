@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using autoCardboard.Common.Hubs;
 
 namespace autoCardboard.GameWatcher
 {
@@ -24,6 +25,7 @@ namespace autoCardboard.GameWatcher
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +52,11 @@ namespace autoCardboard.GameWatcher
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapHub<GameHub>("/gamehub");
             });
+
+            // TODO subscribe to MQTT "AutoCardboard" topic, when a message is recieved send it out on SignalR using IGameHub
+            // Then the web page will see this message and can update itself ( No CORS issues )
         }
     }
 }
