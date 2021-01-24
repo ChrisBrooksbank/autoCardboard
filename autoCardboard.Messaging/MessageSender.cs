@@ -6,13 +6,13 @@ using MQTTnet.Extensions.ManagedClient;
 
 namespace autoCardboard.Messaging
 {
-    public class GameMessenger
+    public class MessageSender: IMessageSender
     {
         private readonly IManagedMqttClient _messageClient;
 
         public IManagedMqttClient Client => _messageClient;
 
-        public GameMessenger()
+        public MessageSender()
         {
             var mqttUri = "localhost";
             int mqttPort = 1884;

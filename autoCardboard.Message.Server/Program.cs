@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Server;
@@ -6,14 +7,18 @@ using MQTTnet.Server;
 namespace autoCardboard.Message.Server
 {
 
+    /// <summary>
+    /// This is a message server hosted in a console application
+    /// Send messages using a IMessageSender
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
         {
-            StartMQTTServer();
+            StartServer();
         }
 
-        static async void StartMQTTServer()
+        static async void StartServer()
         {
             var optionsBuilder = new MqttServerOptionsBuilder()
                 .WithConnectionBacklog(100)
@@ -22,6 +27,8 @@ namespace autoCardboard.Message.Server
             var mqttServer = new MqttFactory().CreateMqttServer();
 
             mqttServer.UseClientConnectedHandler(ClientConnectedHandler);
+            mqttServer.UseClientDisconnectedHandler(ClientDisconnectedHandler);
+            mqttServer.UseApplicationMessageReceivedHandler(MessageReceivedHandler);
 
             await mqttServer.StartAsync(optionsBuilder.Build());
 
@@ -32,7 +39,19 @@ namespace autoCardboard.Message.Server
 
         private static Task ClientConnectedHandler(MqttServerClientConnectedEventArgs arg)
         {
-            Console.WriteLine("Somebody connected");
+            Console.WriteLine($"Client {arg.ClientId} connected");
+            return Task.FromResult(12);
+        }
+
+        private static Task ClientDisconnectedHandler(MqttServerClientDisconnectedEventArgs arg)
+        {
+            Console.WriteLine($"Client {arg.ClientId} disconnected");
+            return Task.FromResult(12);
+        }
+
+        private static Task MessageReceivedHandler(MqttApplicationMessageReceivedEventArgs arg)
+        {
+            Console.WriteLine($"Received message from client {arg.ClientId} with topic {arg.ApplicationMessage.Topic} : {Encoding.UTF8.GetString(arg.ApplicationMessage.Payload)}");
             return Task.FromResult(12);
         }
 
