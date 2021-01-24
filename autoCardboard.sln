@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.DependencyInj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Api", "autoCardboard.Api\autoCardboard.Api.csproj", "{5D352C5E-83AB-42CE-A81C-B3D29564DBB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.GameWatcher", "autoCardboard.GameWatcher\autoCardboard.GameWatcher.csproj", "{C1E44F69-EC26-48CD-A82E-4CDBC11C0D45}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Message.Server", "autoCardboard.Message.Server\autoCardboard.Message.Server.csproj", "{D8A9E98D-40ED-461A-83BE-7CED1400EDEC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Messaging", "autoCardboard.Messaging\autoCardboard.Messaging.csproj", "{B36B539F-715A-4A74-A718-47CB643F5B59}"
@@ -77,10 +75,6 @@ Global
 		{5D352C5E-83AB-42CE-A81C-B3D29564DBB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D352C5E-83AB-42CE-A81C-B3D29564DBB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D352C5E-83AB-42CE-A81C-B3D29564DBB5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1E44F69-EC26-48CD-A82E-4CDBC11C0D45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1E44F69-EC26-48CD-A82E-4CDBC11C0D45}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1E44F69-EC26-48CD-A82E-4CDBC11C0D45}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1E44F69-EC26-48CD-A82E-4CDBC11C0D45}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D8A9E98D-40ED-461A-83BE-7CED1400EDEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8A9E98D-40ED-461A-83BE-7CED1400EDEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A9E98D-40ED-461A-83BE-7CED1400EDEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
