@@ -13,8 +13,8 @@ namespace autoCardboard.DependencyInjection
         public static IServiceProvider GetServiceProvider()
         {
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<IGameHub, GameHub>()
                 .AddSingleton<ICardboardLogger, CardboardLogger>()
+                .AddSingleton<IGameHub, GameHub>()
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()
