@@ -27,7 +27,7 @@ namespace autoCardboard.Pandemic
             _validator = validator;
         }
 
-        public void Play()
+        public IGameState Play()
         {
             Setup(Players);
 
@@ -77,6 +77,7 @@ namespace autoCardboard.Pandemic
             }
 
             _logger.Information("Game Over !");
+            return _state;
         }
 
         private void ProcessTurn(IPandemicTurn turn)

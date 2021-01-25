@@ -19,7 +19,7 @@ namespace autoCardboard.ForSale
             _state = gameState;
         }
 
-        public void Play()
+        public IGameState Play()
         {
             Setup(Players);
 
@@ -34,6 +34,8 @@ namespace autoCardboard.ForSale
             {
                 PlayPropertyFlippingRound();
             }
+
+            return _state;
         }
         
         private void PlayPropertyBidRound()
@@ -66,7 +68,7 @@ namespace autoCardboard.ForSale
                     }
                 }
             }
-
+          
         }
 
         private void PlayPropertyFlippingRound()

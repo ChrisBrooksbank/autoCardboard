@@ -19,6 +19,6 @@ namespace autoCardboard.Common
         /// Verifies each turn is legal
         /// Detects when game is finished and which player won
         /// </summary>
-        void Play();
+        IGameState Play();
     }
 }
