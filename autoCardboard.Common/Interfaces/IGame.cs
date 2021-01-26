@@ -6,6 +6,8 @@ namespace autoCardboard.Common
         where TGameState : IGameState 
         where TGameTurn : IGameTurn
     {
+        TGameState State { get; }
+
         /// <summary>
         /// A list of players who are playing this game.
         /// A player is some code which can take a turn, when asked, given a TGameTurn.

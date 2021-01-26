@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 
 namespace autoCardboard.Api.Controllers
 {
+
+    // https://stackoverflow.com/questions/42290811/how-to-use-newtonsoft-json-as-default-in-asp-net-core-web-api
     [ApiController]
     public class GameController : ControllerBase
     {
@@ -26,10 +28,29 @@ namespace autoCardboard.Api.Controllers
         [Route("GetNewGame")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
-        public IActionResult GetNewGame(Game game)
+        public JsonResult  GetNewGame(Game game)
         {
-            // TODO
-            return null;
+            var messenger = new MessageSender();
+            messenger.SendMessageASync("AutoCardboard", $"Play {game}");
+            
+            var serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
+            IGameState gameState = null;
+
+            switch (game)
+            {
+                case Game.Pandemic:
+                    var pandemicGame = GameFactory.CreateGame<IPandemicState, IPandemicTurn>(serviceProvider, playerConfiguration) as PandemicGame;
+                    pandemicGame.Setup(pandemicGame.Players);
+                    gameState = pandemicGame.State;
+                    break;
+                case Game.ForSale:
+                    var forSaleGame = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration);
+                    gameState = forSaleGame.State;
+                    break;
+            }
+
+            return new JsonResult(gameState);
         }
 
         [HttpGet]
@@ -46,7 +67,7 @@ namespace autoCardboard.Api.Controllers
         [Route("Play")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
-        public string Play(Game game)
+        public JsonResult Play(Game game)
         {
             var messenger = new MessageSender();
             messenger.SendMessageASync("AutoCardboard", $"Play {game}");
@@ -64,15 +85,8 @@ namespace autoCardboard.Api.Controllers
                     gameState = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration).Play();
                     break;
             }
-
-            var settings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented
-            };
-
-            string json = JsonConvert.SerializeObject(gameState,settings);
-
-            return json;
+    
+            return new JsonResult(gameState);
         }
 
     }

@@ -13,6 +13,8 @@ namespace autoCardboard.ForSale
 
         public IEnumerable<IPlayer<IForSaleGameTurn>> Players { get; set; }
 
+        public IForSaleGameState State => _state;
+
         public ForSaleGame(ICardboardLogger logger, IForSaleGameState gameState)
         {
             _logger = logger;

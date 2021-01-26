@@ -15,6 +15,8 @@ namespace autoCardboard.Pandemic
         private readonly IPandemicStateEditor _stateEditor;
         private readonly IPandemicTurnValidator _validator;
 
+        public IPandemicState State => _state;
+
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
         public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor, 
