@@ -1,7 +1,7 @@
-﻿using System;
-using autoCardboard.Common;
+﻿using autoCardboard.Common;
 using System.Collections.Generic;
 using autoCardboard.Infrastructure;
+using autoCardboard.Messaging;
 
 namespace autoCardboard.Pandemic
 {
@@ -17,18 +17,20 @@ namespace autoCardboard.Pandemic
         private readonly IPandemicState _state;
         private readonly IPandemicStateEditor _stateEditor;
         private readonly IPandemicTurnValidator _validator;
+        private readonly IMessageSender _messageSender;
 
         public IPandemicState State => _state;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
         public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor, 
-            IPandemicTurnValidator validator)
+            IPandemicTurnValidator validator, IMessageSender messageSender )
         {
             _logger = logger;
             _state = gamestate;
             _stateEditor = stateEditor;
             _validator = validator;
+            _messageSender = messageSender;
         }
 
         public IGameState Play()
@@ -46,8 +48,10 @@ namespace autoCardboard.Pandemic
 
                     var turn = new PandemicTurn(_logger, _validator) { CurrentPlayerId = player.Id, State = _state};
 
+                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Getting turn");
                     player.GetTurn(turn);
                     ProcessTurn(turn);
+                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Finished turn");
 
                     // draw 2 new player cards
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
@@ -55,12 +59,14 @@ namespace autoCardboard.Pandemic
                     {
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
+                            _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"*** Draws Epidemic ***");
                             _stateEditor.Epidemic(_state);
                             _state.PlayerDiscardPile.AddCard(newPlayerCard);
                         }
                         else
                         {
                             _state.PlayerStates[turn.CurrentPlayerId].PlayerHand.Add(newPlayerCard);
+                            _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Draws card");
                         }
                     }
 

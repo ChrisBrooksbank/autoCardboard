@@ -2,6 +2,7 @@
 using autoCardboard.Infrastructure;
 using System;
 using System.Linq;
+using autoCardboard.Messaging;
 
 namespace autoCardboard.Pandemic
 {
@@ -14,15 +15,17 @@ namespace autoCardboard.Pandemic
         private int _currentPlayerId;
         private PandemicPlayerState _currentPlayerState;
         private readonly IPandemicStateEditor _pandemicStateEditor;
+        private readonly IMessageSender _messageSender;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public PandemicPlayer(ICardboardLogger log, IPandemicStateEditor pandemicStateEditor)
+        public PandemicPlayer(ICardboardLogger log, IPandemicStateEditor pandemicStateEditor, IMessageSender messageSender)
         {
             _log = log;
             _actionsTaken = 0;
             _pandemicStateEditor = pandemicStateEditor;
+            _messageSender = messageSender;
         }
 
         public void GetTurn(IPandemicTurn turn)
@@ -49,6 +52,8 @@ namespace autoCardboard.Pandemic
                 var moveDieRoll = moveDie.Roll();
                 var moveTo = turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).ConnectedCities.ToArray()[moveDieRoll - 1];
 
+                _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
+
                 _turn.DriveOrFerry(moveTo);
                 _actionsTaken++;
              
@@ -70,6 +75,7 @@ namespace autoCardboard.Pandemic
             {
                 if (mapNode.DiseaseCubes[disease] > 0 && _actionsTaken < 4)
                 {
+                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Treating {disease} at {mapNode.City}");
                     _turn.TreatDisease(disease);
                     mapNode.DiseaseCubes[disease]--; // TODO we shouldnt be doing this, see PandemicTurnHandler, call PandemicState.Methods
                     _actionsTaken++;

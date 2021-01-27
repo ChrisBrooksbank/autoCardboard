@@ -1,6 +1,7 @@
 ﻿using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using System.Collections.Generic;
+using autoCardboard.Messaging;
 
 namespace autoCardboard.Pandemic
 {
@@ -20,7 +21,7 @@ namespace autoCardboard.Pandemic
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
             for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
-                var newPlayer = new PandemicPlayer(_log,_pandemicStateEditor)
+                var newPlayer = new PandemicPlayer(_log,_pandemicStateEditor, new MessageSender())
                 {
                     Id = player,
                     Name = player.ToString()

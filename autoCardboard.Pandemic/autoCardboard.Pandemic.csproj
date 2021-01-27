@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
     <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
+    <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

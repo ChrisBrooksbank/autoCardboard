@@ -3,6 +3,7 @@ using autoCardboard.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using autoCardboard.Messaging;
 
 namespace autoCardboard.Pandemic
 {
@@ -12,11 +13,12 @@ namespace autoCardboard.Pandemic
 
         private int _currentPlayerId;
         private IPandemicState _state;
+        private IMessageSender _messageSender;
 
-
-        public PandemicStateEditor(ICardboardLogger logger)
+        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender)
         {
             _log = logger;
+            _messageSender = messageSender;
         }
 
         public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
@@ -26,11 +28,13 @@ namespace autoCardboard.Pandemic
             _state.PandemicCardCount = pandemicCardCount;
             SetupPlayerStates(_state, players);
             PerformInitialInfections(_state);
+            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", "Setup");
         }
 
         public void Clear(IPandemicState state, int pandemicCardCount = 6)
         {
             _state = state;
+            _state.TurnsPlayed = 0;
             var players = new List<IPlayer<IPandemicTurn>>();
             SetupPlayerStates(_state, players);
             _state.IsGameOver = false;
@@ -57,7 +61,7 @@ namespace autoCardboard.Pandemic
 
             _state.ResearchStationStock = 6;
 
-            _state.DiseaseCubeStock = new Dictionary<Disease, int>
+            _state.DiseaseCubeReserve = new Dictionary<Disease, int>
             {
                 {Disease.Blue, 24},
                 {Disease.Black, 24},
@@ -72,6 +76,8 @@ namespace autoCardboard.Pandemic
                 {Disease.Red, DiseaseState.NotCured },
                 {Disease.Yellow, DiseaseState.NotCured}
             };
+
+            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", "Cleared");
         }
 
         public void TakeTurn(IPandemicState state, IPandemicTurn turn)
@@ -82,6 +88,7 @@ namespace autoCardboard.Pandemic
             {
                 TakePlayerAction(_state, action);
             }
+            _state.TurnsPlayed++;
         }
         public void TakePlayerAction(IPandemicState state, PlayerAction action)
         {
@@ -200,13 +207,13 @@ namespace autoCardboard.Pandemic
 
             if (diseaseState == DiseaseState.Cured || currentPlayerRole == PlayerRole.Medic)
             {
-                _state.DiseaseCubeStock[disease] += node.DiseaseCubes[disease];
+                _state.DiseaseCubeReserve[disease] += node.DiseaseCubes[disease];
                 node.DiseaseCubes[disease] = 0;
             }
             else
             {
                 node.DiseaseCubes[disease]--;
-                _state.DiseaseCubeStock[disease]++;
+                _state.DiseaseCubeReserve[disease]++;
             }
           
         }
@@ -224,12 +231,15 @@ namespace autoCardboard.Pandemic
             _state.InfectionDeck.AddCardDeck(_state.InfectionDiscardPile, CardDeckPosition.Top);
 
             _state.InfectionRateMarker++;
+
+            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Epidemic handled at {(City)bottomCard.Value}");
         }
 
         public void InfectCities(IPandemicState state)
         {
             _state = state;
             var infectionRate = _state.InfectionRateTrack[_state.InfectionRateMarker];
+            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Infecting Cities. Rate = {infectionRate}");
 
             if (_state.InfectionDeck.CardCount < infectionRate)
             {
@@ -241,12 +251,20 @@ namespace autoCardboard.Pandemic
 
             foreach (var infectionCard in infectionCards)
             {
-                var city = (City)infectionCard.Value;
-                var disease = city.GetDefaultDisease();
-                AddDiseaseCube(_state, disease, city);
+                if (!_state.IsGameOver)
+                {
+                    var city = (City)infectionCard.Value;
+                    var disease = city.GetDefaultDisease();
+                    AddDiseaseCube(_state, disease, city);
+                    _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Infected {city} with {disease}");
+                }
             }
 
-            _state.InfectionDiscardPile.AddCards(infectionCards);
+            if (!state.IsGameOver)
+            {
+                _state.InfectionDiscardPile.AddCards(infectionCards);
+                _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Finished infecting Cities.");
+            }
         }
 
         public void AddDiseaseCubes(IPandemicState state, City city, int count = 1)
@@ -283,7 +301,7 @@ namespace autoCardboard.Pandemic
 
             if (node.DiseaseCubes[disease] < 3)
             {
-                if (_state.DiseaseCubeStock[disease] == 0)
+                if (_state.DiseaseCubeReserve[disease] == 0)
                 {
                     _log.Information($"Game over. No cubes left for {disease}");
                     _state.IsGameOver = true;
@@ -291,7 +309,7 @@ namespace autoCardboard.Pandemic
                 }
 
                 node.DiseaseCubes[disease] += 1;
-                _state.DiseaseCubeStock[disease]--;
+                _state.DiseaseCubeReserve[disease]--;
 
                 return;
             }

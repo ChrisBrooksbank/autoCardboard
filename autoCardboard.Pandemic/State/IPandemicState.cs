@@ -7,6 +7,7 @@ namespace autoCardboard.Pandemic
     public interface IPandemicState : IGameState
     {
         bool IsGameOver { get; set; }
+        int TurnsPlayed { get; set; }
         PlayerDeck PlayerDeck { get; set; }
         PlayerDeck PlayerDiscardPile { get; set; }
         InfectionDeck InfectionDeck { get; set; }
@@ -20,7 +21,7 @@ namespace autoCardboard.Pandemic
         int InfectionRateMarker { get; set; }
         int[] InfectionRateTrack { get; set; }
         Dictionary<Disease, DiseaseState> DiscoveredCures { get; set; }
-        Dictionary<Disease, int> DiseaseCubeStock { get; set; }
+        Dictionary<Disease, int> DiseaseCubeReserve { get; set; }
         int ResearchStationStock { get; set; }
     }
 }

@@ -12,6 +12,7 @@
     <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
     <ProjectReference Include="..\autoCardboard.ForSale\autoCardboard.ForSale.csproj" />
     <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
+    <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />
     <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.csproj" />
   </ItemGroup>
 

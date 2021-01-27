@@ -62,7 +62,7 @@ namespace autoCardboard.Pandemic.Test
         public void AddingDiseaseDecrementsDiseaseCubeStock()
         {
             _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            Assert.AreEqual(_gameState.DiseaseCubeStock[Disease.Blue], 23);
+            Assert.AreEqual(_gameState.DiseaseCubeReserve[Disease.Blue], 23);
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace autoCardboard.Pandemic.Test
 
             _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
 
-            Assert.AreEqual(_gameState.DiseaseCubeStock[Disease.Blue], 13);
+            Assert.AreEqual(_gameState.DiseaseCubeReserve[Disease.Blue], 13);
         }
 
         [Test]
@@ -106,10 +106,10 @@ namespace autoCardboard.Pandemic.Test
             var players = new List<PandemicPlayer>();
             _stateEditor.Setup(_gameState,players);
 
-            var diseaseCubesInStockpile = _gameState.DiseaseCubeStock[Disease.Blue]
-                                          + _gameState.DiseaseCubeStock[Disease.Black]
-                                          + _gameState.DiseaseCubeStock[Disease.Yellow]
-                                          + _gameState.DiseaseCubeStock[Disease.Red];
+            var diseaseCubesInStockpile = _gameState.DiseaseCubeReserve[Disease.Blue]
+                                          + _gameState.DiseaseCubeReserve[Disease.Black]
+                                          + _gameState.DiseaseCubeReserve[Disease.Yellow]
+                                          + _gameState.DiseaseCubeReserve[Disease.Red];
             Assert.AreEqual(diseaseCubesInStockpile, 78);
         }
 

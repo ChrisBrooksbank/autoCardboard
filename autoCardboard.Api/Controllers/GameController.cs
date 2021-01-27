@@ -1,19 +1,31 @@
-﻿using autoCardboard.Common;
+﻿using System;
+using autoCardboard.Common;
 using autoCardboard.DependencyInjection;
 using autoCardboard.ForSale;
+using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace autoCardboard.Api.Controllers
 {
 
-    // https://stackoverflow.com/questions/42290811/how-to-use-newtonsoft-json-as-default-in-asp-net-core-web-api
     [ApiController]
     public class GameController : ControllerBase
     {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ICardboardLogger _logger;
+        private readonly IMessageSender _messageSender;
+
+        public GameController()
+        {
+            _serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            _logger = _serviceProvider.GetService<ICardboardLogger>();
+            _messageSender = _serviceProvider.GetService<IMessageSender>();
+        }
+
         [HttpGet]
         [Route("GetGames")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -28,28 +40,26 @@ namespace autoCardboard.Api.Controllers
         [Route("GetNewGame")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
-        public JsonResult  GetNewGame(Game game)
+        public JsonResult GetNewGame(Game game)
         {
-            var messenger = new MessageSender();
-            messenger.SendMessageASync("AutoCardboard", $"Play {game}");
-            
-            var serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            LogMessage($"Getting new game {game}");
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
 
             switch (game)
             {
                 case Game.Pandemic:
-                    var pandemicGame = GameFactory.CreateGame<IPandemicState, IPandemicTurn>(serviceProvider, playerConfiguration) as PandemicGame;
+                    var pandemicGame = GameFactory.CreateGame<IPandemicState, IPandemicTurn>(_serviceProvider, playerConfiguration) as PandemicGame;
                     pandemicGame.Setup(pandemicGame.Players);
                     gameState = pandemicGame.State;
                     break;
                 case Game.ForSale:
-                    var forSaleGame = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration);
+                    var forSaleGame = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(_serviceProvider, playerConfiguration);
                     gameState = forSaleGame.State;
                     break;
             }
 
+            LogMessage($"Got new game {game}");
             return new JsonResult(gameState);
         }
 
@@ -59,9 +69,7 @@ namespace autoCardboard.Api.Controllers
         [Produces("application/json")]
         public JsonResult Play(Game game)
         {
-            var messenger = new MessageSender();
-            messenger.SendMessageASync("AutoCardboard", $"Play {game}");
-            
+            LogMessage( $"Playing game {game}");
             var serviceProvider = ServiceProviderFactory.GetServiceProvider();
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
@@ -75,8 +83,15 @@ namespace autoCardboard.Api.Controllers
                     gameState = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration).Play();
                     break;
             }
-    
-            return new JsonResult(gameState);
+
+            LogMessage($"Finished playing game {game}");
+            return new JsonResult(gameState);;
+        }
+
+        private void LogMessage(string message, string topic = "AutoCardboard")
+        {
+            _logger.Information(message);
+            _messageSender.SendMessageASync(topic, message);
         }
 
     }
