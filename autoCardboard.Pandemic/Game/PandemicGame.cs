@@ -10,6 +10,8 @@ namespace autoCardboard.Pandemic
     /// </summary>
     public class PandemicGame : IGame<IPandemicState, IPandemicTurn>
     {
+        private const int PlayerHandLimit = 7;
+
         private readonly ICardboardLogger _logger;
         private readonly IPandemicState _state;
         private readonly IPandemicStateEditor _stateEditor;
@@ -61,20 +63,9 @@ namespace autoCardboard.Pandemic
                         }
                     }
 
-                    // Player must discard down to their hand limit
-                    if (_state.PlayerStates[turn.CurrentPlayerId].PlayerHand.Count > 7)
-                    {
-                        // TODO mark this turn as being to discard down to hand limit ( only )
-                        player.GetTurn(turn);
-                        ProcessDiscardToHandLimitTurn(turn);
+                    CurrentPlayerDiscardsDownToHandLimit(turn);
 
-                        // TODO remove this fake code, designed to allow testing of flow of game
-                        var cardToDiscard = _state.PlayerStates[turn.CurrentPlayerId].PlayerHand[0];
-                        _state.PlayerStates[turn.CurrentPlayerId].PlayerHand.Remove(cardToDiscard);
-                        _state.PlayerDiscardPile.AddCard(cardToDiscard);
-                    }
-
-                    _stateEditor.InfectCities();
+                    _stateEditor.InfectCities(); // TODO ok ???
                 }
             }
 
@@ -87,10 +78,18 @@ namespace autoCardboard.Pandemic
             _stateEditor.TakeTurn(turn);
         }
 
-        private void ProcessDiscardToHandLimitTurn(IPandemicTurn turn)
+        private void CurrentPlayerDiscardsDownToHandLimit(IPandemicTurn turn)
         {
-            // TODO
             var playerId = turn.CurrentPlayerId;
+            var playerState = _state.PlayerStates[playerId];
+
+            while (playerState.PlayerHand.Count > PlayerHandLimit)
+            {
+                var discardCardAtIndex = new Die(playerState.PlayerHand.Count).Roll();
+                var cardToDiscard = _state.PlayerStates[turn.CurrentPlayerId].PlayerHand[discardCardAtIndex - 1];
+                _state.PlayerStates[turn.CurrentPlayerId].PlayerHand.Remove(cardToDiscard);
+                _state.PlayerDiscardPile.AddCard(cardToDiscard);
+            }
         }
 
         public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players)

@@ -41,6 +41,7 @@ namespace autoCardboard.Pandemic
                 TreatDiseases();
             }
 
+            // Cant move more than once per turn currently, because they dont move here properly in state and it breaks code.
             if (_actionsTaken < 4)
             {
                 var connectionCount = _currentMapNode.ConnectedCities.Count();
@@ -54,7 +55,6 @@ namespace autoCardboard.Pandemic
                 // TODO, we shouldnt be doing this 
                 _currentCity = moveTo;
                 _currentMapNode = turn.State.Cities.Single(n => n.City == moveTo);
-
             }                
 
             _log.Information($"Pandemic player {Id} has taken turn");

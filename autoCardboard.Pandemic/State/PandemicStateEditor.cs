@@ -29,7 +29,8 @@ namespace autoCardboard.Pandemic
 
         public void Clear(int pandemicCardCount = 6)
         {
-            SetupPlayerStates(new List<IPlayer<IPandemicTurn>>());
+            var players = new List<IPlayer<IPandemicTurn>>();
+            SetupPlayerStates(players);
             State.IsGameOver = false;
             State.Cities = new List<MapNode>();
 
@@ -37,9 +38,8 @@ namespace autoCardboard.Pandemic
             State.InfectionDiscardPile = new CardDeck<Card>();
             State.PlayerDeck = new PlayerDeck();
             State.PandemicCardCount = pandemicCardCount;
-            State.PlayerDeck.Setup(State.PandemicCardCount);
-
             State.PlayerDiscardPile = new PlayerDeck();
+            SetupPlayerDeck();
 
             State.DiscoveredCures = new Dictionary<Disease, DiseaseState>();
             State.InfectionRateMarker = 0;
@@ -303,10 +303,64 @@ namespace autoCardboard.Pandemic
             {
                 State.PlayerStates[player.Id] = new PandemicPlayerState
                 {
-                    PlayerHand = new List<PandemicPlayerCard>(), // TODO start with 4 cards
+                    PlayerHand = new List<PandemicPlayerCard>(),
                     Location = City.Atlanta,
                     PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
                 };
+            }
+
+            SetupPlayerDeck();
+        }
+
+        public void SetupPlayerDeck()
+        {
+            State.PlayerDeck = new PlayerDeck();
+
+            // Add city cards
+            foreach (var city in Enum.GetValues(typeof(City)))
+            {
+                State.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)city, Name = city.ToString(), PlayerCardType = PlayerCardType.City});
+            }
+
+            // Add event cards
+            foreach (var eventCard in Enum.GetValues(typeof(EventCard)))
+            {
+                State.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)eventCard, Name = eventCard.ToString(), PlayerCardType = PlayerCardType.Event});
+            }
+
+            State.PlayerDeck.Shuffle();
+
+            if (State.PlayerStates != null)
+            {
+                foreach (var player in  State.PlayerStates)
+                {
+                    var newPlayerCards = State.PlayerDeck.Draw(4);
+
+                    foreach (var card in newPlayerCards)
+                    {
+                        player.Value.PlayerHand.Add(card);
+                    }
+                }
+            }
+           
+
+            if (State.PandemicCardCount != 0)
+            {
+                // Divide empties out State.PlayerDeck of cards 
+                var playerDeckCardPiles = State.PlayerDeck.Divide(State.PandemicCardCount).ToList();
+
+                foreach (var cardDeck in playerDeckCardPiles)
+                {
+                    cardDeck.AddCard( new PandemicPlayerCard{ PlayerCardType = PlayerCardType.Epidemic, Name = "Epidemic", Value = 0});
+                    cardDeck.Shuffle();
+                }
+
+                // Divide removed all cards from State.PlayerDeck when it moved them into piles
+                // add the shuffled piles back, starting from rightmost pile
+                foreach (var cardDeck in playerDeckCardPiles)
+                {
+                    State.PlayerDeck.Add(cardDeck);
+                }
             }
         }
 

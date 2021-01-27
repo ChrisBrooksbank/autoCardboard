@@ -1,5 +1,8 @@
 using System;
+using autoCardboard.Common;
+using autoCardboard.Infrastructure;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace autoCardboard.Pandemic.Test
 {
@@ -11,11 +14,19 @@ namespace autoCardboard.Pandemic.Test
         [SetUp]
         public void Setup()
         {
-            deckWith6Epidemics = new PlayerDeck();
-            deckWith6Epidemics.Setup(6);
+            var logger = new CardboardLogger();
+            var pandemicStateEditor = new PandemicStateEditor(logger);
+            var statewith6Epidemics = new PandemicState();
+            statewith6Epidemics.PandemicCardCount = 6;
+            pandemicStateEditor.State = statewith6Epidemics;
+            pandemicStateEditor.SetupPlayerDeck();
+            deckWith6Epidemics = statewith6Epidemics.PlayerDeck;
 
-            deckWith5Epidemics = new PlayerDeck();
-            deckWith5Epidemics.Setup(5);
+            var statewith5Epidemics = new PandemicState();
+            statewith5Epidemics.PandemicCardCount = 5;
+            pandemicStateEditor.State = statewith5Epidemics;
+            pandemicStateEditor.SetupPlayerDeck();
+            deckWith5Epidemics = statewith5Epidemics.PlayerDeck;
         }
 
         [Test]

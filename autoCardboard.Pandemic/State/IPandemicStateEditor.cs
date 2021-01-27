@@ -9,6 +9,7 @@ namespace autoCardboard.Pandemic
 
         void Clear(int pandemicCardCount = 6);
         void Setup(IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6);
+        void SetupPlayerDeck();
         void Epidemic();
         void InfectCities();
         void AddDiseaseCubes(City city, int count = 1);
