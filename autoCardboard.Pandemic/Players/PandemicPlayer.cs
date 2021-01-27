@@ -31,7 +31,6 @@ namespace autoCardboard.Pandemic
 
             _actionsTaken = 0;
             _turn = turn;
-            _pandemicStateEditor.State = turn.State;
             _currentPlayerId = turn.CurrentPlayerId;
             _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
 
@@ -53,7 +52,7 @@ namespace autoCardboard.Pandemic
                 _turn.DriveOrFerry(moveTo);
                 _actionsTaken++;
              
-                _pandemicStateEditor.TakePlayerAction( new PlayerAction
+                _pandemicStateEditor.TakePlayerAction( turn.State, new PlayerAction
                 {
                     PlayerId = _currentPlayerId,
                     PlayerActionType = PlayerActionType.DriveOrFerry,

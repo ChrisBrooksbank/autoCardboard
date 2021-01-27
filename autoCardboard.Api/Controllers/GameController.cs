@@ -54,16 +54,6 @@ namespace autoCardboard.Api.Controllers
         }
 
         [HttpGet]
-        [Route("PlayNextRound")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [Produces("application/json")]
-        public IActionResult PlayNextRound(Game game, IGameState gameState)
-        {
-            // TODO
-            return null;
-        }
-
-        [HttpGet]
         [Route("Play")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]

@@ -28,7 +28,6 @@ namespace autoCardboard.Pandemic
             _logger = logger;
             _state = gamestate;
             _stateEditor = stateEditor;
-            _stateEditor.State = _state;
             _validator = validator;
         }
 
@@ -49,7 +48,6 @@ namespace autoCardboard.Pandemic
 
                     player.GetTurn(turn);
                     ProcessTurn(turn);
-                    _stateEditor.State = _state;
 
                     // draw 2 new player cards
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
@@ -57,7 +55,7 @@ namespace autoCardboard.Pandemic
                     {
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
-                            _stateEditor.Epidemic();
+                            _stateEditor.Epidemic(_state);
                             _state.PlayerDiscardPile.AddCard(newPlayerCard);
                         }
                         else
@@ -68,7 +66,7 @@ namespace autoCardboard.Pandemic
 
                     CurrentPlayerDiscardsDownToHandLimit(turn);
 
-                    _stateEditor.InfectCities();
+                    _stateEditor.InfectCities(_state);
                 }
             }
 
@@ -78,7 +76,7 @@ namespace autoCardboard.Pandemic
 
         private void ProcessTurn(IPandemicTurn turn)
         {
-            _stateEditor.TakeTurn(turn);
+            _stateEditor.TakeTurn(_state, turn);
         }
 
         private void CurrentPlayerDiscardsDownToHandLimit(IPandemicTurn turn)
@@ -97,7 +95,7 @@ namespace autoCardboard.Pandemic
 
         public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
-            _stateEditor.Setup(players); 
+            _stateEditor.Setup(_state, players); 
             Players = players;
         }
         

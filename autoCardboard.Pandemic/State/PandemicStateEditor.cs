@@ -11,52 +11,53 @@ namespace autoCardboard.Pandemic
         private readonly ICardboardLogger _log;
 
         private int _currentPlayerId;
+        private IPandemicState _state;
 
-        public IPandemicState State { get; set; }
 
         public PandemicStateEditor(ICardboardLogger logger)
         {
             _log = logger;
-            State = null;
         }
 
-        public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
+        public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
         {
-            Clear();
-            State.PandemicCardCount = pandemicCardCount;
-            SetupPlayerStates(players);
-            PerformInitialInfections();
+            _state = state;
+            Clear(_state);
+            _state.PandemicCardCount = pandemicCardCount;
+            SetupPlayerStates(_state, players);
+            PerformInitialInfections(_state);
         }
 
-        public void Clear(int pandemicCardCount = 6)
+        public void Clear(IPandemicState state, int pandemicCardCount = 6)
         {
+            _state = state;
             var players = new List<IPlayer<IPandemicTurn>>();
-            SetupPlayerStates(players);
-            State.IsGameOver = false;
-            State.Cities = new List<MapNode>();
+            SetupPlayerStates(_state, players);
+            _state.IsGameOver = false;
+            _state.Cities = new List<MapNode>();
 
-            State.InfectionDeck = new InfectionDeck();
-            State.InfectionDiscardPile = new CardDeck<Card>();
-            State.PlayerDeck = new PlayerDeck();
-            State.PandemicCardCount = pandemicCardCount;
-            State.PlayerDiscardPile = new PlayerDeck();
-            SetupPlayerDeck();
+            _state.InfectionDeck = new InfectionDeck();
+            _state.InfectionDiscardPile = new CardDeck<Card>();
+            _state.PlayerDeck = new PlayerDeck();
+            _state.PandemicCardCount = pandemicCardCount;
+            _state.PlayerDiscardPile = new PlayerDeck();
+            SetupPlayerDeck(_state);
 
-            State.DiscoveredCures = new Dictionary<Disease, DiseaseState>();
-            State.InfectionRateMarker = 0;
-            State.InfectionRateTrack = new int[] { 2, 2, 2, 3, 3, 4, 4 };
+            _state.DiscoveredCures = new Dictionary<Disease, DiseaseState>();
+            _state.InfectionRateMarker = 0;
+            _state.InfectionRateTrack = new int[] { 2, 2, 2, 3, 3, 4, 4 };
 
             var nodeFactory = new MapNodeFactory();
 
             var cities = Enum.GetValues(typeof(City));
             foreach (var city in cities)
             {
-                State.Cities.Add(nodeFactory.CreateMapNode((City)city));
+                _state.Cities.Add(nodeFactory.CreateMapNode((City)city));
             }
 
-            State.ResearchStationStock = 6;
+            _state.ResearchStationStock = 6;
 
-            State.DiseaseCubeStock = new Dictionary<Disease, int>
+            _state.DiseaseCubeStock = new Dictionary<Disease, int>
             {
                 {Disease.Blue, 24},
                 {Disease.Black, 24},
@@ -64,7 +65,7 @@ namespace autoCardboard.Pandemic
                 {Disease.Yellow, 24}
             };
 
-            State.DiscoveredCures = new Dictionary<Disease, DiseaseState>
+            _state.DiscoveredCures = new Dictionary<Disease, DiseaseState>
             {
                 {Disease.Blue, DiseaseState.NotCured},
                 {Disease.Black, DiseaseState.NotCured},
@@ -73,40 +74,42 @@ namespace autoCardboard.Pandemic
             };
         }
 
-        public void TakeTurn(IPandemicTurn turn)
+        public void TakeTurn(IPandemicState state, IPandemicTurn turn)
         {
+            _state = state;
             _currentPlayerId = turn.CurrentPlayerId;
             foreach (var action in turn.ActionsTaken)
             {
-                TakePlayerAction(action);
+                TakePlayerAction(_state, action);
             }
         }
-        public void TakePlayerAction(PlayerAction action)
+        public void TakePlayerAction(IPandemicState state, PlayerAction action)
         {
+            _state = state;
             _currentPlayerId = action.PlayerId;
 
             switch(action.PlayerActionType)
             {
                 case PlayerActionType.TreatDisease:
-                    TreatDisease(action.City, action.Disease);
+                    TreatDisease(_state, action.City, action.Disease);
                     break;
                 case PlayerActionType.DriveOrFerry:
-                    DriveOrFerry(action.City);
+                    DriveOrFerry(_state, action.City);
                     break;
                 case PlayerActionType.BuildResearchStation:
-                    BuildResearchStation(action.City);
+                    BuildResearchStation(_state, action.City);
                     break;
                 case PlayerActionType.CharterFlight:
-                    CharterFlight(action.City);
+                    CharterFlight(_state, action.City);
                     break;
                 case PlayerActionType.DirectFlight:
-                    DirectFlight(action.City);
+                    DirectFlight(_state, action.City);
                     break;
                 case PlayerActionType.ShuttleFlight:
-                    ShuttleFlight(action.City);
+                    ShuttleFlight(_state, action.City);
                     break;
                 case PlayerActionType.DiscoverCure:
-                    DiscoverCure(action.Disease);
+                    DiscoverCure(_state, action.Disease);
                     break;
                 case PlayerActionType.ShareKnowledge:
                     ShareKnowledge();
@@ -121,67 +124,74 @@ namespace autoCardboard.Pandemic
                         
         }
 
-        private void DiscoverCure(Disease disease)
+        private void DiscoverCure(IPandemicState state, Disease disease)
         {
-            State.DiscoveredCures[disease] = !State.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
+            _state = state;
+            _state.DiscoveredCures[disease] = !_state.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
         }
 
-        private void ShuttleFlight(City city)
+        private void ShuttleFlight(IPandemicState state, City city)
         {
-            var node = State.Cities.Single(c => c.City == city);
-            var playerState = State.PlayerStates[_currentPlayerId];
+            _state = state;
+            var node = _state.Cities.Single(c => c.City == city);
+            var playerState = _state.PlayerStates[_currentPlayerId];
             var startingCity = playerState.Location;
             playerState.Location = city;
 
             var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == startingCity);
             playerState.PlayerHand.Remove(cardToDiscard);
-            State.PlayerDiscardPile.AddCard(cardToDiscard);
+            _state.PlayerDiscardPile.AddCard(cardToDiscard);
         }
 
-        private void DirectFlight(City city)
+        private void DirectFlight(IPandemicState state, City city)
         {
-            var node = State.Cities.Single(c => c.City == city);
-            var playerState = State.PlayerStates[_currentPlayerId];
+            _state = state;
+            var node = _state.Cities.Single(c => c.City == city);
+            var playerState = _state.PlayerStates[_currentPlayerId];
             playerState.Location = city;
 
             var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
             playerState.PlayerHand.Remove(cardToDiscard);
-            State.PlayerDiscardPile.AddCard(cardToDiscard);
+            _state.PlayerDiscardPile.AddCard(cardToDiscard);
         }
 
-        private void CharterFlight(City city)
+        private void CharterFlight(IPandemicState state, City city)
         {
-            var node = State.Cities.Single(c => c.City == city);
-            var playerState = State.PlayerStates[_currentPlayerId];
+            _state = state;
+            var node = _state.Cities.Single(c => c.City == city);
+            var playerState = _state.PlayerStates[_currentPlayerId];
             var startingCity = playerState.Location;
             playerState.Location = city;
 
             var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == startingCity);
             playerState.PlayerHand.Remove(cardToDiscard);
-            State.PlayerDiscardPile.AddCard(cardToDiscard);
+            _state.PlayerDiscardPile.AddCard(cardToDiscard);
         }
 
-        private void BuildResearchStation(City city)
+        private void BuildResearchStation(IPandemicState state, City city)
         {
-            var node = State.Cities.Single(c => c.City == city);
+            _state = state;
+            var node = _state.Cities.Single(c => c.City == city);
             node.HasResearchStation = true;
-            State.ResearchStationStock--;
+            _state.ResearchStationStock--;
 
             // TODO discard city card unless operations expert
         }
 
-        private void DriveOrFerry(City city)
+        private void DriveOrFerry(IPandemicState state, City city)
         {
-            var playerState = State.PlayerStates[_currentPlayerId];
+            _state = state;
+            var playerState = _state.PlayerStates[_currentPlayerId];
             playerState.Location = city;
         }
 
-        private void TreatDisease(City city, Disease disease)
+        private void TreatDisease(IPandemicState state, City city, Disease disease)
         {
-            var diseaseState = State.DiscoveredCures[disease];
-            var currentPlayerRole = State.PlayerStates[_currentPlayerId].PlayerRole;
+            _state = state;
+            var diseaseState = _state.DiscoveredCures[disease];
+            var currentPlayerRole = _state.PlayerStates[_currentPlayerId].PlayerRole;
 
-            var node = State.Cities.Single(c => c.City == city);
+            var node = _state.Cities.Single(c => c.City == city);
 
             if (disease == 0)
             {
@@ -190,73 +200,77 @@ namespace autoCardboard.Pandemic
 
             if (diseaseState == DiseaseState.Cured || currentPlayerRole == PlayerRole.Medic)
             {
-                State.DiseaseCubeStock[disease] += node.DiseaseCubes[disease];
+                _state.DiseaseCubeStock[disease] += node.DiseaseCubes[disease];
                 node.DiseaseCubes[disease] = 0;
             }
             else
             {
                 node.DiseaseCubes[disease]--;
-                State.DiseaseCubeStock[disease]++;
+                _state.DiseaseCubeStock[disease]++;
             }
           
         }
 
-        public void Epidemic()
+        public void Epidemic(IPandemicState state)
         {
-            var bottomCard = State.InfectionDeck.DrawBottom();
+            _state = state;
+            var bottomCard = _state.InfectionDeck.DrawBottom();
             _log.Information($"Epidemic in {(City)bottomCard.Value}");
-            State.InfectionDiscardPile.AddCard(bottomCard);
-            AddDiseaseCubes((City)bottomCard.Value, 3);
+            _state.InfectionDiscardPile.AddCard(bottomCard);
+            AddDiseaseCubes(_state, (City)bottomCard.Value, 3);
 
             // Intensify
-            State.InfectionDiscardPile.Shuffle();
-            State.InfectionDeck.AddCardDeck(State.InfectionDiscardPile, CardDeckPosition.Top);
+            _state.InfectionDiscardPile.Shuffle();
+            _state.InfectionDeck.AddCardDeck(_state.InfectionDiscardPile, CardDeckPosition.Top);
 
-            State.InfectionRateMarker++;
+            _state.InfectionRateMarker++;
         }
 
-        public void InfectCities()
+        public void InfectCities(IPandemicState state)
         {
-            var infectionRate = State.InfectionRateTrack[State.InfectionRateMarker];
+            _state = state;
+            var infectionRate = _state.InfectionRateTrack[_state.InfectionRateMarker];
 
-            if (State.InfectionDeck.CardCount < infectionRate)
+            if (_state.InfectionDeck.CardCount < infectionRate)
             {
-                State.IsGameOver = true;
+                _state.IsGameOver = true;
                 return;
             }
 
-            var infectionCards = State.InfectionDeck.Draw(infectionRate).ToList();
+            var infectionCards = _state.InfectionDeck.Draw(infectionRate).ToList();
 
             foreach (var infectionCard in infectionCards)
             {
                 var city = (City)infectionCard.Value;
                 var disease = city.GetDefaultDisease();
-                AddDiseaseCube(disease, city);
+                AddDiseaseCube(_state, disease, city);
             }
 
-            State.InfectionDiscardPile.AddCards(infectionCards);
+            _state.InfectionDiscardPile.AddCards(infectionCards);
         }
 
-        public void AddDiseaseCubes(City city, int count = 1)
+        public void AddDiseaseCubes(IPandemicState state, City city, int count = 1)
         {
+            _state = state;
             var disease = city.GetDefaultDisease();
 
             for (var i = 0; i < count; i++)
             {
-                AddDiseaseCube(disease, city);
+                AddDiseaseCube(_state, disease, city);
             }
         }
 
-        public void AddDiseaseCube(Disease disease, City city, List<City> ignoreCities = null)
+        public void AddDiseaseCube(IPandemicState state, Disease disease, City city, List<City> ignoreCities = null)
         {
-            var node = State.Cities.Single(n => n.City == city);
+            _state = state;
+            var node = _state.Cities.Single(n => n.City == city);
 
 
             // Dont place disease if quarantineSpecialist is here or in neighbouring city
-            var quarantineSpecialist = GetPlayerStateByRole(PlayerRole.QuarantineSpecialist);
+            var quarantineSpecialist = GetPlayerStateByRole(_state, PlayerRole.QuarantineSpecialist);
             if (quarantineSpecialist != null)
             {
-                if (quarantineSpecialist.Location == city || State.Cities.Single(n => n.City == quarantineSpecialist.Location).ConnectedCities.Contains(city))
+                if (quarantineSpecialist.Location == city || _state.Cities.Single(n => n.City == quarantineSpecialist.Location).ConnectedCities.Contains(city))
                 {
                     _log.Information($"quarantineSpecialist in {quarantineSpecialist.Location} prevented {disease} in {city}");
                     return;
@@ -269,46 +283,47 @@ namespace autoCardboard.Pandemic
 
             if (node.DiseaseCubes[disease] < 3)
             {
-                if (State.DiseaseCubeStock[disease] == 0)
+                if (_state.DiseaseCubeStock[disease] == 0)
                 {
                     _log.Information($"Game over. No cubes left for {disease}");
-                    State.IsGameOver = true;
+                    _state.IsGameOver = true;
                     return;
                 }
 
                 node.DiseaseCubes[disease] += 1;
-                State.DiseaseCubeStock[disease]--;
+                _state.DiseaseCubeStock[disease]--;
 
                 return;
             }
 
             _log.Information($"Outbreak in {node.City}");
-            State.OutbreakCount++;
+            _state.OutbreakCount++;
 
-            if (State.OutbreakCount > 7)
+            if (_state.OutbreakCount > 7)
             {
                 _log.Information($"Game over. Too many outbreaks");
-                State.IsGameOver = true;
+                _state.IsGameOver = true;
                 return;
             }
 
             ignoreCities.Add(city);
             foreach (var connectedCity in node.ConnectedCities.Where(c => !ignoreCities.Contains(c)))
             {
-                AddDiseaseCube(disease, connectedCity, ignoreCities);
+                AddDiseaseCube(_state, disease, connectedCity, ignoreCities);
             }
 
             _log.Information($"Finished adding {disease} to {city}");
         }
 
-        private void SetupPlayerStates(IEnumerable<IPlayer<IPandemicTurn>> players)
+        private void SetupPlayerStates(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players)
         {
+            _state = state;
             var roleDeck = new RoleDeck();
 
-            State.PlayerStates = new Dictionary<int, PandemicPlayerState>();
+            _state.PlayerStates = new Dictionary<int, PandemicPlayerState>();
             foreach (var player in players)
             {
-                State.PlayerStates[player.Id] = new PandemicPlayerState
+                _state.PlayerStates[player.Id] = new PandemicPlayerState
                 {
                     PlayerHand = new List<PandemicPlayerCard>(),
                     Location = City.Atlanta,
@@ -316,32 +331,33 @@ namespace autoCardboard.Pandemic
                 };
             }
 
-            SetupPlayerDeck();
+            SetupPlayerDeck(_state);
         }
 
-        public void SetupPlayerDeck()
+        public void SetupPlayerDeck(IPandemicState state)
         {
-            State.PlayerDeck = new PlayerDeck();
+            _state = state;
+            _state.PlayerDeck = new PlayerDeck();
 
             // Add city cards
             foreach (var city in Enum.GetValues(typeof(City)))
             {
-                State.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)city, Name = city.ToString(), PlayerCardType = PlayerCardType.City});
+                _state.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)city, Name = city.ToString(), PlayerCardType = PlayerCardType.City});
             }
 
             // Add event cards
             foreach (var eventCard in Enum.GetValues(typeof(EventCard)))
             {
-                State.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)eventCard, Name = eventCard.ToString(), PlayerCardType = PlayerCardType.Event});
+                _state.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)eventCard, Name = eventCard.ToString(), PlayerCardType = PlayerCardType.Event});
             }
 
-            State.PlayerDeck.Shuffle();
+            _state.PlayerDeck.Shuffle();
 
-            if (State.PlayerStates != null)
+            if (_state.PlayerStates != null)
             {
-                foreach (var player in  State.PlayerStates)
+                foreach (var player in  _state.PlayerStates)
                 {
-                    var newPlayerCards = State.PlayerDeck.Draw(4);
+                    var newPlayerCards = _state.PlayerDeck.Draw(4);
 
                     foreach (var card in newPlayerCards)
                     {
@@ -351,10 +367,10 @@ namespace autoCardboard.Pandemic
             }
            
 
-            if (State.PandemicCardCount != 0)
+            if (_state.PandemicCardCount != 0)
             {
                 // Divide empties out State.PlayerDeck of cards 
-                var playerDeckCardPiles = State.PlayerDeck.Divide(State.PandemicCardCount).ToList();
+                var playerDeckCardPiles = _state.PlayerDeck.Divide(_state.PandemicCardCount).ToList();
 
                 foreach (var cardDeck in playerDeckCardPiles)
                 {
@@ -366,14 +382,15 @@ namespace autoCardboard.Pandemic
                 // add the shuffled piles back, starting from rightmost pile
                 foreach (var cardDeck in playerDeckCardPiles)
                 {
-                    State.PlayerDeck.Add(cardDeck);
+                    _state.PlayerDeck.Add(cardDeck);
                 }
             }
         }
 
-        private PandemicPlayerState GetPlayerStateByRole(PlayerRole playerRole)
+        private PandemicPlayerState GetPlayerStateByRole(IPandemicState state, PlayerRole playerRole)
         {
-            foreach (var playerState in State.PlayerStates)
+            _state = state;
+            foreach (var playerState in _state.PlayerStates)
             {
                 if (playerState.Value.PlayerRole == playerRole)
                 {
@@ -383,44 +400,46 @@ namespace autoCardboard.Pandemic
             return null;
         }
 
-        private void PerformInitialInfections()
+        private void PerformInitialInfections(IPandemicState state)
         {
+            _state = state;
             _log.Information("Starting initial infections");
 
-            var infectionCards = State.InfectionDeck.Draw(3).ToList();
-            State.InfectionDiscardPile.AddCards(infectionCards);
+            var infectionCards = _state.InfectionDeck.Draw(3).ToList();
+            _state.InfectionDiscardPile.AddCards(infectionCards);
             foreach (var infectionCard in infectionCards)
             {
-                AddDiseaseCubes((City)infectionCard.Value, 3);
+                AddDiseaseCubes(_state, (City)infectionCard.Value, 3);
             }
 
-            infectionCards = State.InfectionDeck.Draw(3).ToList();
-            State.InfectionDiscardPile.AddCards(infectionCards);
+            infectionCards = _state.InfectionDeck.Draw(3).ToList();
+            _state.InfectionDiscardPile.AddCards(infectionCards);
             foreach (var infectionCard in infectionCards)
             {
-                AddDiseaseCubes((City)infectionCard.Value, 2);
+                AddDiseaseCubes(_state, (City)infectionCard.Value, 2);
             }
 
-            infectionCards = State.InfectionDeck.Draw(3).ToList();
-            State.InfectionDiscardPile.AddCards(infectionCards);
+            infectionCards = _state.InfectionDeck.Draw(3).ToList();
+            _state.InfectionDiscardPile.AddCards(infectionCards);
             foreach (var infectionCard in infectionCards)
             {
-                AddDiseaseCubes((City)infectionCard.Value, 1);
+                AddDiseaseCubes(_state, (City)infectionCard.Value, 1);
             }
 
             _log.Information("Finished initial infections");
         }
 
-        public IEnumerable<PandemicPlayerCard> DrawPlayerCards()
+        public IEnumerable<PandemicPlayerCard> DrawPlayerCards(IPandemicState state)
         {
-            if (State.PlayerDeck.CardCount < 2)
+            _state = state;
+            if (_state.PlayerDeck.CardCount < 2)
             {
                 _log.Information("Game over. Empty playerdeck");
-                State.IsGameOver = true;
+                _state.IsGameOver = true;
                 return new List<PandemicPlayerCard>();
             }
 
-            return State.PlayerDeck.Draw(2);
+            return _state.PlayerDeck.Draw(2);
         }
 
     }

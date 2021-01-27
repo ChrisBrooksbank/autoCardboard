@@ -18,14 +18,12 @@ namespace autoCardboard.Pandemic.Test
             var pandemicStateEditor = new PandemicStateEditor(logger);
             var statewith6Epidemics = new PandemicState();
             statewith6Epidemics.PandemicCardCount = 6;
-            pandemicStateEditor.State = statewith6Epidemics;
-            pandemicStateEditor.SetupPlayerDeck();
+            pandemicStateEditor.SetupPlayerDeck(statewith6Epidemics);
             deckWith6Epidemics = statewith6Epidemics.PlayerDeck;
 
             var statewith5Epidemics = new PandemicState();
             statewith5Epidemics.PandemicCardCount = 5;
-            pandemicStateEditor.State = statewith5Epidemics;
-            pandemicStateEditor.SetupPlayerDeck();
+            pandemicStateEditor.SetupPlayerDeck(statewith5Epidemics);
             deckWith5Epidemics = statewith5Epidemics.PlayerDeck;
         }
 
