@@ -1,4 +1,5 @@
-﻿using autoCardboard.Common;
+﻿using System;
+using autoCardboard.Common;
 using System.Collections.Generic;
 using autoCardboard.Infrastructure;
 
@@ -44,9 +45,11 @@ namespace autoCardboard.Pandemic
                         break;
                     }
 
-                    var turn = new PandemicTurn(_logger, _validator) { CurrentPlayerId = player.Id, State = _state };
+                    var turn = new PandemicTurn(_logger, _validator) { CurrentPlayerId = player.Id, State = _state};
+
                     player.GetTurn(turn);
                     ProcessTurn(turn);
+                    _stateEditor.State = _state;
 
                     // draw 2 new player cards
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
@@ -65,7 +68,7 @@ namespace autoCardboard.Pandemic
 
                     CurrentPlayerDiscardsDownToHandLimit(turn);
 
-                    _stateEditor.InfectCities(); // TODO ok ???
+                    _stateEditor.InfectCities();
                 }
             }
 
@@ -97,6 +100,6 @@ namespace autoCardboard.Pandemic
             _stateEditor.Setup(players); 
             Players = players;
         }
-
+        
     }
 }

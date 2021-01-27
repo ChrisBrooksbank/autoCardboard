@@ -17,6 +17,7 @@ namespace autoCardboard.Pandemic
         public PandemicStateEditor(ICardboardLogger logger)
         {
             _log = logger;
+            State = null;
         }
 
         public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
@@ -77,13 +78,13 @@ namespace autoCardboard.Pandemic
             _currentPlayerId = turn.CurrentPlayerId;
             foreach (var action in turn.ActionsTaken)
             {
-                TakeAction(action);
+                TakePlayerAction(action);
             }
         }
-
-
-        private void TakeAction(PlayerAction action)
+        public void TakePlayerAction(PlayerAction action)
         {
+            _currentPlayerId = action.PlayerId;
+
             switch(action.PlayerActionType)
             {
                 case PlayerActionType.TreatDisease:
@@ -171,7 +172,6 @@ namespace autoCardboard.Pandemic
 
         private void DriveOrFerry(City city)
         {
-            var node = State.Cities.Single(c => c.City == city);
             var playerState = State.PlayerStates[_currentPlayerId];
             playerState.Location = city;
         }
@@ -218,6 +218,13 @@ namespace autoCardboard.Pandemic
         public void InfectCities()
         {
             var infectionRate = State.InfectionRateTrack[State.InfectionRateMarker];
+
+            if (State.InfectionDeck.CardCount < infectionRate)
+            {
+                State.IsGameOver = true;
+                return;
+            }
+
             var infectionCards = State.InfectionDeck.Draw(infectionRate).ToList();
 
             foreach (var infectionCard in infectionCards)

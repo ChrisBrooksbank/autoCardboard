@@ -13,16 +13,16 @@ namespace autoCardboard.Pandemic
         private int _actionsTaken;
         private int _currentPlayerId;
         private PandemicPlayerState _currentPlayerState;
-        private City _currentCity;
-        private MapNode _currentMapNode;
+        private readonly IPandemicStateEditor _pandemicStateEditor;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public PandemicPlayer(ICardboardLogger log)
+        public PandemicPlayer(ICardboardLogger log, IPandemicStateEditor pandemicStateEditor)
         {
             _log = log;
             _actionsTaken = 0;
+            _pandemicStateEditor = pandemicStateEditor;
         }
 
         public void GetTurn(IPandemicTurn turn)
@@ -31,43 +31,48 @@ namespace autoCardboard.Pandemic
 
             _actionsTaken = 0;
             _turn = turn;
+            _pandemicStateEditor.State = turn.State;
             _currentPlayerId = turn.CurrentPlayerId;
             _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
-            _currentCity = _currentPlayerState.Location;
-            _currentMapNode = turn.State.Cities.Single(n => n.City == _currentCity);
 
-            while (_actionsTaken < 4 && _currentMapNode.DiseaseCubeCount > 0)
+            
+            while (_actionsTaken < 4 && turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 0)
             {
-                TreatDiseases();
+                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
+                TreatDiseases(mapNodeToTreatDiseases);
             }
 
-            // Cant move more than once per turn currently, because they dont move here properly in state and it breaks code.
+            // TODO if I change this to 'WHEN (_actionsTaken < 4)' validation fails for some reason
             if (_actionsTaken < 4)
             {
-                var connectionCount = _currentMapNode.ConnectedCities.Count();
+                var connectionCount = turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).ConnectedCities.Count();
                 var moveDie = new Die(connectionCount);
                 var moveDieRoll = moveDie.Roll();
-                var moveTo = _currentMapNode.ConnectedCities.ToArray()[moveDieRoll - 1];
+                var moveTo = turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).ConnectedCities.ToArray()[moveDieRoll - 1];
 
                 _turn.DriveOrFerry(moveTo);
                 _actionsTaken++;
+             
+                _pandemicStateEditor.TakePlayerAction( new PlayerAction
+                {
+                    PlayerId = _currentPlayerId,
+                    PlayerActionType = PlayerActionType.DriveOrFerry,
+                    City = moveTo
+                } );
 
-                // TODO, we shouldnt be doing this 
-                _currentCity = moveTo;
-                _currentMapNode = turn.State.Cities.Single(n => n.City == moveTo);
             }                
 
             _log.Information($"Pandemic player {Id} has taken turn");
         }
 
-        private void TreatDiseases()
+        private void TreatDiseases(MapNode mapNode)
         {
             foreach (var disease in Enum.GetValues(typeof(Disease)).Cast<Disease>())
             {
-                if (_currentMapNode.DiseaseCubes[disease] > 0 && _actionsTaken < 4)
+                if (mapNode.DiseaseCubes[disease] > 0 && _actionsTaken < 4)
                 {
                     _turn.TreatDisease(disease);
-                    _currentMapNode.DiseaseCubes[disease]--; // TODO we shouldnt be doing this, see PandemicTurnHandler, call PandemicState.Methods
+                    mapNode.DiseaseCubes[disease]--; // TODO we shouldnt be doing this, see PandemicTurnHandler, call PandemicState.Methods
                     _actionsTaken++;
                 }
             }
