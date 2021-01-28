@@ -46,25 +46,19 @@ namespace autoCardBoard.Pandemic.Bots
                 TreatDiseases(mapNodeToTreatDiseases);
             }
 
-            // TODO if I change this to 'WHEN (_actionsTaken < 4)' validation fails for some reason
-            if (_actionsTaken < 4)
+            var nextTurnStartsFromLocation = _currentPlayerState.Location;
+            while (_actionsTaken < 4)
             {
-                var connectionCount = turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).ConnectedCities.Count();
+                var connectionCount = turn.State.Cities.Single(n => n.City ==  nextTurnStartsFromLocation).ConnectedCities.Count();
                 var moveDie = new Die(connectionCount);
                 var moveDieRoll = moveDie.Roll();
-                var moveTo = turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).ConnectedCities.ToArray()[moveDieRoll - 1];
+                var moveTo = turn.State.Cities.Single(n => n.City ==  nextTurnStartsFromLocation).ConnectedCities.ToArray()[moveDieRoll - 1];
 
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
 
                 _turn.DriveOrFerry(moveTo);
                 _actionsTaken++;
-             
-                _pandemicStateEditor.TakePlayerAction( turn.State, new PlayerAction
-                {
-                    PlayerId = _currentPlayerId,
-                    PlayerActionType = PlayerActionType.DriveOrFerry,
-                    City = moveTo
-                } );
+                nextTurnStartsFromLocation = moveTo;
             }                
 
             _log.Information($"Pandemic player {Id} has taken turn");

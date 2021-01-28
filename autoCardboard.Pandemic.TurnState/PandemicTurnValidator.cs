@@ -16,15 +16,20 @@ namespace autoCardboard.Pandemic.TurnState
         private int _playerId;
         private PandemicPlayerState _pandemicPlayerState;
         private MapNode _currentMapLocation;
+        private IPandemicStateEditor _stateEditor;
 
-        // TODO change ( cloned ) state as each action in series is validated, use PandemicTurnHandler
+        public PandemicTurnValidator(IPandemicStateEditor stateEditor)
+        {
+            _stateEditor = stateEditor;
+        }
 
         public IEnumerable<string> ValidatePlayerActions(int playerId, IPandemicState state, IEnumerable<PlayerAction> playerActions, PlayerAction newPlayerAction)
         {
             _state = state.Clone() as IPandemicState;
+            state = null;
             _playerId = playerId;
-            _pandemicPlayerState = state.PlayerStates[_playerId];
-            _currentMapLocation = state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
+            _pandemicPlayerState = _state.PlayerStates[_playerId];
+            _currentMapLocation = _state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
 
             var validationFailures = new List<string>();
 
@@ -36,16 +41,29 @@ namespace autoCardboard.Pandemic.TurnState
             foreach (var proposedTurn in playerActions)
             {
                 var validationFailure = GetTurnValidationFailure(proposedTurn);
-                if (!string.IsNullOrWhiteSpace(validationFailure))
+                if (string.IsNullOrWhiteSpace(validationFailure))
+                {
+                    _stateEditor.TakePlayerAction(_state, proposedTurn);
+                    _pandemicPlayerState = _state.PlayerStates[_playerId];
+                    _currentMapLocation = _state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
+                }
+                else
                 {
                     validationFailures.Add(validationFailure);
                 }
             }
 
-            var validationFailure2 = GetTurnValidationFailure(newPlayerAction); // TODO naming !
-            if (!string.IsNullOrWhiteSpace(validationFailure2))
+            var validationFailureNewAction = GetTurnValidationFailure(newPlayerAction);
+            if (string.IsNullOrWhiteSpace(validationFailureNewAction))
             {
-                validationFailures.Add(validationFailure2);
+                // why are _state and state different ???
+                _stateEditor.TakePlayerAction(_state, newPlayerAction);
+                _pandemicPlayerState = _state.PlayerStates[_playerId];
+                _currentMapLocation = _state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
+            }
+            else
+            {
+                validationFailures.Add(validationFailureNewAction);
             }
 
             return validationFailures;
