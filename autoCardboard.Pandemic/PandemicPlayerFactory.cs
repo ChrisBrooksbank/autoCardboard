@@ -3,6 +3,7 @@ using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardBoard.Pandemic.Bots;
+using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
 
 namespace autoCardboard.Pandemic.Game
@@ -23,7 +24,7 @@ namespace autoCardboard.Pandemic.Game
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
             for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
-                var newPlayer = new PandemicPlayer(_log,_pandemicStateEditor, new MessageSender())
+                var newPlayer = new PandemicPlayer(_log, new RouteHelper(new MapNodeFactory()), new MessageSender())
                 {
                     Id = player,
                     Name = player.ToString()

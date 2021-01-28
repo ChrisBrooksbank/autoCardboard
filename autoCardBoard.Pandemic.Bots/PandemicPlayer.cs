@@ -11,22 +11,22 @@ namespace autoCardBoard.Pandemic.Bots
      public class PandemicPlayer: IPlayer<IPandemicTurn>
     {
         private readonly ICardboardLogger _log;
+        private readonly IRouteHelper _routeHelper;
 
         private IPandemicTurn _turn;
         private int _actionsTaken;
         private int _currentPlayerId;
         private PandemicPlayerState _currentPlayerState;
-        private readonly IPandemicStateEditor _pandemicStateEditor;
         private readonly IMessageSender _messageSender;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public PandemicPlayer(ICardboardLogger log, IPandemicStateEditor pandemicStateEditor, IMessageSender messageSender)
+        public PandemicPlayer(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender)
         {
             _log = log;
+            _routeHelper = routeHelper;
             _actionsTaken = 0;
-            _pandemicStateEditor = pandemicStateEditor;
             _messageSender = messageSender;
         }
 
@@ -49,10 +49,9 @@ namespace autoCardBoard.Pandemic.Bots
             var nextTurnStartsFromLocation = _currentPlayerState.Location;
             while (_actionsTaken < 4)
             {
-                var connectionCount = turn.State.Cities.Single(n => n.City ==  nextTurnStartsFromLocation).ConnectedCities.Count();
-                var moveDie = new Die(connectionCount);
-                var moveDieRoll = moveDie.Roll();
-                var moveTo = turn.State.Cities.Single(n => n.City ==  nextTurnStartsFromLocation).ConnectedCities.ToArray()[moveDieRoll - 1];
+                var moveTo = _routeHelper.GetBestCityToDriveOrFerryTo(turn.State, nextTurnStartsFromLocation);
+
+              
 
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
 

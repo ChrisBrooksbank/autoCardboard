@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace autoCardboard.Pandemic.State
 {
-    public class MapNodeFactory
+    public class MapNodeFactory: IMapNodeFactory
     {
         // Top left is 0,0 - means row 0 , column 0, there were gaps - approximate
         private const string CityGridRowsAndColumns = @"
