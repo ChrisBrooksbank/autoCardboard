@@ -2,7 +2,9 @@
 using System.Linq;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
+using autoCardBoard.Pandemic.Bots;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test

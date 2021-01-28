@@ -1,8 +1,10 @@
-﻿using autoCardboard.Common;
-using autoCardboard.Pandemic.State;
+﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using autoCardboard.Common;
+using autoCardboard.Pandemic.State;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.TurnState
 {
     public interface IPandemicStateEditor
     {

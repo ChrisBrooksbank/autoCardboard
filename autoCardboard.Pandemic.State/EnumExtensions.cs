@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using autoCardboard.Pandemic.State;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.State
 {
     public static class EnumExtensions
     {

@@ -19,7 +19,9 @@
     <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
     <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
     <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />
+    <ProjectReference Include="..\autoCardBoard.Pandemic.Bots\autoCardBoard.Pandemic.Bots.csproj" />
     <ProjectReference Include="..\autoCardboard.Pandemic.State\autoCardboard.Pandemic.State.csproj" />
+    <ProjectReference Include="..\autoCardboard.Pandemic.TurnState\autoCardboard.Pandemic.TurnState.csproj" />
   </ItemGroup>
 
 </Project>

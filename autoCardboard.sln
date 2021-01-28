@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Messaging", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardBoard.Pandemic.Bots", "autoCardBoard.Pandemic.Bots\autoCardBoard.Pandemic.Bots.csproj", "{5B106C65-91B9-49E3-BC71-CD9FA1DBEDBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.Pandemic.State", "autoCardboard.Pandemic.State\autoCardboard.Pandemic.State.csproj", "{AF2F66A9-0296-4A28-8B3A-1580B9283E24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.State", "autoCardboard.Pandemic.State\autoCardboard.Pandemic.State.csproj", "{AF2F66A9-0296-4A28-8B3A-1580B9283E24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.Pandemic.TurnState", "autoCardboard.Pandemic.TurnState\autoCardboard.Pandemic.TurnState.csproj", "{D95EB48F-1985-4CF2-9416-4F2397C21516}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,10 @@ Global
 		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D95EB48F-1985-4CF2-9416-4F2397C21516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D95EB48F-1985-4CF2-9416-4F2397C21516}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D95EB48F-1985-4CF2-9416-4F2397C21516}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D95EB48F-1985-4CF2-9416-4F2397C21516}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

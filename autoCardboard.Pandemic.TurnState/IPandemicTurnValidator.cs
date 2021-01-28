@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using autoCardboard.Pandemic.State;
+﻿using autoCardboard.Pandemic.State;
+using System.Collections.Generic;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.TurnState
 {
     public interface IPandemicTurnValidator
     {

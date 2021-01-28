@@ -1,6 +1,6 @@
 ﻿using autoCardboard.Pandemic.State;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.TurnState
 {
     public class PlayerAction
     {
