@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
+using autoCardboard.Pandemic.State;
 
 namespace autoCardboard.Pandemic
 {

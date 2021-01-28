@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
-    <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.csproj" />
+    <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.Game.csproj" />
   </ItemGroup>
 
 </Project>

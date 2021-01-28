@@ -1,6 +1,8 @@
 using System;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
+using autoCardboard.Messaging;
+using autoCardboard.Pandemic.State;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -15,7 +17,7 @@ namespace autoCardboard.Pandemic.Test
         public void Setup()
         {
             var logger = new CardboardLogger();
-            var pandemicStateEditor = new PandemicStateEditor(logger);
+            var pandemicStateEditor = new PandemicStateEditor(logger, new MessageSender());
             var statewith6Epidemics = new PandemicState();
             statewith6Epidemics.PandemicCardCount = 6;
             pandemicStateEditor.SetupPlayerDeck(statewith6Epidemics);

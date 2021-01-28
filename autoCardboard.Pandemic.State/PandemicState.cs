@@ -1,8 +1,8 @@
 ﻿using System;
-using autoCardboard.Common;
 using System.Collections.Generic;
+using autoCardboard.Common;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.State
 {
     [Serializable]
     public class PandemicState: GameState, IPandemicState

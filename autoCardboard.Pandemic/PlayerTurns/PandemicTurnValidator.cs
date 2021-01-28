@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using autoCardboard.Pandemic.State;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace autoCardboard.Pandemic

@@ -2,6 +2,7 @@
 using autoCardboard.DependencyInjection;
 using autoCardboard.ForSale;
 using autoCardboard.Pandemic;
+using autoCardboard.Pandemic.State;
 
 namespace autoCardboard.ConsoleApp
 {

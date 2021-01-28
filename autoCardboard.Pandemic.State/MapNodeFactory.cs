@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.State
 {
     public class MapNodeFactory
     {

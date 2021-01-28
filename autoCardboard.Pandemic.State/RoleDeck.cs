@@ -1,7 +1,7 @@
 ﻿using System;
 using autoCardboard.Common;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.State
 {
     public class RoleDeck: CardDeck<Card>
     {

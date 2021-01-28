@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Infrastructure;
+using autoCardboard.Messaging;
+using autoCardboard.Pandemic.State;
 using NUnit.Framework;
 
 namespace autoCardboard.Pandemic.Test
@@ -14,7 +16,7 @@ namespace autoCardboard.Pandemic.Test
         public void Setup()
         {
             _gameState = new PandemicState();
-            _stateEditor = new PandemicStateEditor(new CardboardLogger());
+            _stateEditor = new PandemicStateEditor(new CardboardLogger(), new MessageSender());
             _stateEditor.Clear(_gameState);
             var players = new List<PandemicPlayer>();
             _stateEditor.Setup(_gameState, players);

@@ -4,7 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.State
 {
     [Serializable]
     public class MapNode

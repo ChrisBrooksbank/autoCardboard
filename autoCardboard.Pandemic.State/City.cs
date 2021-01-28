@@ -1,6 +1,6 @@
-﻿namespace autoCardboard.Pandemic
+﻿namespace autoCardboard.Pandemic.State
 {
-    public enum City
+      public enum City
     {
         [Disease(Disease.Blue)]
         Atlanta,

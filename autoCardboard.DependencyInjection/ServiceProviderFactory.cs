@@ -5,6 +5,7 @@ using autoCardboard.ForSale;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic;
+using autoCardboard.Pandemic.State;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace autoCardboard.DependencyInjection

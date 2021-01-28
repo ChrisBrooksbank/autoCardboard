@@ -1,4 +1,6 @@
-﻿namespace autoCardboard.Pandemic
+﻿using autoCardboard.Pandemic.State;
+
+namespace autoCardboard.Pandemic
 {
     public class PlayerAction
     {
