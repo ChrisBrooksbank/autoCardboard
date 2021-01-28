@@ -15,5 +15,7 @@ namespace autoCardboard.Pandemic.State
         public bool HasResearchStation { get; set; }
         public Dictionary<Disease,int> DiseaseCubes { get; set; }
         public int DiseaseCubeCount => DiseaseCubes.Values.Sum();
+        public int GridRow { get; set; } // top row is 0
+        public int GridColumn { get; set; } // left column is 0
     }
 }
