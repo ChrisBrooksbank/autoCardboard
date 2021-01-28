@@ -3,6 +3,7 @@ using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 

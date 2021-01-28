@@ -3,6 +3,7 @@ using autoCardboard.DependencyInjection;
 using autoCardboard.ForSale;
 using autoCardboard.Pandemic;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 
 namespace autoCardboard.ConsoleApp
 {

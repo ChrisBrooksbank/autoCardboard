@@ -1,13 +1,14 @@
-﻿using autoCardboard.Common;
-using autoCardboard.Infrastructure;
-using System;
+﻿using System;
 using System.Linq;
+using autoCardboard.Common;
+using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 
-namespace autoCardboard.Pandemic
+namespace autoCardBoard.Pandemic.Bots
 {
-    public class PandemicPlayer: IPlayer<IPandemicTurn>
+     public class PandemicPlayer: IPlayer<IPandemicTurn>
     {
         private readonly ICardboardLogger _log;
 
@@ -64,7 +65,6 @@ namespace autoCardboard.Pandemic
                     PlayerActionType = PlayerActionType.DriveOrFerry,
                     City = moveTo
                 } );
-
             }                
 
             _log.Information($"Pandemic player {Id} has taken turn");

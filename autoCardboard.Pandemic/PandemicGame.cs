@@ -1,13 +1,13 @@
-﻿using autoCardboard.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.Game
 {
-
-    /// <summary>
+   /// <summary>
     /// Implements game of pandemic
     /// </summary>
     public class PandemicGame : IGame<IPandemicState, IPandemicTurn>

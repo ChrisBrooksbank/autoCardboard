@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.TurnState
 {
-
+    
     /// <summary>
     /// This class is responsible for validating that players actions are valid.
     /// Its called when a player is indicating their actions, using a PandemicTurn.

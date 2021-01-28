@@ -1,9 +1,11 @@
-﻿using autoCardboard.Common;
+﻿using System.Collections.Generic;
+using autoCardboard.Common;
 using autoCardboard.Infrastructure;
-using System.Collections.Generic;
 using autoCardboard.Messaging;
+using autoCardBoard.Pandemic.Bots;
+using autoCardboard.Pandemic.TurnState;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.Game
 {
     public class PandemicPlayerFactory : IPlayerFactory<IPandemicTurn>
     {

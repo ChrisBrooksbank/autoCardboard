@@ -1,14 +1,14 @@
-﻿using autoCardboard.Common;
-using autoCardboard.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using autoCardboard.Common;
+using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 
-namespace autoCardboard.Pandemic
+namespace autoCardboard.Pandemic.TurnState
 {
-    public class PandemicStateEditor: IPandemicStateEditor
+      public class PandemicStateEditor: IPandemicStateEditor
     {
         private readonly ICardboardLogger _log;
 

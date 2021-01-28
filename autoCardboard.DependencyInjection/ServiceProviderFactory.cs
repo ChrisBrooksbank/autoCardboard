@@ -4,8 +4,9 @@ using autoCardboard.Common.Hubs;
 using autoCardboard.ForSale;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
-using autoCardboard.Pandemic;
+using autoCardboard.Pandemic.Game;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace autoCardboard.DependencyInjection
@@ -25,7 +26,7 @@ namespace autoCardboard.DependencyInjection
 
                 .AddScoped<IPandemicState, PandemicState>()
                 .AddScoped<IGame<IPandemicState, IPandemicTurn>, PandemicGame>()
-                .AddScoped<IPlayerFactory<IPandemicTurn>, Pandemic.PandemicPlayerFactory>()
+                .AddScoped<IPlayerFactory<IPandemicTurn>, PandemicPlayerFactory>()
                 .AddScoped<IPandemicTurnValidator, PandemicTurnValidator>()
 
                 .BuildServiceProvider();
