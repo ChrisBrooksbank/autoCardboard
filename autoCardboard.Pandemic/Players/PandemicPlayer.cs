@@ -3,6 +3,7 @@ using autoCardboard.Infrastructure;
 using System;
 using System.Linq;
 using autoCardboard.Messaging;
+using autoCardboard.Pandemic.State;
 
 namespace autoCardboard.Pandemic
 {

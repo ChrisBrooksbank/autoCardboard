@@ -5,6 +5,7 @@ using autoCardboard.ForSale;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic;
+using autoCardboard.Pandemic.State;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

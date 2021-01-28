@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common", "aut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale", "autoCardboard.ForSale\autoCardboard.ForSale.csproj", "{58D8B8C9-8BF2-4496-9034-772D4ABA3F21}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic", "autoCardboard.Pandemic\autoCardboard.Pandemic.csproj", "{6DE1A17A-896C-4E12-921A-30C41D04F922}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Game", "autoCardboard.Pandemic\autoCardboard.Pandemic.Game.csproj", "{6DE1A17A-896C-4E12-921A-30C41D04F922}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Infrastructure", "autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj", "{FB3FCAAC-F2CF-4F27-92FB-8255908F18CF}"
 EndProject
@@ -26,6 +26,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Message.Server", "autoCardboard.Message.Server\autoCardboard.Message.Server.csproj", "{D8A9E98D-40ED-461A-83BE-7CED1400EDEC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Messaging", "autoCardboard.Messaging\autoCardboard.Messaging.csproj", "{B36B539F-715A-4A74-A718-47CB643F5B59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardBoard.Pandemic.Bots", "autoCardBoard.Pandemic.Bots\autoCardBoard.Pandemic.Bots.csproj", "{5B106C65-91B9-49E3-BC71-CD9FA1DBEDBE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.Pandemic.State", "autoCardboard.Pandemic.State\autoCardboard.Pandemic.State.csproj", "{AF2F66A9-0296-4A28-8B3A-1580B9283E24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +85,14 @@ Global
 		{B36B539F-715A-4A74-A718-47CB643F5B59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B36B539F-715A-4A74-A718-47CB643F5B59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B36B539F-715A-4A74-A718-47CB643F5B59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B106C65-91B9-49E3-BC71-CD9FA1DBEDBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B106C65-91B9-49E3-BC71-CD9FA1DBEDBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B106C65-91B9-49E3-BC71-CD9FA1DBEDBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B106C65-91B9-49E3-BC71-CD9FA1DBEDBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF2F66A9-0296-4A28-8B3A-1580B9283E24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

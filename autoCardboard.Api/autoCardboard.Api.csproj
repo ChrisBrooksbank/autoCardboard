@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\autoCardboard.DependencyInjection\autoCardboard.DependencyInjection.csproj" />
     <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />
-    <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.csproj" />
+    <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.Game.csproj" />
   </ItemGroup>
 
   <ItemGroup>

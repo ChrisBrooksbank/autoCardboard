@@ -1,4 +1,5 @@
 ﻿using autoCardboard.Common;
+using autoCardboard.Pandemic.State;
 
 namespace autoCardboard.Pandemic
 {
