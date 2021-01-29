@@ -50,6 +50,22 @@ namespace autoCardboard.Pandemic.TurnState
             _validator = validator;
         }
 
+        public void BuildResearchStation(City city)
+        {
+            var playerAction = new PlayerAction {PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.BuildResearchStation, City = city};
+
+            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, playerAction).ToList();
+
+            if (validationFailures.Any())
+            {
+                throw new CardboardException(validationFailures[0]);
+            }
+
+            _log.Information($"Building research station at {city}.");
+
+            _playerActions.Add(playerAction);
+        }
+
         public void DriveOrFerry(City toConnectedCity)
         {
             var playerAction = new PlayerAction {PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DriveOrFerry, City = toConnectedCity};

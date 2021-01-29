@@ -179,11 +179,18 @@ namespace autoCardboard.Pandemic.TurnState
         private void BuildResearchStation(IPandemicState state, City city)
         {
             _state = state;
+            var playerState = _state.PlayerStates[_currentPlayerId];
+
             var node = _state.Cities.Single(c => c.City == city);
             node.HasResearchStation = true;
             _state.ResearchStationStock--;
 
-            // TODO discard city card unless operations expert
+            if (playerState.PlayerRole != PlayerRole.OperationsExpert)
+            {
+                var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
+                playerState.PlayerHand.Remove(cardToDiscard);
+                _state.PlayerDiscardPile.AddCard(cardToDiscard);
+            }
         }
 
         private void DriveOrFerry(IPandemicState state, City city)

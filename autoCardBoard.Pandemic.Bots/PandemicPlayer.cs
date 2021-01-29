@@ -39,6 +39,23 @@ namespace autoCardBoard.Pandemic.Bots
             _currentPlayerId = turn.CurrentPlayerId;
             _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
 
+            // Consider building a research station
+            var hasCardForCurrentCity = _currentPlayerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.City
+                && (City) c.Value == _currentPlayerState.Location);
+            if (_actionsTaken < 4 && (_currentPlayerState.PlayerRole == PlayerRole.OperationsExpert || hasCardForCurrentCity))
+            {
+                var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State.Cities, _currentPlayerState.Location);
+                var distanceToNearestResearchStation = nearestCityWithResearchStation == null
+                    ? 999999
+                    : _routeHelper.GetDistance(turn.State.Cities, _currentPlayerState.Location,
+                        nearestCityWithResearchStation.Value);
+
+                if (distanceToNearestResearchStation > 3)
+                {
+                    _turn.BuildResearchStation(_currentPlayerState.Location);
+                    _actionsTaken++;
+                }
+            }
             
             while (_actionsTaken < 4 && turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 0)
             {
@@ -50,9 +67,6 @@ namespace autoCardBoard.Pandemic.Bots
             while (_actionsTaken < 4)
             {
                 var moveTo = _routeHelper.GetBestCityToDriveOrFerryTo(turn.State, nextTurnStartsFromLocation);
-
-              
-
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
 
                 _turn.DriveOrFerry(moveTo);

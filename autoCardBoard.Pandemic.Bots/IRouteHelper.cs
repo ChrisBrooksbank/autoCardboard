@@ -9,6 +9,7 @@ namespace autoCardBoard.Pandemic.Bots
         City GetBestCityToDriveOrFerryTo(IPandemicState state, City startingLocation);
         int GetDistance(List<MapNode> cities, City city1, City city2);
         City GetRandomNeighbour(IPandemicState state, City startingLocation);
+        City? GetNearestCitywithResearchStation(List<MapNode> cities, City city);
         List<City> GetShortestPath(List<MapNode> cities, City fromCity, City toCity);
         Graph<City, string> GetCityGraph(List<MapNode> cities);
     }

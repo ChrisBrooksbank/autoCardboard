@@ -19,10 +19,10 @@ namespace autoCardBoard.Pandemic.Bots
 
         public City GetBestCityToDriveOrFerryTo(IPandemicState state, City startingLocation)
         {
+            var threeCubeCities = state.Cities.Where(c => c.DiseaseCubeCount >= 3).ToList();
+
             var bestCandidate = 
-                state.Cities.Where(c => c.DiseaseCubeCount > 1)
-                    .Where(c => GetDistance(state.Cities,startingLocation, c.City) < 3)
-                    .OrderBy(c => GetDistance(state.Cities,startingLocation, c.City)).FirstOrDefault();
+                threeCubeCities.OrderBy(c => GetDistance(state.Cities,startingLocation, c.City)).FirstOrDefault();
 
             if (bestCandidate != null)
             {
@@ -33,7 +33,7 @@ namespace autoCardBoard.Pandemic.Bots
 
             return bestCandidate == null ? GetRandomNeighbour(state, startingLocation) : bestCandidate.City;
         }
-
+        
         public City GetRandomNeighbour(IPandemicState state, City startingLocation)
         {
             var connectionCount = state.Cities.Single(n => n.City ==  startingLocation).ConnectedCities.Count();
@@ -44,9 +44,16 @@ namespace autoCardBoard.Pandemic.Bots
             return moveTo;
         }
 
+        public City? GetNearestCitywithResearchStation(List<MapNode> cities, City city)
+        {
+            return cities.Where(n => n.HasResearchStation == true)
+                .OrderBy(n => GetDistance(cities, city, n.City) )
+                .FirstOrDefault()?.City;
+        }
+
         public int GetDistance(List<MapNode> cities, City city1, City city2)
         {
-            return GetShortestPath(cities, city1, city2).Count;
+            return GetShortestPath(cities, city1, city2).Count - 1; // -2 because list includes start and destination
         }
         
         public List<City> GetShortestPath(List<MapNode> cities, City fromCity, City toCity)
@@ -84,5 +91,7 @@ namespace autoCardBoard.Pandemic.Bots
             
             return graph;
         }
+
+       
     }
 }
