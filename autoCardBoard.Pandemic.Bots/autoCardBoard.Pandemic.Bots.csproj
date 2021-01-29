@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dijkstra.NET" Version="1.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
     <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
     <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />

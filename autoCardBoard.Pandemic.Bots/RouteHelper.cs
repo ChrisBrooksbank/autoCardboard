@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Pandemic.State;
+using Dijkstra.NET.Graph;
+using Dijkstra.NET.ShortestPath;
 
 namespace autoCardBoard.Pandemic.Bots
 {
@@ -19,13 +21,13 @@ namespace autoCardBoard.Pandemic.Bots
         {
             var bestCandidate = 
                 state.Cities.Where(c => c.DiseaseCubeCount > 1)
-                    .Where(c => GetRoughDistance(startingLocation, c.City) < 3)
-                    .OrderBy(c => GetRoughDistance(startingLocation, c.City)).FirstOrDefault();
+                    .Where(c => GetDistance(state.Cities,startingLocation, c.City) < 3)
+                    .OrderBy(c => GetDistance(state.Cities,startingLocation, c.City)).FirstOrDefault();
 
             if (bestCandidate != null)
             {
                 var startingNode = _mapNodeFactory.CreateMapNode(startingLocation);
-                var bestMoveTo = startingNode.ConnectedCities.OrderBy(c => GetRoughDistance(bestCandidate.City, c)).First();
+                var bestMoveTo = startingNode.ConnectedCities.OrderBy(c => GetDistance(state.Cities,bestCandidate.City, c)).First();
                 return bestMoveTo;
             }
 
@@ -42,26 +44,45 @@ namespace autoCardBoard.Pandemic.Bots
             return moveTo;
         }
 
-        public int GetRoughDistance(City city1, City city2)
+        public int GetDistance(List<MapNode> cities, City city1, City city2)
         {
-            var node1 = _mapNodeFactory.CreateMapNode(city1);
-            var node2 = _mapNodeFactory.CreateMapNode(city2);
+            return GetShortestPath(cities, city1, city2).Count;
+        }
+        
+        public List<City> GetShortestPath(List<MapNode> cities, City fromCity, City toCity)
+        {
+            var cityGraph = GetCityGraph(cities);
 
-            var distanceRows = Math.Abs(node1.GridRow - node2.GridRow);
-            var distanceColumns =  Math.Abs(node1.GridColumn - node2.GridColumn);
+            var route =  cityGraph.Dijkstra( (uint)fromCity+1, (uint)toCity+1);
+            var path = route.GetPath();
 
-            // account for map wrapping
-            //if (distanceRows > 7)
-            //{
-            //    distanceRows = 14 - distanceRows;
-            //}
-            
-            return distanceRows + distanceColumns;
+            var citiesTravelledTo = new List<City>();
+            foreach (var node in path)
+            {
+                citiesTravelledTo.Add((City)(node-1));
+            }
+
+            return citiesTravelledTo;
         }
 
-        public IEnumerable<MapNode> GetCitiesWithDisease(IPandemicState state)
+        public Graph<City, string> GetCityGraph(List<MapNode> cities)
         {
-            return state.Cities.Where(c => c.DiseaseCubeCount > 0).OrderBy(c => c.DiseaseCubeCount);
+            var graph = new Graph<City, string>();
+
+            foreach(var city in Enum.GetValues(typeof(City)) )
+            {
+                graph.AddNode((City)city);
+            }
+
+            foreach (var cityNode in cities)
+            {
+                foreach (var connectedCity in cityNode.ConnectedCities)
+                {
+                    graph.Connect((uint)cityNode.City + 1, (uint)connectedCity + 1, 1, $"{cityNode.City}-{connectedCity}");
+                }
+            }
+            
+            return graph;
         }
     }
 }
