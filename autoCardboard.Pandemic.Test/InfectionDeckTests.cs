@@ -20,7 +20,7 @@ namespace autoCardboard.Pandemic.Test
             _gameState = new PandemicState();
             _stateEditor = new PandemicStateEditor(new CardboardLogger(), new MessageSender());
             _stateEditor.Clear(_gameState);
-            var players = new List<PandemicPlayer>();
+            var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState, players);
         }
         

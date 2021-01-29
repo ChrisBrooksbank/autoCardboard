@@ -55,7 +55,7 @@ namespace autoCardBoard.Pandemic.Bots
         {
             return GetShortestPath(cities, city1, city2).Count - 1; // -2 because list includes start and destination
         }
-        
+
         public List<City> GetShortestPath(List<MapNode> cities, City fromCity, City toCity)
         {
             var cityGraph = GetCityGraph(cities);

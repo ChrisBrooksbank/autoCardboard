@@ -107,7 +107,7 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void InitialInfectionDepletesDiseaseStockpile()
         {
-            var players = new List<PandemicPlayer>();
+            var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState,players);
 
             var diseaseCubesInStockpile = _gameState.DiseaseCubeReserve[Disease.Blue]
@@ -120,7 +120,7 @@ namespace autoCardboard.Pandemic.Test
         [Test]
         public void InitialInfectionInfectsCities()
         {
-            var players = new List<PandemicPlayer>();
+            var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState,players);
 
             var infectedCities = _gameState.Cities.Where(c => c.DiseaseCubeCount > 0);
