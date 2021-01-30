@@ -82,7 +82,7 @@ namespace autoCardBoard.Pandemic.Bots
             }
             
             // If there is disease here, use remaining actions to cure it
-            while (_actionsTaken < 4 && turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 0)
+            while (_actionsTaken < 4 && turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 2)
             {
                 var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
                 TreatDiseases(mapNodeToTreatDiseases);
