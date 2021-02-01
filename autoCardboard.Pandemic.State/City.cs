@@ -1,6 +1,10 @@
-﻿namespace autoCardboard.Pandemic.State
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace autoCardboard.Pandemic.State
 {
-      public enum City
+    [JsonConverter(typeof(StringEnumConverter))] 
+    public enum City
     {
         [Disease(Disease.Blue)]
         Atlanta,
