@@ -1,4 +1,3 @@
-
 interface PandemicState {
     isGameOver: boolean;
     turnsPlayed: number;
