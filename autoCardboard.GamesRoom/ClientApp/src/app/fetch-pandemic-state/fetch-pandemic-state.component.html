@@ -2,3 +2,22 @@
 
 <p>This component demonstrates fetching pandemic state from the server.</p>
 
+<p>Turns made : {{ pandemicState.turnsPlayed }}</p>
+<p>Outbreak count : {{ pandemicState.outbreakCount }}</p>
+<p>Infection rate marker: {{ pandemicState.infectionRateMarker }}</p>
+
+
+<table class='table table-striped' aria-labelledby="tableLabel">
+  <thead>
+  <tr>
+    <th>City Name</th>
+    <th>Disease Cube Count</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let cityNode of pandemicState.cities">
+    <td>{{ cityNode.city }}</td>
+    <td>{{ cityNode.diseaseCubeCount }}</td>
+  </tr>
+  </tbody>
+</table>

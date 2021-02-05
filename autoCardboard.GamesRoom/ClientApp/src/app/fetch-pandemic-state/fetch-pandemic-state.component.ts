@@ -9,8 +9,8 @@ export class FetchPandemicStateComponent {
   public pandemicState: PandemicState;
 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
-    http.get<PandemicState>(baseUrl + 'weatherforecast').subscribe(result => {
-      //this.pandemicState = result;
+    http.get<PandemicState>(baseUrl + 'Game').subscribe(result => {
+      this.pandemicState = result;
     }, error => console.error(error));
   }
 }
