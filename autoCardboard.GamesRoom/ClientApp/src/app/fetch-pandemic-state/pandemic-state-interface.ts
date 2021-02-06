@@ -12,10 +12,10 @@ interface PandemicState {
 interface PandemicPlayerState {
     playerRole: string;
     location: string;
-    playerHand: PandemicPlayerHand;
+    playerHand: ReadonlyArray<PandemicPlayerCard>;
 }
 
-interface PandemicPlayerHand {
+interface PandemicPlayerCard {
     playerCardType: string;
     value: number;
     name: string;
@@ -27,8 +27,8 @@ interface PandemicMapNode {
     hasResearchStation: boolean; 
     diseaseCubes: ReadonlyArray<PandemicDiseaseAndCount>;
     diseaseCubeCount: number;
-    gridRow: number;
-    gridColumn: number;
+    gridRow: number; // 0 is top, 0 - 6
+    gridColumn: number; // 0 is left, 0 - 13
 };
 
 interface PandemicDiseaseAndCount {
