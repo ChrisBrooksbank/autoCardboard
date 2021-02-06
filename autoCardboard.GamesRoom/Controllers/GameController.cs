@@ -5,18 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace autoCardboard.GamesRoom.Controllers
 {
-   [ApiController]
-   [Route("[controller]")]
+   [ApiController]  
     public class GameController : ControllerBase
     {
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
-        public async Task<IActionResult> Get()
+        [Route("Play")]
+        public async Task<IActionResult> Get(string game)
         {
             var client = new HttpClient();
-            var response = await client.GetAsync("https://localhost:44387/Play?game=Pandemic");
+            var response = await client.GetAsync("https://localhost:44387/Play?game=" + game);
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
             return new JsonResult(responseBody);

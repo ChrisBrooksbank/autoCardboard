@@ -17,9 +17,9 @@ namespace autoCardboard.Pandemic.State
         public Dictionary<Disease, DiseaseState> DiscoveredCures { get; set; }
         public Dictionary<int, PandemicPlayerState> PlayerStates { get; set; }
         public InfectionDeck InfectionDeck { get; set; }
-        public CardDeck<Card> InfectionDiscardPile { get; set; }
+        public CardDeckOpen<Card> InfectionDiscardPile { get; set; }
         public PlayerDeck PlayerDeck { get; set; }
-        public PlayerDeck PlayerDiscardPile { get; set; }
+        public PlayerDeckOpen PlayerDiscardPile { get; set; }
         public int[] InfectionRateTrack { get; set; }
         public List<MapNode> Cities { get; set; }
     }

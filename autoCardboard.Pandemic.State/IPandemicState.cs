@@ -8,9 +8,9 @@ namespace autoCardboard.Pandemic.State
         bool IsGameOver { get; set; }
         int TurnsPlayed { get; set; }
         PlayerDeck PlayerDeck { get; set; }
-        PlayerDeck PlayerDiscardPile { get; set; }
+        PlayerDeckOpen PlayerDiscardPile { get; set; }
         InfectionDeck InfectionDeck { get; set; }
-        CardDeck<Card> InfectionDiscardPile { get; set; }
+        CardDeckOpen<Card> InfectionDiscardPile { get; set; }
 
         int OutbreakCount { get; set; }
         int PandemicCardCount { get; set; }

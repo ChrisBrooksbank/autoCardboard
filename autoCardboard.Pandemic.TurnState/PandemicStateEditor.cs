@@ -42,10 +42,10 @@ namespace autoCardboard.Pandemic.TurnState
             _state.Cities = new List<MapNode>();
 
             _state.InfectionDeck = new InfectionDeck();
-            _state.InfectionDiscardPile = new CardDeck<Card>();
+            _state.InfectionDiscardPile = new CardDeckOpen<Card>();
             _state.PlayerDeck = new PlayerDeck();
             _state.PandemicCardCount = pandemicCardCount;
-            _state.PlayerDiscardPile = new PlayerDeck();
+            _state.PlayerDiscardPile = new PlayerDeckOpen();
             SetupPlayerDeck(_state);
 
             _state.DiscoveredCures = new Dictionary<Disease, DiseaseState>();
