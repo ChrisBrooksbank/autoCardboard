@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.1.2">
@@ -31,17 +32,6 @@
   <ItemGroup>
     <None Remove="ClientApp\src\app\fetch-pandemic-state\fetch-pandemic-state.ts" />
     <None Remove="ClientApp\src\app\fetch-pandemic-state\pandemicState.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\autoCardboard.Api\autoCardboard.Api.csproj" />
-    <ProjectReference Include="..\autoCardboard.Common\autoCardboard.Common.csproj" />
-    <ProjectReference Include="..\autoCardboard.DependencyInjection\autoCardboard.DependencyInjection.csproj" />
-    <ProjectReference Include="..\autoCardboard.ForSale\autoCardboard.ForSale.csproj" />
-    <ProjectReference Include="..\autoCardboard.Infrastructure\autoCardboard.Infrastructure.csproj" />
-    <ProjectReference Include="..\autoCardboard.Messaging\autoCardboard.Messaging.csproj" />
-    <ProjectReference Include="..\autoCardboard.Pandemic.State\autoCardboard.Pandemic.State.csproj" />
-    <ProjectReference Include="..\autoCardboard.Pandemic\autoCardboard.Pandemic.Game.csproj" />
   </ItemGroup>
 
   <ItemGroup>

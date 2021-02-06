@@ -1,12 +1,14 @@
 <h1 id="tableLabel">Pandemic</h1>
 
-<ul>
+<p *ngIf="!pandemicState"><em>Loading...</em></p>
+
+<ul *ngIf="pandemicState">
   <li>Turns made : {{ pandemicState.turnsPlayed }}</li>
   <li>Outbreak count : {{ pandemicState.outbreakCount }}</li>
   <li>Infection rate marker: {{ pandemicState.infectionRateMarker }}</li>
 </ul>
 
-<table class='table table-striped' aria-labelledby="tableLabel">
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="pandemicState">
     <tbody>
       <tr>
         <td></td>
@@ -123,7 +125,7 @@
     </tbody>
 </table>
 
-<table class='table table-striped' aria-labelledby="tableLabel">
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="pandemicState">
   <thead>
   <tr>
     <th>City Name</th>
