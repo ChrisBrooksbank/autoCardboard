@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace autoCardboard.Pandemic.State
 {
@@ -16,5 +14,6 @@ namespace autoCardboard.Pandemic.State
         public int DiseaseCubeCount => DiseaseCubes.Values.Sum();
         public int GridRow { get; set; } // top row is 0
         public int GridColumn { get; set; } // left column is 0
+        public Disease DefaultDisease { get; set; }
     }
 }

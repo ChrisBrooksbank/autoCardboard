@@ -7,101 +7,196 @@ namespace autoCardboard.Pandemic.State
     public enum City
     {
         [Disease(Disease.Blue)]
+        [Connections(Chicago,Washington,Miami)]
+        [GridPosition(2,1)]
         Atlanta,
         [Disease(Disease.Blue)]
+        [Connections(SanFrancisco,Montreal,Atlanta,LosAngeles,MexicoCity)]
+        [GridPosition(1,1)]
         Chicago,
         [Disease(Disease.Blue)]
+        [Connections(London,Paris,Milan,StPetersburg)]
+        [GridPosition(1,5)]
         Essen,
         [Disease(Disease.Blue)]
+        [Connections(NewYork,Madrid,Paris,Essen)]
+        [GridPosition(1,4)]
         London,
         [Disease(Disease.Blue)]
+        [Connections(NewYork,London,Paris,Algiers,SaoPaulo)]
+        [GridPosition(2,4)]
         Madrid,
         [Disease(Disease.Blue)]
+        [Connections(Essen,Paris,Istanbul)]
+        [GridPosition(1,6)]
         Milan,
         [Disease(Disease.Blue)]
+        [Connections(Chicago,NewYork,Washington)]
+        [GridPosition(1,2)]
         Montreal,
         [Disease(Disease.Blue)]
+        [Connections(Montreal,Washington,London,Madrid)]
+        [GridPosition(1,3)]
         NewYork,
         [Disease(Disease.Blue)]
+        [Connections(London,Essen,Milan,Algiers,Madrid)]
+        [GridPosition(2,5)]
         Paris,
         [Disease(Disease.Blue)]
+        [Connections(Tokyo,Manila,Chicago,LosAngeles)]
+        [GridPosition(1,0)]
         SanFrancisco,
         [Disease(Disease.Blue)]
+        [Connections(Essen,Istanbul,Moscow)]
+        [GridPosition(0,6)]
         StPetersburg,
         [Disease(Disease.Blue)]
+        [Connections(Montreal,NewYork,Atlanta,Miami)]
+        [GridPosition(2,3)]
         Washington,
         [Disease(Disease.Yellow)]
+        [Connections(Miami,SaoPaulo,BuenosAires,Lima,MexicoCity)]
+        [GridPosition(4,3)]
         Bogota,
         [Disease(Disease.Yellow)]
+        [Connections(Bogota,SaoPaulo)]
+        [GridPosition(6,4)]
         BuenosAires,
         [Disease(Disease.Yellow)]
+        [Connections(Kinshasa,Khartoum)]
+        [GridPosition(6,6)]
         Johannesburg,
         [Disease(Disease.Yellow)]
+        [Connections(Cairo,Lagos,Kinshasa,Johannesburg)]
+        [GridPosition(4,6)]
         Khartoum,
         [Disease(Disease.Yellow)]
+        [Connections(Lagos,Khartoum,Johannesburg)]
+        [GridPosition(5,6)]
         Kinshasa,
         [Disease(Disease.Yellow)]
+        [Connections(SaoPaulo,Khartoum,Kinshasa)]
+        [GridPosition(4,5)]
         Lagos,
         [Disease(Disease.Yellow)]
+        [Connections(MexicoCity,Bogota,Santiago)]
+        [GridPosition(5,3)]
         Lima,
         [Disease(Disease.Yellow)]
+        [Connections(SanFrancisco,Sydney,Chicago,MexicoCity)]
+        [GridPosition(3,0)]
         LosAngeles,
         [Disease(Disease.Yellow)]
+        [Connections(LosAngeles,Chicago,Miami,Bogota,Lima)]
+        [GridPosition(3,1)]
         MexicoCity,
         [Disease(Disease.Yellow)]
+        [Connections(Atlanta,Washington,Bogota,MexicoCity)]
+        [GridPosition(3,3)]
         Miami,
         [Disease(Disease.Yellow)]
+        [Connections(Lima)]
+        [GridPosition(6,3)]
         Santiago,
         [Disease(Disease.Yellow)]
+        [Connections(Bogota,Lagos,BuenosAires)]
+        [GridPosition(5,4)]
         SaoPaulo,
-
         [Disease(Disease.Black)]
+        [Connections(Madrid,Paris,Istanbul,Cairo)]
+        [GridPosition(3,5)]
         Algiers,
         [Disease(Disease.Black)]
+        [Connections(Istanbul,Tehran,Karachi,Riyadh,Cairo)]
+        [GridPosition(3,7)]
         Baghdad,
         [Disease(Disease.Black)]
+        [Connections(Algiers,Istanbul,Baghdad,Riyadh,Khartoum)]
+        [GridPosition(3,6)]
         Cairo,
         [Disease(Disease.Black)]
+        [Connections(Mumbai,Delhi,Kolkata,Bangkok,Jakarta)]
+        [GridPosition(4,9)]
         Chennai,
         [Disease(Disease.Black)]
+        [Connections(Tehran,Kolkata,Chennai,Mumbai,Karachi)]
+        [GridPosition(3,9)]
         Delhi,
         [Disease(Disease.Black)]
+        [Connections(Milan,StPetersburg,Moscow,Baghdad,Cairo,Algiers)]
+        [GridPosition(2,6)]
         Istanbul,
         [Disease(Disease.Black)]
+        [Connections(Tehran,Delhi,Mumbai,Riyadh,Baghdad)]
+        [GridPosition(3,8)]
         Karachi,
         [Disease(Disease.Black)]
+        [Connections(Delhi,HongKong,Bangkok,Chennai)]
+        [GridPosition(3,10)]
         Kolkata,
         [Disease(Disease.Black)]
+        [Connections(StPetersburg,Tehran,Istanbul)]
+        [GridPosition(2,7)]
         Moscow,
         [Disease(Disease.Black)]
+        [Connections(Karachi,Delhi,Chennai)]
+        [GridPosition(4,8)]
         Mumbai,
         [Disease(Disease.Black)]
+        [Connections(Baghdad,Karachi,Cairo)]
+        [GridPosition(4,7)]
         Riyadh,
         [Disease(Disease.Black)]
+        [Connections(Moscow,Delhi,Karachi,Baghdad)]
+        [GridPosition(2,8)]
         Tehran,
         [Disease(Disease.Red)]
+        [Connections(Kolkata,HongKong,HoChiMinhCity,Jakarta,Chennai)]
+        [GridPosition(4,10)]
         Bangkok,
         [Disease(Disease.Red)]
+        [Connections(Seoul,Shanghai)]
+        [GridPosition(2,11)]
         Beijing,
         [Disease(Disease.Red)]
+        [Connections(Bangkok,HongKong,Manila,Jakarta)]
+        [GridPosition(5,11)]
         HoChiMinhCity,
         [Disease(Disease.Red)]
+        [Connections(Shanghai,Taipei,Manila,HoChiMinhCity,Bangkok)]
+        [GridPosition(4,11)]
         HongKong,
         [Disease(Disease.Red)]
+        [Connections(Chennai,Bangkok,HoChiMinhCity,Sydney)]
+        [GridPosition(6,10)]
         Jakarta,
         [Disease(Disease.Red)]
+        [Connections(HongKong,Taipei,SanFrancisco,Sydney,HoChiMinhCity)]
+        [GridPosition(5,12)]
         Manila,
         [Disease(Disease.Red)]
+        [Connections(Tokyo,Taipei)]
+        [GridPosition(4,13)]
         Osaka,
         [Disease(Disease.Red)]
+        [Connections(Beijing,Tokyo,Shanghai)]
+        [GridPosition(2,12)]
         Seoul,
         [Disease(Disease.Red)]
+        [Connections(Beijing,Seoul,Tokyo,Taipei,HongKong)]
+        [GridPosition(3,11)]
         Shanghai,
         [Disease(Disease.Red)]
+        [Connections(LosAngeles,Jakarta,Manila)]
+        [GridPosition(6,12)]
         Sydney,
         [Disease(Disease.Red)]
+        [Connections(Shanghai,Osaka,Manila,HongKong)]
+        [GridPosition(4,12)]
         Taipei,
         [Disease(Disease.Red)]
+        [Connections(SanFrancisco,Osaka,Shanghai,Seoul)]
+        [GridPosition(3,13)]
         Tokyo
     }
 }

@@ -100,8 +100,6 @@ namespace autoCardBoard.Pandemic.Bots
 
             cacheEntry = graph;
             var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
-
-            // Save data in cache.
             _memoryCache.Set("Pandemic.CityGraph", cacheEntry, cacheEntryOptions);
             
             return graph;

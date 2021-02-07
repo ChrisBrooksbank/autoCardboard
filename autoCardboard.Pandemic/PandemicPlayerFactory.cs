@@ -25,7 +25,7 @@ namespace autoCardboard.Pandemic.Game
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
             for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
-                var newPlayer = new PandemicBotStandard(_log, new RouteHelper(_memoryCache, new MapNodeFactory(_memoryCache)), new MessageSender(), new PlayerDeckHelper())
+                var newPlayer = new PandemicBotStandard(_log, new RouteHelper(_memoryCache, new MapNodeFactory()), new MessageSender(), new PlayerDeckHelper())
                 {
                     Id = player,
                     Name = player.ToString()

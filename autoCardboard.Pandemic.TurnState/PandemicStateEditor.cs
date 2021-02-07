@@ -5,24 +5,21 @@ using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace autoCardboard.Pandemic.TurnState
 {
-      public class PandemicStateEditor: IPandemicStateEditor
+    public class PandemicStateEditor: IPandemicStateEditor
     {
         private readonly ICardboardLogger _log;
 
         private int _currentPlayerId;
         private IPandemicState _state;
         private readonly IMessageSender _messageSender;
-        private readonly IMemoryCache _memoryCache;
 
-        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender, IMemoryCache memoryCache)
+        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender)
         {
             _log = logger;
             _messageSender = messageSender;
-            _memoryCache = memoryCache;
         }
 
         public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
@@ -55,7 +52,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state.InfectionRateMarker = 0;
             _state.InfectionRateTrack = new int[] { 2, 2, 2, 3, 3, 4, 4 };
 
-            var nodeFactory = new MapNodeFactory(_memoryCache);
+            var nodeFactory = new MapNodeFactory();
 
             var cities = Enum.GetValues(typeof(City));
             foreach (var city in cities)
