@@ -9,7 +9,6 @@ namespace autoCardboard.Pandemic.State
     [Serializable]
     public class MapNode
     {
-        [JsonConverter(typeof(StringEnumConverter))] 
         public City City { get; set; }
         public IEnumerable<City> ConnectedCities { get; set; }
         public bool HasResearchStation { get; set; }

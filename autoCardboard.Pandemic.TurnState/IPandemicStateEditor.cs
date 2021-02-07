@@ -17,5 +17,6 @@ namespace autoCardboard.Pandemic.TurnState
         void AddDiseaseCube(IPandemicState state, Disease disease, City city, List<City> ignoreCities = null);
         void TakeTurn(IPandemicState state, IPandemicTurn turn);
         void TakePlayerAction(IPandemicState state, PlayerAction playerAction);
+        void RemoveUnknownStateForPlayer(IPandemicState state, int playerId);
     }
 }

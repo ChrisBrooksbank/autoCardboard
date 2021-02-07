@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace autoCardboard.Pandemic.State
 {
     public class MapNodeFactory: IMapNodeFactory
     {
+        private readonly IMemoryCache _memoryCache;
+
         // Top left is 0,0 - means row 0 , column 0, there were gaps - approximate
         private const string CityGridRowsAndColumns = @"
             Atlanta:2,1.
@@ -107,6 +109,12 @@ namespace autoCardboard.Pandemic.State
             Taipei:Shanghai,Osaka,Manila,HongKong.
             Tokyo:SanFrancisco,Osaka,Shanghai,Seoul.";
 
+
+        public MapNodeFactory(IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+        }
+
         public MapNode CreateMapNode(City city)
         {
             var gridPosition = GetGridPosition(city);
@@ -131,6 +139,13 @@ namespace autoCardboard.Pandemic.State
 
         private List<City> GetConnectedCities(City city)
         {
+            var cacheKey = $"Pandemic.ConnectedCities{city}";
+            List<City> cacheEntry;
+            if (_memoryCache.TryGetValue(cacheKey, out cacheEntry))
+            {
+                return cacheEntry;
+            }
+
             var cities = new List<City>();
 
             var dataSignature = city.ToString() + ":";
@@ -148,11 +163,22 @@ namespace autoCardboard.Pandemic.State
                 cities.Add((City)Enum.Parse(typeof(City),cityField, true));
             }
 
+            cacheEntry = cities;
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
+            _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
+
             return cities;
         }
 
         private (int row, int column) GetGridPosition(City city)
         {
+            var cacheKey = $"Pandemic.GridPosition.{city}";
+            (int row, int column) cacheEntry;
+            if (_memoryCache.TryGetValue(cacheKey, out cacheEntry))
+            {
+                return cacheEntry;
+            }
+
             var gridRow = -1;
             var gridColumn = -1;
 
@@ -168,6 +194,10 @@ namespace autoCardboard.Pandemic.State
 
             gridRow = int.Parse(rowAndColumnCsv[0]);
             gridColumn = int.Parse(rowAndColumnCsv[1]);
+
+            cacheEntry = (gridRow, gridColumn);
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
+            _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
 
             return (gridRow, gridColumn);
         }

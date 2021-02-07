@@ -58,7 +58,7 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             // TODO this should loop towards research station until actions used up
-            if (_actionsTaken < 4 && readyToCure && !atResearchStation)
+            if (_actionsTaken < 4 && readyToCure && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
             {
                 var moveTo = routeToNearestResearchStation[1];
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");

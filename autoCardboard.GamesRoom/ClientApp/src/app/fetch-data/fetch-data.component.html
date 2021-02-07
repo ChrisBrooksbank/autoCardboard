@@ -8,17 +8,15 @@
   <thead>
     <tr>
       <th>Date</th>
-      <th>Temp. (C)</th>
+      <th>Temp. (Centigrade)</th>
       <th>Temp. (F)</th>
       <th>Summary</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let forecast of forecasts">
+    <tr *ngFor="let forecast of cities">
       <td>{{ forecast.date }}</td>
       <td>{{ forecast.temperatureC }}</td>
-      <td>{{ forecast.temperatureF }}</td>
-      <td>{{ forecast.summary }}</td>
     </tr>
   </tbody>
 </table>

@@ -5,16 +5,19 @@ using autoCardboard.Common;
 using autoCardboard.Pandemic.State;
 using Dijkstra.NET.Graph;
 using Dijkstra.NET.ShortestPath;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace autoCardBoard.Pandemic.Bots
 {
     public class RouteHelper : IRouteHelper
     {
+        private readonly IMemoryCache _memoryCache;
         private readonly IMapNodeFactory _mapNodeFactory;
 
-        public RouteHelper(IMapNodeFactory mapNodeFactory)
+        public RouteHelper(IMemoryCache memoryCache, IMapNodeFactory mapNodeFactory)
         {
             _mapNodeFactory = mapNodeFactory;
+            _memoryCache = memoryCache;
         }
 
         public City GetBestCityToDriveOrFerryTo(IPandemicState state, City startingLocation)
@@ -74,6 +77,12 @@ namespace autoCardBoard.Pandemic.Bots
 
         public Graph<City, string> GetCityGraph(List<MapNode> cities)
         {
+            Graph<City, string> cacheEntry;
+            if (_memoryCache.TryGetValue("Pandemic.CityGraph", out cacheEntry))
+            {
+                return cacheEntry;
+            }
+
             var graph = new Graph<City, string>();
 
             foreach(var city in Enum.GetValues(typeof(City)) )
@@ -88,10 +97,14 @@ namespace autoCardBoard.Pandemic.Bots
                     graph.Connect((uint)cityNode.City + 1, (uint)connectedCity + 1, 1, $"{cityNode.City}-{connectedCity}");
                 }
             }
+
+            cacheEntry = graph;
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
+
+            // Save data in cache.
+            _memoryCache.Set("Pandemic.CityGraph", cacheEntry, cacheEntryOptions);
             
             return graph;
         }
-
-       
     }
 }

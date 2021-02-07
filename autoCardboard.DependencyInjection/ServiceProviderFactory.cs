@@ -7,6 +7,7 @@ using autoCardboard.Messaging;
 using autoCardboard.Pandemic.Game;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace autoCardboard.DependencyInjection
@@ -15,10 +16,13 @@ namespace autoCardboard.DependencyInjection
     {
         public static IServiceProvider GetServiceProvider()
         {
+            var memoryCache = new MemoryCache(new MemoryCacheOptions());
+
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<ICardboardLogger, CardboardLogger>()
                 .AddSingleton<IGameHub, GameHub>()
                 .AddSingleton<IMessageSender,MessageSender>()
+                .AddSingleton<IMemoryCache>(memoryCache)
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()
