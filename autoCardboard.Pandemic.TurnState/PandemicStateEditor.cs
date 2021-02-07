@@ -5,6 +5,7 @@ using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace autoCardboard.Pandemic.TurnState
 {
@@ -14,12 +15,14 @@ namespace autoCardboard.Pandemic.TurnState
 
         private int _currentPlayerId;
         private IPandemicState _state;
-        private IMessageSender _messageSender;
+        private readonly IMessageSender _messageSender;
+        private readonly IMemoryCache _memoryCache;
 
-        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender)
+        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender, IMemoryCache memoryCache)
         {
             _log = logger;
             _messageSender = messageSender;
+            _memoryCache = memoryCache;
         }
 
         public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
@@ -42,17 +45,17 @@ namespace autoCardboard.Pandemic.TurnState
             _state.Cities = new List<MapNode>();
 
             _state.InfectionDeck = new InfectionDeck();
-            _state.InfectionDiscardPile = new CardDeckOpen<Card>();
+            _state.InfectionDiscardPile = new CardDeck<Card>();
             _state.PlayerDeck = new PlayerDeck();
             _state.PandemicCardCount = pandemicCardCount;
-            _state.PlayerDiscardPile = new PlayerDeckOpen();
+            _state.PlayerDiscardPile = new PlayerDeck();
             SetupPlayerDeck(_state);
 
             _state.DiscoveredCures = new Dictionary<Disease, DiseaseState>();
             _state.InfectionRateMarker = 0;
             _state.InfectionRateTrack = new int[] { 2, 2, 2, 3, 3, 4, 4 };
 
-            var nodeFactory = new MapNodeFactory();
+            var nodeFactory = new MapNodeFactory(_memoryCache);
 
             var cities = Enum.GetValues(typeof(City));
             foreach (var city in cities)
@@ -466,6 +469,12 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             return _state.PlayerDeck.Draw(2);
+        }
+
+        public void RemoveUnknownStateForPlayer(IPandemicState state, int playerId)
+        {
+            state.PlayerDeck = new PlayerDeck();
+            state.InfectionDeck = new InfectionDeck();
         }
 
     }

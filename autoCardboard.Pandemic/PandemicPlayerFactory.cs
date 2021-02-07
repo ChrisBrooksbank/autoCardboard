@@ -5,18 +5,19 @@ using autoCardboard.Messaging;
 using autoCardBoard.Pandemic.Bots;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace autoCardboard.Pandemic.Game
 {
     public class PandemicPlayerFactory : IPlayerFactory<IPandemicTurn>
     {
         private readonly ICardboardLogger _log;
-        private readonly IPandemicStateEditor _pandemicStateEditor;
+        private readonly IMemoryCache _memoryCache;
 
-        public PandemicPlayerFactory(ICardboardLogger log, IPandemicStateEditor pandemicStateEditor)
+        public PandemicPlayerFactory(ICardboardLogger log, IMemoryCache memoryCache)
         {
             _log = log;
-            _pandemicStateEditor = pandemicStateEditor;
+            _memoryCache = memoryCache;
         }
 
         public IEnumerable<IPlayer<IPandemicTurn>> CreatePlayers(PlayerConfiguration playerConfiguration)
@@ -24,7 +25,7 @@ namespace autoCardboard.Pandemic.Game
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
             for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
-                var newPlayer = new PandemicBotStandard(_log, new RouteHelper(new MapNodeFactory()), new MessageSender(), new PlayerDeckHelper())
+                var newPlayer = new PandemicBotStandard(_log, new RouteHelper(_memoryCache, new MapNodeFactory(_memoryCache)), new MessageSender(), new PlayerDeckHelper())
                 {
                     Id = player,
                     Name = player.ToString()

@@ -10,6 +10,8 @@ namespace autoCardboard.Common
         private static Random r = new Random();
         protected List<TCardType> cards = new List<TCardType>();
 
+        public List<TCardType> Cards => cards;
+
         public bool Empty => !cards.Any();
         public int CardCount => cards.Count;
         public void Shuffle()
