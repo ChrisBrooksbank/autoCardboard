@@ -10,4 +10,4 @@ For Sale is competitive, Pandemic is co-operative.
 
 Developers will be able to initiate a game of a supported type (For Sale or Pandemic) using a API call.
 
-GamesRoom project provides a ( Angular 8 SPA ) application enabling games to be run, and game state to be rendered.
+GamesRoom project provides a ( Angular 8 SPA ) application enabling games to be run, and game state to be rendered. GamesRoom calls the API to play games.
