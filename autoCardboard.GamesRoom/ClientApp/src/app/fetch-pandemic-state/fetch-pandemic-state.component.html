@@ -8,6 +8,8 @@
   <li>Infection rate marker: {{ pandemicState.infectionRateMarker }}</li>
 </ul>
 
+<button *ngIf="pandemicState" (click)="play()">Play Again</button>
+
 <table class='table table-striped' aria-labelledby="tableLabel" *ngIf="pandemicState">
     <tbody>
       <tr>
