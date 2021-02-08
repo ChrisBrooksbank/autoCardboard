@@ -49,6 +49,7 @@ namespace autoCardBoard.Pandemic.Bots
                                   || cardsByCity[Disease.Red].Count == 5 
                                   || cardsByCity[Disease.Yellow].Count == 5
                                   || cardsByCity[Disease.Black].Count == 5;
+
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
             var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State.Cities, _currentPlayerState.Location);
             var routeToNearestResearchStation = new List<City>();

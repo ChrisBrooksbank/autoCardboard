@@ -1,5 +1,4 @@
 ﻿using autoCardboard.Pandemic.State;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +26,14 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             return cityCardsByColour;
+        }
+
+        public IEnumerable<Disease> GetDiseasesCanCure(PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards)
+        {
+            var cardsNeededToCure = playerRole == PlayerRole.Scientist ? 4 : 5;
+            return  GetCityCardsByColour(cards)
+                .Where(cbd => cbd.Value.Count >= cardsNeededToCure)
+                .Select(cbd => cbd.Key);
         }
     }
 }

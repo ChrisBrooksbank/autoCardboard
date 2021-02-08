@@ -61,6 +61,13 @@ namespace autoCardBoard.Pandemic.Bots
 
         public List<City> GetShortestPath(List<MapNode> cities, City fromCity, City toCity)
         {
+            var cacheKey = $"Pandemic.ShortestPath.{fromCity}-{toCity}";
+            List<City> cacheEntry;
+            if (_memoryCache.TryGetValue(cacheKey, out cacheEntry))
+            {
+                return cacheEntry;
+            }
+
             var cityGraph = GetCityGraph(cities);
 
             var route =  cityGraph.Dijkstra( (uint)fromCity+1, (uint)toCity+1);
@@ -71,6 +78,10 @@ namespace autoCardBoard.Pandemic.Bots
             {
                 citiesTravelledTo.Add((City)(node-1));
             }
+
+            cacheEntry = citiesTravelledTo;
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
+            _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
 
             return citiesTravelledTo;
         }
