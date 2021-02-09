@@ -7,28 +7,24 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
-import { FetchPandemicStateComponent } from './fetch-pandemic-state/fetch-pandemic-state.component';
-
+import { PandemicComponent } from './pandemic/pandemic.component';
+import { ForSaleComponent } from './forsale/forsale.component';
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
-    HomeComponent,
-    CounterComponent,
-    FetchDataComponent,
-    FetchPandemicStateComponent
+    HomeComponent, 
+    PandemicComponent,
+    ForSaleComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
-      { path: 'fetch-pandemic-state', component: FetchPandemicStateComponent }
+      { path: '', component: HomeComponent, pathMatch: 'full' },      
+      { path: 'pandemic', component: PandemicComponent },
+      { path: 'forsale', component: ForSaleComponent },
     ])
   ],
   providers: [],

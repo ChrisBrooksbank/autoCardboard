@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-fetch-data',
-  templateUrl: './fetch-pandemic-state.component.html'
+  templateUrl: './pandemic.component.html'
 })
-export class FetchPandemicStateComponent {
+export class PandemicComponent {
   public pandemicState: PandemicState;
   public play;
 
