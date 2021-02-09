@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 namespace autoCardboard.GamesRoom
 {
     public class Startup
-    {
+    {     
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -22,8 +22,11 @@ namespace autoCardboard.GamesRoom
         {
             services
                 .AddControllers()
-                .AddNewtonsoftJson()
+               .AddNewtonsoftJson()
+             
                 .AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()) );
+
+            services.Configure<ApiConfig>(Configuration.GetSection("ApiConfig"));    
 
             services.AddControllersWithViews();
             // In production, the Angular files will be served from this directory
