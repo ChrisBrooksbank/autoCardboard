@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ConsoleApp", "autoCardboard.ConsoleApp\autoCardboard.ConsoleApp.csproj", "{FA05777B-B40C-45BA-9935-9D924435C359}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Test", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.csproj", "{D278AC30-926B-409E-9A9E-03C6A83464B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale.Test", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.csproj", "{29B5E25C-8DF9-4241-BF02-950B8F94515F}"
@@ -39,10 +37,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FA05777B-B40C-45BA-9935-9D924435C359}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FA05777B-B40C-45BA-9935-9D924435C359}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FA05777B-B40C-45BA-9935-9D924435C359}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FA05777B-B40C-45BA-9935-9D924435C359}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D278AC30-926B-409E-9A9E-03C6A83464B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D278AC30-926B-409E-9A9E-03C6A83464B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D278AC30-926B-409E-9A9E-03C6A83464B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
