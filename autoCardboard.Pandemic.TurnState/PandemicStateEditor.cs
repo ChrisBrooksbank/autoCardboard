@@ -78,6 +78,10 @@ namespace autoCardboard.Pandemic.TurnState
                 {Disease.Yellow, DiseaseState.NotCured}
             };
 
+            // Atlanta starts with a research station
+            _state.Cities.Single(c => c.City == City.Atlanta).HasResearchStation = true;
+            _state.ResearchStationStock--;
+
             _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", "Cleared");
         }
 
@@ -94,7 +98,6 @@ namespace autoCardboard.Pandemic.TurnState
             }
         }
 
-        // TODO debug this
         public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
         {
             _state = state;

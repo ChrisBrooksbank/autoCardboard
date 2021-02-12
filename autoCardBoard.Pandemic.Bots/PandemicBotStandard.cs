@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
@@ -20,17 +21,20 @@ namespace autoCardBoard.Pandemic.Bots
         private PandemicPlayerState _currentPlayerState;
         private readonly IMessageSender _messageSender;
         private readonly IPlayerDeckHelper _playerDeckHelper;
+        private readonly IResearchStationHelper _researchStationHelper;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, IPlayerDeckHelper playerDeckHelper)
+        public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
+            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper)
         {
             _log = log;
             _routeHelper = routeHelper;
             _actionsTaken = 0;
             _messageSender = messageSender;
             _playerDeckHelper = playerDeckHelper;
+            _researchStationHelper = researchStationHelper;
         }
 
         public void GetTurn(IPandemicTurn turn)
@@ -75,14 +79,19 @@ namespace autoCardBoard.Pandemic.Bots
             _turn = turn;
             _currentPlayerId = turn.CurrentPlayerId;
             _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
-            var hasCardForCurrentCity = _currentPlayerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.City
-                && (City) c.Value == _currentPlayerState.Location);
 
-            var cardsByCity = _playerDeckHelper.GetCityCardsByColour(_currentPlayerState.PlayerHand);
-            var readyToCure = cardsByCity[Disease.Blue].Count == 5 
-                                  || cardsByCity[Disease.Red].Count == 5 
-                                  || cardsByCity[Disease.Yellow].Count == 5
-                                  || cardsByCity[Disease.Black].Count == 5;
+            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(_currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand).ToList();
+            if (curableDiseases.Any())
+            {
+                _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"I have the cards to cure {curableDiseases[0]}");
+            }
+
+            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(turn.State.Cities, _currentPlayerState.Location, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+            if (_actionsTaken < 4 && shouldBuildResearchStation)
+            {
+                _turn.BuildResearchStation(_currentPlayerState.Location);
+                _actionsTaken++;
+            }
 
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
             var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State.Cities, _currentPlayerState.Location);
@@ -92,31 +101,25 @@ namespace autoCardBoard.Pandemic.Bots
                 routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State.Cities , _currentPlayerState.Location, nearestCityWithResearchStation.Value);
             }
 
-            // TODO this should loop towards research station until actions used up
-            if (_actionsTaken < 4 && readyToCure && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
+            // TODO changing if to while, still causes issues
+            var nextTurnStartsFromLocation = _currentPlayerState.Location;
+            if (_actionsTaken < 4 && curableDiseases.Any() && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
             {
                 var moveTo = routeToNearestResearchStation[1];
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
                 _turn.DriveOrFerry(moveTo);
                 _actionsTaken++;
+                nextTurnStartsFromLocation = moveTo;
             }
 
-            if (_actionsTaken < 4 && readyToCure && atResearchStation)
+            if (_actionsTaken < 4 && curableDiseases.Any() && atResearchStation)
             {
-                // TODO cure disease
+                _turn.DiscoverCure(curableDiseases[0]);
+                _actionsTaken++;
+                // TODO we need to discard cards to discover cure
             }
 
-            // If we can build a research station here, and we are not too close to another one, then build one
-            if (_actionsTaken < 4 && (_currentPlayerState.PlayerRole == PlayerRole.OperationsExpert || hasCardForCurrentCity))
-            {
-                if (routeToNearestResearchStation.Count > 2)
-                {
-                    _turn.BuildResearchStation(_currentPlayerState.Location);
-                    _actionsTaken++;
-                }
-            }
-            
-            // If there is disease here, use remaining actions to cure it
+            // If there is disease here, use remaining actions to treat
             while (_actionsTaken < 4 && turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 2)
             {
                 var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
@@ -124,7 +127,7 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             // Use any remaining actions, to move towards nearest city with significant disease
-            var nextTurnStartsFromLocation = _currentPlayerState.Location;
+            nextTurnStartsFromLocation = _currentPlayerState.Location;
             while (_actionsTaken < 4)
             {
                 var moveTo = _routeHelper.GetBestCityToDriveOrFerryTo(turn.State, nextTurnStartsFromLocation);
