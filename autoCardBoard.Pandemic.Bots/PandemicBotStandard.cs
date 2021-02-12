@@ -35,8 +35,40 @@ namespace autoCardBoard.Pandemic.Bots
 
         public void GetTurn(IPandemicTurn turn)
         {
-            _log.Information($"Pandemic player {Id} taking turn");
+            _log.Information($"Pandemic player {Id} taking turn of type {turn.TurnType}");
 
+            switch (turn.TurnType)
+            {
+                case PandemicTurnType.TakeActions:
+                    GetActionsTurn(turn);
+                    break;
+                case PandemicTurnType.DiscardCards:
+                    GetDiscardCardsTurn(turn);
+                    break;
+            }
+
+            _log.Information($"Pandemic player {Id} has taken turn");
+        }
+
+        public void GetDiscardCardsTurn(IPandemicTurn turn)
+        {
+            _currentPlayerId = turn.CurrentPlayerId;
+            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
+
+            var maxHandSize = 7;
+            var toDiscardCount = _currentPlayerState.PlayerHand.Count - maxHandSize;
+
+            var cardsToDiscard = new List<PandemicPlayerCard>();
+            while (cardsToDiscard.Count() < toDiscardCount)
+            {
+                cardsToDiscard.Add(_currentPlayerState.PlayerHand[0]);
+                _currentPlayerState.PlayerHand.RemoveAt(0);
+            }
+            turn.CardsToDiscard = cardsToDiscard;
+        }
+
+        public void GetActionsTurn(IPandemicTurn turn)
+        {
             _actionsTaken = 0;
             _turn = turn;
             _currentPlayerId = turn.CurrentPlayerId;
@@ -100,11 +132,6 @@ namespace autoCardBoard.Pandemic.Bots
                 _actionsTaken++;
                 nextTurnStartsFromLocation = moveTo;
             }             
-
-            // TODO we want control over which cards to discard, probably a new PlayerAction type,
-            // e.g. if we have five red cards, dont discard a red card !!!
-
-            _log.Information($"Pandemic player {Id} has taken turn");
         }
 
         private void TreatDiseases(MapNode mapNode)
@@ -115,7 +142,7 @@ namespace autoCardBoard.Pandemic.Bots
                 {
                     _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Treating {disease} at {mapNode.City}");
                     _turn.TreatDisease(disease);
-                    mapNode.DiseaseCubes[disease]--; // TODO we shouldnt be doing this, see PandemicTurnHandler, call PandemicState.Methods
+                    mapNode.DiseaseCubes[disease]--;
                     _actionsTaken++;
                 }
             }

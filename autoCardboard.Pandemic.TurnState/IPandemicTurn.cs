@@ -7,8 +7,10 @@ namespace autoCardboard.Pandemic.TurnState
     public interface IPandemicTurn : IGameTurn
     {
         int CurrentPlayerId { get; set; }
+        PandemicTurnType TurnType { get; set; }
         IEnumerable<PlayerAction> ActionsTaken { get; }
         IPandemicState State { get; set; }
+        IEnumerable<PandemicPlayerCard> CardsToDiscard{ get; set; }
 
         void DriveOrFerry(City toConnectedCity);
         void TreatDisease(Disease disease);

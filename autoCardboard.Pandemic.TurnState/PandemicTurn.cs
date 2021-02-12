@@ -29,6 +29,9 @@ namespace autoCardboard.Pandemic.TurnState
         public int CurrentPlayerId { get; set; }
 
         public IEnumerable<PlayerAction> ActionsTaken => _playerActions;
+        public IEnumerable<PandemicPlayerCard> CardsToDiscard { get;set; }
+
+        public PandemicTurnType TurnType { get; set; }
 
         public IPandemicState State
         {
@@ -48,6 +51,7 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _log = log;
             _validator = validator;
+            CardsToDiscard = new List<PandemicPlayerCard>();
         }
 
         public void BuildResearchStation(City city)

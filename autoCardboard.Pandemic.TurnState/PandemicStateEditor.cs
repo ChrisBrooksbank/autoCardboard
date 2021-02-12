@@ -83,6 +83,38 @@ namespace autoCardboard.Pandemic.TurnState
 
         public void TakeTurn(IPandemicState state, IPandemicTurn turn)
         {
+            switch (turn.TurnType)
+            {
+                case PandemicTurnType.TakeActions:
+                    TakeActionsTurn(state, turn);
+                    break;
+                case PandemicTurnType.DiscardCards:
+                    TakeDiscardCardsTurn(state,turn);
+                    break;
+            }
+        }
+
+        // TODO debug this
+        public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
+        {
+            _state = state;
+            _currentPlayerId = turn.CurrentPlayerId;
+            var playerState = _state.PlayerStates[_currentPlayerId];
+
+            foreach (var cardToDiscard in turn.CardsToDiscard)
+            {
+                var cardInPlayerDeck = playerState.PlayerHand
+                    .SingleOrDefault(c => c.PlayerCardType == cardToDiscard.PlayerCardType && c.Value == cardToDiscard.Value);
+                if (cardInPlayerDeck != null)
+                {
+                    playerState.PlayerHand.Remove(cardInPlayerDeck);
+                }
+            }
+
+        }
+
+        public void TakeActionsTurn(IPandemicState state, IPandemicTurn turn)
+        {
             _state = state;
             _currentPlayerId = turn.CurrentPlayerId;
             foreach (var action in turn.ActionsTaken)
@@ -91,6 +123,9 @@ namespace autoCardboard.Pandemic.TurnState
             }
             _state.TurnsPlayed++;
         }
+
+
+
         public void TakePlayerAction(IPandemicState state, PlayerAction action)
         {
             _state = state;

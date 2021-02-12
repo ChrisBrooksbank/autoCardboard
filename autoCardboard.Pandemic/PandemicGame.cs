@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
@@ -47,7 +48,10 @@ namespace autoCardboard.Pandemic.Game
                         break;
                     }
 
-                    var turn = new PandemicTurn(_logger, _validator) { CurrentPlayerId = player.Id, State = _state};
+                    var turn = new PandemicTurn(_logger, _validator)
+                    {
+                        CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
+                    };
 
                     _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Getting turn");
                     player.GetTurn(turn);
@@ -71,8 +75,7 @@ namespace autoCardboard.Pandemic.Game
                         }
                     }
 
-                    CurrentPlayerDiscardsDownToHandLimit(turn);
-
+                    PlayerDiscardsDownToHandLimit(player, turn);
                     _stateEditor.InfectCities(_state);
                 }
             }
@@ -86,17 +89,19 @@ namespace autoCardboard.Pandemic.Game
             _stateEditor.TakeTurn(_state, turn);
         }
 
-        private void CurrentPlayerDiscardsDownToHandLimit(IPandemicTurn turn)
+        private void PlayerDiscardsDownToHandLimit(IPlayer<IPandemicTurn> player, IPandemicTurn turn)
         {
-            var playerId = turn.CurrentPlayerId;
-            var playerState = _state.PlayerStates[playerId];
+            var currentPlayerId = turn.CurrentPlayerId;
+            var playerState = _state.PlayerStates[currentPlayerId];
 
             while (playerState.PlayerHand.Count > PlayerHandLimit)
             {
-                var discardCardAtIndex = new Die(playerState.PlayerHand.Count).Roll();
-                var cardToDiscard = _state.PlayerStates[turn.CurrentPlayerId].PlayerHand[discardCardAtIndex - 1];
-                _state.PlayerStates[turn.CurrentPlayerId].PlayerHand.Remove(cardToDiscard);
-                _state.PlayerDiscardPile.AddCard(cardToDiscard);
+                var discardCardsTurn = new PandemicTurn(_logger, _validator)
+                {
+                    CurrentPlayerId =currentPlayerId, State = _state, TurnType = PandemicTurnType.DiscardCards
+                };
+                player.GetTurn(discardCardsTurn);
+                ProcessTurn(discardCardsTurn);
             }
         }
 
@@ -105,6 +110,5 @@ namespace autoCardboard.Pandemic.Game
             _stateEditor.Setup(_state, players); 
             Players = players;
         }
-        
     }
 }
