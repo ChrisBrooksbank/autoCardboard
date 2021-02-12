@@ -47,8 +47,10 @@ namespace autoCardBoard.Pandemic.Bots
                return true;
            }
 
+           var minimumDistanceBetweenResearchStations = 2; // could be dynamic
+
            var routeToNearestResearchStation = _routeHelper.GetShortestPath(mapNodes , currentLocation, nearestCityWithResearchStation.Value);
-           if (routeToNearestResearchStation.Count > 2)
+           if (routeToNearestResearchStation.Count > minimumDistanceBetweenResearchStations)
            {
                return true;
            }

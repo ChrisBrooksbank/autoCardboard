@@ -78,6 +78,10 @@ namespace autoCardboard.Pandemic.TurnState
                 {Disease.Yellow, DiseaseState.NotCured}
             };
 
+            // Atlanta starts with a research station
+            _state.Cities.Single(c => c.City == City.Atlanta).HasResearchStation = true;
+            _state.ResearchStationStock--;
+
             _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", "Cleared");
         }
 
@@ -168,7 +172,6 @@ namespace autoCardboard.Pandemic.TurnState
 
         private void DiscoverCure(IPandemicState state, Disease disease)
         {
-            // TODO this is big news, defintely log this !!
             _state = state;
             _state.DiscoveredCures[disease] = !_state.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
         }
