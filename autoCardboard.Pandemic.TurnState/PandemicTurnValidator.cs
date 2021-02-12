@@ -80,7 +80,7 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 if(_currentMapLocation.ConnectedCities.All(c => c != playerAction.City))
                 {
-                    return "Cant drive or ferry here because its not connected to current location";
+                    return $"Cant drive or ferry to {playerAction.City} because its not connected to {_currentMapLocation.City}";
                 }
             }
 

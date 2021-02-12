@@ -102,14 +102,12 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             // TODO changing if to while, still causes issues
-            var nextTurnStartsFromLocation = _currentPlayerState.Location;
             if (_actionsTaken < 4 && curableDiseases.Any() && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
             {
                 var moveTo = routeToNearestResearchStation[1];
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
                 _turn.DriveOrFerry(moveTo);
                 _actionsTaken++;
-                nextTurnStartsFromLocation = moveTo;
             }
 
             if (_actionsTaken < 4 && curableDiseases.Any() && atResearchStation)
@@ -127,7 +125,7 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             // Use any remaining actions, to move towards nearest city with significant disease
-            nextTurnStartsFromLocation = _currentPlayerState.Location;
+            var nextTurnStartsFromLocation = _currentPlayerState.Location;
             while (_actionsTaken < 4)
             {
                 var moveTo = _routeHelper.GetBestCityToDriveOrFerryTo(turn.State, nextTurnStartsFromLocation);
