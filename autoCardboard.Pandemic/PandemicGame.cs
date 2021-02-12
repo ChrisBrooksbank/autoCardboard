@@ -62,6 +62,10 @@ namespace autoCardboard.Pandemic.Game
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
                     foreach (var newPlayerCard in newPlayerCards)
                     {
+                        if (State.IsGameOver)
+                        {
+                            break;
+                        }
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
                             _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"*** Draws Epidemic ***");
@@ -75,8 +79,11 @@ namespace autoCardboard.Pandemic.Game
                         }
                     }
 
-                    PlayerDiscardsDownToHandLimit(player, turn);
-                    _stateEditor.InfectCities(_state);
+                    if (!State.IsGameOver)
+                    {
+                        PlayerDiscardsDownToHandLimit(player, turn);
+                        _stateEditor.InfectCities(_state);
+                    }
                 }
             }
 

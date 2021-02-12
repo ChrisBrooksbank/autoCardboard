@@ -61,9 +61,11 @@ namespace autoCardBoard.Pandemic.Bots
             var cardsToDiscard = new List<PandemicPlayerCard>();
             while (cardsToDiscard.Count() < toDiscardCount)
             {
-                cardsToDiscard.Add(_currentPlayerState.PlayerHand[0]);
-                _currentPlayerState.PlayerHand.RemoveAt(0);
+                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+                cardsToDiscard.Add(weakestCard);
+                _currentPlayerState.PlayerHand.Remove(weakestCard);
             }
+
             turn.CardsToDiscard = cardsToDiscard;
         }
 
