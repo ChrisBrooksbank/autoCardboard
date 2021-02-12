@@ -15,5 +15,6 @@ namespace autoCardboard.Pandemic.TurnState
         void DriveOrFerry(City toConnectedCity);
         void TreatDisease(Disease disease);
         void BuildResearchStation(City city);
+        void DiscoverCure(Disease disease);
     }
 }

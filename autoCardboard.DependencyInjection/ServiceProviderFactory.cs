@@ -4,9 +4,11 @@ using autoCardboard.Common.Hubs;
 using autoCardboard.ForSale;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
+using autoCardBoard.Pandemic.Bots;
 using autoCardboard.Pandemic.Game;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +25,10 @@ namespace autoCardboard.DependencyInjection
                 .AddSingleton<IGameHub, GameHub>()
                 .AddSingleton<IMessageSender,MessageSender>()
                 .AddSingleton<IMemoryCache>(memoryCache)
+                .AddSingleton<IRouteHelper, RouteHelper>()
+                .AddSingleton<IPlayerDeckHelper, PlayerDeckHelper>()
+                .AddSingleton<IResearchStationHelper, ResearchStationHelper>()
+                .AddSingleton<IMapNodeFactory, MapNodeFactory>()
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()

@@ -94,7 +94,6 @@ namespace autoCardboard.Pandemic.TurnState
             }
         }
 
-        // TODO debug this
         public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
         {
             _state = state;
@@ -169,6 +168,7 @@ namespace autoCardboard.Pandemic.TurnState
 
         private void DiscoverCure(IPandemicState state, Disease disease)
         {
+            // TODO this is big news, defintely log this !!
             _state = state;
             _state.DiscoveredCures[disease] = !_state.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
         }

@@ -189,7 +189,7 @@ namespace autoCardboard.Pandemic.TurnState
             _playerActions.Add(newPlayerTurn);
         }
 
-        public void DiscoverACure(Disease disease)
+        public void DiscoverCure(Disease disease)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DiscoverCure, City = playerState.Location, Disease = disease };
@@ -204,6 +204,5 @@ namespace autoCardboard.Pandemic.TurnState
             _playerActions.Add(newPlayerTurn);
         }
 
-        // TODO Dispatcher can move another players pawn
-    }
+     }
 }
