@@ -155,7 +155,7 @@ namespace autoCardboard.Pandemic.TurnState
                     ShuttleFlight(_state, action.City);
                     break;
                 case PlayerActionType.DiscoverCure:
-                    DiscoverCure(_state, action.Disease);
+                    DiscoverCure(_state, action.Disease, action.CardsToDiscard);
                     break;
                 case PlayerActionType.ShareKnowledge:
                     ShareKnowledge();
@@ -170,10 +170,16 @@ namespace autoCardboard.Pandemic.TurnState
                         
         }
 
-        private void DiscoverCure(IPandemicState state, Disease disease)
+        private void DiscoverCure(IPandemicState state, Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard)
         {
             _state = state;
-            _state.DiscoveredCures[disease] = !_state.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
+            _state.DiscoveredCures[disease] = _state.Cities.Any(n => n.DiseaseCubes[disease] > 0) ? DiseaseState.Cured : DiseaseState.Eradicated;
+            foreach (var cardToDiscard in cardsToDiscard)
+            {
+                _state.PlayerStates[_currentPlayerId].PlayerHand.Remove(cardToDiscard);
+                _state.PlayerDiscardPile.AddCard(cardToDiscard);
+            }
+           
         }
 
         private void ShuttleFlight(IPandemicState state, City city)
@@ -284,6 +290,14 @@ namespace autoCardboard.Pandemic.TurnState
         public void InfectCities(IPandemicState state)
         {
             _state = state;
+
+            if (_state.OneQuietNight)
+            {
+                _state.OneQuietNight = false;
+                // TODO discard OneQuietNight card
+                return;
+            }
+
             var infectionRate = _state.InfectionRateTrack[_state.InfectionRateMarker];
             _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Infecting Cities. Rate = {infectionRate}");
 

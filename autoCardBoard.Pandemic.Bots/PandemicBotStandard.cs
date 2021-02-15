@@ -121,9 +121,10 @@ namespace autoCardBoard.Pandemic.Bots
 
             if (_actionsTaken < 4 && curableDiseases.Any() && atResearchStation)
             {
-                _turn.DiscoverCure(curableDiseases[0]);
+                var disease = curableDiseases[0];
+                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+                _turn.DiscoverCure(disease, cureCardsToDiscard);
                 _actionsTaken++;
-                // TODO we need to discard cards to discover cure
             }
 
             // If there is disease here, use remaining actions to treat

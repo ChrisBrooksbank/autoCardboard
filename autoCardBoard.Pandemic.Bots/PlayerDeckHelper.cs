@@ -1,12 +1,12 @@
 ﻿using autoCardboard.Pandemic.State;
 using System.Collections.Generic;
 using System.Linq;
+using autoCardboard.Infrastructure.Exceptions;
 
 namespace autoCardBoard.Pandemic.Bots
 {
     public class PlayerDeckHelper : IPlayerDeckHelper
     {
-
         public Dictionary<Disease, List<PandemicPlayerCard>> GetCityCardsByColour(IEnumerable<PandemicPlayerCard> cards)
         {
             var cityCardsByColour = new Dictionary<Disease, List<PandemicPlayerCard>>();
@@ -78,6 +78,19 @@ namespace autoCardBoard.Pandemic.Bots
 
             // If we have got here, we simply discard the first card
             return playerCards[0];
+        }
+
+        public List<PandemicPlayerCard> GetCardsToDiscardToCure(IPandemicState state, Disease disease, PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards)
+        {
+            var cardCountToDiscard = playerRole == PlayerRole.Scientist ? 4 : 5;
+            var candidateDiscards = GetCityCardsByColour(cards)[disease];
+
+            if (cardCountToDiscard > candidateDiscards.Count)
+            {
+                throw new CardboardException($"Cant find enough cards to discard to cure disease {disease}");
+            }
+            
+            return candidateDiscards.Take(cardCountToDiscard).ToList();
         }
     }
 }

@@ -13,7 +13,6 @@ namespace autoCardboard.Pandemic.TurnState
     // The state class in here is a clone of the game state as players dont have ability to directly modify the game state.
     // It performs some validation to prevent invalid player turns being presented back to the game.
 
-    // TODO move code out e.g. => PandemicTurnHandler, e.g. for DriveOrFerry, keep calls to validator in here ???
     public class PandemicTurn : IPandemicTurn
     {
         private readonly ICardboardLogger _log;
@@ -32,6 +31,8 @@ namespace autoCardboard.Pandemic.TurnState
         public IEnumerable<PandemicPlayerCard> CardsToDiscard { get;set; }
 
         public PandemicTurnType TurnType { get; set; }
+
+        public bool OneQuietNight { get; set; }
 
         public IPandemicState State
         {
@@ -151,8 +152,6 @@ namespace autoCardboard.Pandemic.TurnState
         public void ShuttleFlight(City anyCityAlsoWithResearchStation)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
-            var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
-            var destinationMapLocation = State.Cities.Single(n => n.City == anyCityAlsoWithResearchStation);
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.ShuttleFlight, City = anyCityAlsoWithResearchStation };
 
             var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
@@ -189,10 +188,17 @@ namespace autoCardboard.Pandemic.TurnState
             _playerActions.Add(newPlayerTurn);
         }
 
-        public void DiscoverCure(Disease disease)
+        public void DiscoverCure(Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
-            var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DiscoverCure, City = playerState.Location, Disease = disease };
+            var newPlayerTurn = new PlayerAction
+            {
+                PlayerId = CurrentPlayerId, 
+                PlayerActionType = PlayerActionType.DiscoverCure, 
+                City = playerState.Location, 
+                Disease = disease,
+                CardsToDiscard = cardsToDiscard
+            };
 
             var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
 
@@ -204,5 +210,9 @@ namespace autoCardboard.Pandemic.TurnState
             _playerActions.Add(newPlayerTurn);
         }
 
-     }
+        public void PlayOneQuietNight()
+        {
+            this.OneQuietNight = true;
+        }
+    }
 }
