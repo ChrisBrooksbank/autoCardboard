@@ -1,5 +1,5 @@
 # autoCardboard
-models board games played by bots.
+enables developers to develop bots to play boardgames.
 
 Developers can write logic which plays turns on any supported board game. ( Currently Pandemic and For Sale )
 
