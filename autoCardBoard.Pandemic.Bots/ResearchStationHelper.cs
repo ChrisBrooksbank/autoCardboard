@@ -15,6 +15,8 @@ namespace autoCardBoard.Pandemic.Bots
 
         public bool CouldBuildResearchStation(List<MapNode> mapNodes, City currentLocation, PlayerRole playerRole, List<PandemicPlayerCard> playerHand)
         {
+           // TODO check that we have at least one research station in the reserve 
+
            var atResearchStation = mapNodes.Single(c => c.City.Equals(currentLocation)).HasResearchStation;
            if (atResearchStation)
            {
