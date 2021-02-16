@@ -4,6 +4,8 @@ models board games played by bots.
 Developers can write logic which plays turns on any supported board game. ( Currently Pandemic and For Sale )
 
 > For Sale is a quick, fun game nominally about buying and selling real estate. During the game's two distinct phases, players first bid for several buildings then, after all buildings have been bought, sell the buildings for the greatest profit possible.
+
+
 > Pandemic is a cooperative board game designed by Matt Leacock and first published by Z-Man Games in the United States in 2008.[1] Pandemic is based on the premise that four diseases have broken out in the world, each threatening to wipe out a region. The game accommodates two to four players, each playing one of seven possible roles: dispatcher, medic, scientist, researcher, operations expert, contingency planner, or quarantine specialist. Through the combined effort of all the players, the goal is to discover all four cures before any of several game-losing conditions are reached.
 
 An *API* is provided which enables supported games to be played.
