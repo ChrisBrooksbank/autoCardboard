@@ -19,5 +19,3 @@ Bot Library provides helper methods. For example Pandemic library provides short
 MQTT messaging is used as a way for interested code to monitor game progress in realtime.
 
 GamesRoom project provides a ( Angular 8 SPA ) application enabling games to be run, and game state to be rendered. GamesRoom calls the API to play games.
-
-![](pandemicAPI.gif)
