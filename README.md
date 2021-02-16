@@ -1,7 +1,5 @@
 # autoCardboard
-enables developers to develop bots to play boardgames.
-
-Developers can write logic which plays turns on any supported board game. ( Currently Pandemic and For Sale )
+enables developers to develop bots to play supported boardgames.
 
 > For Sale is a quick, fun game nominally about buying and selling real estate. During the game's two distinct phases, players first bid for several buildings then, after all buildings have been bought, sell the buildings for the greatest profit possible.
 [ForSale rules](https://www.ultraboardgames.com/for-sale/game-rules.php )
@@ -13,9 +11,10 @@ An *API* is provided which enables supported games to be played.
 * End gamestate is returned as JSON.
 * MQTT messages are broadcast during play e.g. if realtime display of moves is required.
 
-The *Bot Library* provides helper methods.
+The *Bot Library* provides helper methods that can be used when writing bots, to reduce the amount of code to write.
 Designed to be a toolkit for developers tweaking the existing bots, or building new ones.
 e.g. the Pandemic bot library provides shortest path analysis for optimal routes between any two Pandemic cities, using Dijkstra's algorithm.
+
 
 MQTT messaging is used as a way for interested code to monitor game progress in realtime.
 
