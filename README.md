@@ -3,6 +3,8 @@ models board games played by bots.
 
 Developers can write logic which plays turns on any supported board game. ( Currently Pandemic and For Sale )
 
+API is provided which enables supported games to be played.
+
 Initial implentation of two games : 
 * For Sale ( https://www.ultraboardgames.com/for-sale/game-rules.php ) 
 * and Pandemic (https://www.ultraboardgames.com/pandemic/game-rules.php). 
