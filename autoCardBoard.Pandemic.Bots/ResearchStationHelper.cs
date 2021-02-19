@@ -13,11 +13,14 @@ namespace autoCardBoard.Pandemic.Bots
             _routeHelper = routeHelper;
         }
 
-        public bool CouldBuildResearchStation(List<MapNode> mapNodes, City currentLocation, PlayerRole playerRole, List<PandemicPlayerCard> playerHand)
+        public bool CouldBuildResearchStation(IPandemicState state, City currentLocation, PlayerRole playerRole, List<PandemicPlayerCard> playerHand)
         {
-           // TODO check that we have at least one research station in the reserve 
+           if (state.ResearchStationStock < 1)
+           {
+               return false;
+           }
 
-           var atResearchStation = mapNodes.Single(c => c.City.Equals(currentLocation)).HasResearchStation;
+           var atResearchStation = state.Cities.Single(c => c.City.Equals(currentLocation)).HasResearchStation;
            if (atResearchStation)
            {
                return false;
@@ -36,14 +39,14 @@ namespace autoCardBoard.Pandemic.Bots
            return false;
         }
 
-        public bool ShouldBuildResearchStation(List<MapNode> mapNodes, City currentLocation, PlayerRole playerRole, List<PandemicPlayerCard> playerHand)
+        public bool ShouldBuildResearchStation(IPandemicState state, City currentLocation, PlayerRole playerRole, List<PandemicPlayerCard> playerHand)
         {
-           if (!CouldBuildResearchStation(mapNodes, currentLocation, playerRole, playerHand))
+           if (!CouldBuildResearchStation(state, currentLocation, playerRole, playerHand))
            {
                return false;
            }
 
-           var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(mapNodes, currentLocation);
+           var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(state, currentLocation);
            if (nearestCityWithResearchStation == null)
            {
                return true;
@@ -51,7 +54,7 @@ namespace autoCardBoard.Pandemic.Bots
 
            var minimumDistanceBetweenResearchStations = 2; // could be dynamic
 
-           var routeToNearestResearchStation = _routeHelper.GetShortestPath(mapNodes , currentLocation, nearestCityWithResearchStation.Value);
+           var routeToNearestResearchStation = _routeHelper.GetShortestPath(state , currentLocation, nearestCityWithResearchStation.Value);
            if (routeToNearestResearchStation.Count > minimumDistanceBetweenResearchStations)
            {
                return true;

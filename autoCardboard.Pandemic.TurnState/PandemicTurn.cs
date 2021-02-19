@@ -214,5 +214,6 @@ namespace autoCardboard.Pandemic.TurnState
         {
             this.OneQuietNight = true;
         }
+
     }
 }

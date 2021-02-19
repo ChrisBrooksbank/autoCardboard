@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "Play?game=Pandemic",
+      "launchUrl": "Play?game=Pandemic&playCount=1",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

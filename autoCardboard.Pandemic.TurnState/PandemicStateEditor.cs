@@ -35,6 +35,7 @@ namespace autoCardboard.Pandemic.TurnState
         public void Clear(IPandemicState state, int pandemicCardCount = 6)
         {
             _state = state;
+            _state.Id = Guid.NewGuid().ToString();
             _state.TurnsPlayed = 0;
             var players = new List<IPlayer<IPandemicTurn>>();
             SetupPlayerStates(_state, players);
@@ -177,7 +178,7 @@ namespace autoCardboard.Pandemic.TurnState
             foreach (var cardToDiscard in cardsToDiscard)
             {
                 _state.PlayerStates[_currentPlayerId].PlayerHand.Remove(cardToDiscard);
-                _state.PlayerDiscardPile.AddCard(cardToDiscard);
+                                                   _state.PlayerDiscardPile.AddCard(cardToDiscard);
             }
            
         }
@@ -185,20 +186,13 @@ namespace autoCardboard.Pandemic.TurnState
         private void ShuttleFlight(IPandemicState state, City city)
         {
             _state = state;
-            var node = _state.Cities.Single(c => c.City == city);
             var playerState = _state.PlayerStates[_currentPlayerId];
-            var startingCity = playerState.Location;
             playerState.Location = city;
-
-            var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == startingCity);
-            playerState.PlayerHand.Remove(cardToDiscard);
-            _state.PlayerDiscardPile.AddCard(cardToDiscard);
         }
 
         private void DirectFlight(IPandemicState state, City city)
         {
             _state = state;
-            var node = _state.Cities.Single(c => c.City == city);
             var playerState = _state.PlayerStates[_currentPlayerId];
             playerState.Location = city;
 
@@ -210,7 +204,6 @@ namespace autoCardboard.Pandemic.TurnState
         private void CharterFlight(IPandemicState state, City city)
         {
             _state = state;
-            var node = _state.Cities.Single(c => c.City == city);
             var playerState = _state.PlayerStates[_currentPlayerId];
             var startingCity = playerState.Location;
             playerState.Location = city;

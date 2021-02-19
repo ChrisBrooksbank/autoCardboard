@@ -5,6 +5,7 @@ namespace autoCardboard.Pandemic.State
 {
     public interface IPandemicState : IGameState
     {
+        string Id { get; set; }
         bool IsGameOver { get; set; }
         int TurnsPlayed { get; set; }
         PlayerDeck PlayerDeck { get; set; }

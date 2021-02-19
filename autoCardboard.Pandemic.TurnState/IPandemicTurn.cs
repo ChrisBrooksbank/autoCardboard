@@ -13,6 +13,7 @@ namespace autoCardboard.Pandemic.TurnState
         IEnumerable<PandemicPlayerCard> CardsToDiscard{ get; set; }
 
         void DriveOrFerry(City toConnectedCity);
+        void ShuttleFlight(City anyCityAlsoWithResearchStation);
         void TreatDisease(Disease disease);
         void BuildResearchStation(City city);
         void DiscoverCure(Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard);
