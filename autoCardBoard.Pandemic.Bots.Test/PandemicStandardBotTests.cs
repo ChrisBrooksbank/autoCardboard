@@ -49,11 +49,15 @@ namespace autoCardBoard.Pandemic.Bots.Test
                 PlayerRole = PlayerRole.Researcher
             };
 
+            var atlanta = _state.Cities.Single(c => c.City == City.Atlanta);
+            atlanta.HasResearchStation = true;
+            _state.ResearchStationStock = 6;
+
             var mumbai = _state.Cities.Single(c => c.City == City.Mumbai);
             mumbai.HasResearchStation = true;
-            _state.ResearchStationStock = 5;
+            _state.ResearchStationStock--;
 
-            var bangkok =  _state.Cities.Single(c => c.City == City.Mumbai);
+            var bangkok =  _state.Cities.Single(c => c.City == City.Bangkok);
             bangkok.DiseaseCubes[Disease.Blue] = 3;
             _state.DiseaseCubeReserve[Disease.Blue] -= 3;
             

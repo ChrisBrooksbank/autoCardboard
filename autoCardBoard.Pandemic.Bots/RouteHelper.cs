@@ -24,6 +24,7 @@ namespace autoCardBoard.Pandemic.Bots
         
         public City GetBestCityToTravelToWithoutDiscarding(IPandemicState state, City startingLocation)
         {
+            var startingNode = state.Cities.Single(n => n.City == startingLocation);
             var threeCubeCities = state.Cities.Where(c => c.DiseaseCubeCount >= 3).ToList();
 
             var bestCandidate = 
@@ -31,8 +32,16 @@ namespace autoCardBoard.Pandemic.Bots
 
             if (bestCandidate != null)
             {
-                var startingNode = _mapNodeFactory.CreateMapNode(startingLocation);
-                var bestDriveFerryOrShuttleFlightTo = startingNode.ConnectedCities.OrderBy(c => GetDistance(state,bestCandidate.City, c)).First();
+                // TODO bug, doesnt look at research stations !
+                var connections = startingNode.ConnectedCities.ToList();
+                if (startingNode.HasResearchStation)
+                {
+                    var researchStationNodes = state.Cities
+                        .Where(n => n.HasResearchStation && n.City != startingLocation)
+                        .Select(n => n.City);
+                    connections.AddRange(researchStationNodes);
+                }
+                var bestDriveFerryOrShuttleFlightTo = connections.OrderBy(c => GetDistance(state,bestCandidate.City, c)).First();
                 
                 return bestDriveFerryOrShuttleFlightTo;
             }

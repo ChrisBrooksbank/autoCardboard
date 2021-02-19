@@ -100,24 +100,28 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
-            var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State, nextTurnStartsFromLocation);
-            var routeToNearestResearchStation = new List<City>();
-            if (nearestCityWithResearchStation != null)
-            {
-                routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
-            }
 
-            while (nearestCityWithResearchStation != null && _actionsTaken < 4 && curableDiseases.Any() 
-                   && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
+            if (!atResearchStation)
             {
-                var moveTo = routeToNearestResearchStation[1];
-                _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
-                _log.Information($"Movement : P{_currentPlayerId} walking towards research station to {moveTo}");
-                _turn.DriveOrFerry(moveTo);
-                nextTurnStartsFromLocation = moveTo;
-                atResearchStation = turn.State.Cities.Single(c => c.City.Equals(nextTurnStartsFromLocation)).HasResearchStation;
-                routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
-                _actionsTaken++;
+                var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State, nextTurnStartsFromLocation);
+                var routeToNearestResearchStation = new List<City>();
+                if (nearestCityWithResearchStation != null)
+                {
+                    routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
+                }
+
+                while (nearestCityWithResearchStation != null && _actionsTaken < 4 && curableDiseases.Any() 
+                       && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
+                {
+                    var moveTo = routeToNearestResearchStation[1];
+                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
+                    _log.Information($"Movement : P{_currentPlayerId} walking towards research station to {moveTo}");
+                    _turn.DriveOrFerry(moveTo);
+                    nextTurnStartsFromLocation = moveTo;
+                    atResearchStation = turn.State.Cities.Single(c => c.City.Equals(nextTurnStartsFromLocation)).HasResearchStation;
+                    routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
+                    _actionsTaken++;
+                }
             }
 
             if (_actionsTaken < 4 && curableDiseases.Any() && atResearchStation)
