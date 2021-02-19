@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.TurnState;
 using Dijkstra.NET.Graph;
 using Dijkstra.NET.ShortestPath;
 using Microsoft.Extensions.Caching.Memory;
+using autoCardboard.Pandemic.TurnState;
 
 namespace autoCardBoard.Pandemic.Bots
 {
@@ -19,19 +21,20 @@ namespace autoCardBoard.Pandemic.Bots
             _mapNodeFactory = mapNodeFactory;
             _memoryCache = memoryCache;
         }
-
-        public City GetBestCityToDriveOrFerryTo(IPandemicState state, City startingLocation)
+        
+        public City GetBestCityToTravelToWithoutDiscarding(IPandemicState state, City startingLocation)
         {
             var threeCubeCities = state.Cities.Where(c => c.DiseaseCubeCount >= 3).ToList();
 
             var bestCandidate = 
-                threeCubeCities.OrderBy(c => GetDistance(state.Cities,startingLocation, c.City)).FirstOrDefault();
+                threeCubeCities.OrderBy(c => GetDistance(state,startingLocation, c.City)).FirstOrDefault();
 
             if (bestCandidate != null)
             {
                 var startingNode = _mapNodeFactory.CreateMapNode(startingLocation);
-                var bestMoveTo = startingNode.ConnectedCities.OrderBy(c => GetDistance(state.Cities,bestCandidate.City, c)).First();
-                return bestMoveTo;
+                var bestDriveFerryOrShuttleFlightTo = startingNode.ConnectedCities.OrderBy(c => GetDistance(state,bestCandidate.City, c)).First();
+                
+                return bestDriveFerryOrShuttleFlightTo;
             }
 
             return bestCandidate == null ? GetRandomNeighbour(state, startingLocation) : bestCandidate.City;
@@ -47,28 +50,32 @@ namespace autoCardBoard.Pandemic.Bots
             return moveTo;
         }
 
-        public City? GetNearestCitywithResearchStation(List<MapNode> cities, City city)
+        // TODO this is wrong !!!!
+        public City? GetNearestCitywithResearchStation(IPandemicState state, City city)
         {
-            return cities.Where(n => n.HasResearchStation == true)
-                .OrderBy(n => GetDistance(cities, city, n.City) )
+            return state.Cities.Where(n => n.HasResearchStation == true)
+                .OrderBy(n => GetDistance(state, city, n.City) )
                 .FirstOrDefault()?.City;
         }
 
-        public int GetDistance(List<MapNode> cities, City city1, City city2)
+        public int GetDistance(IPandemicState state, City city1, City city2)
         {
-            return GetShortestPath(cities, city1, city2).Count - 1; // -2 because list includes start and destination
+            return GetShortestPath(state, city1, city2).Count - 1; // -2 because list includes start and destination
         }
 
-        public List<City> GetShortestPath(List<MapNode> cities, City fromCity, City toCity)
+        public List<City> GetShortestPath(IPandemicState state, City fromCity, City toCity)
         {
-            var cacheKey = $"Pandemic.ShortestPath.{fromCity}-{toCity}";
+            var citiesWithResearchStations = state.Cities.Where( n => n.HasResearchStation).ToList();
+            var cacheKey = citiesWithResearchStations.Count < 2 ? $"Pandemic.ShortestPath.{fromCity}-{toCity}" :  $"Pandemic.{state.Id}.ShortestPath.{fromCity}-{toCity}";
+            var cacheExpires = citiesWithResearchStations.Count < 2 ? TimeSpan.FromMinutes(30) : TimeSpan.FromMilliseconds(2000);
+
             List<City> cacheEntry;
             if (_memoryCache.TryGetValue(cacheKey, out cacheEntry))
             {
                 return cacheEntry;
             }
 
-            var cityGraph = GetCityGraph(cities);
+            var cityGraph = GetCityGraph(state);
 
             var route =  cityGraph.Dijkstra( (uint)fromCity+1, (uint)toCity+1);
             var path = route.GetPath();
@@ -80,16 +87,20 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             cacheEntry = citiesTravelledTo;
-            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(cacheExpires);
             _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
 
             return citiesTravelledTo;
         }
 
-        public Graph<City, string> GetCityGraph(List<MapNode> cities)
+        public Graph<City, string> GetCityGraph(IPandemicState state)
         {
+            var citiesWithResearchStations = state.Cities.Where( n => n.HasResearchStation).ToList();
+            var cacheKey = citiesWithResearchStations.Count < 2 ? "Pandemic.CityGraph" : $"Pandemic.{state.Id}.CityGraph.R{state.ResearchStationStock}";
+            var cacheExpires = citiesWithResearchStations.Count < 2 ? TimeSpan.FromMinutes(30) : TimeSpan.FromMilliseconds(2000);
+
             Graph<City, string> cacheEntry;
-            if (_memoryCache.TryGetValue("Pandemic.CityGraph", out cacheEntry))
+            if (_memoryCache.TryGetValue(cacheKey, out cacheEntry))
             {
                 return cacheEntry;
             }
@@ -101,17 +112,29 @@ namespace autoCardBoard.Pandemic.Bots
                 graph.AddNode((City)city);
             }
 
-            foreach (var cityNode in cities)
+            foreach (var cityNode in state.Cities)
             {
                 foreach (var connectedCity in cityNode.ConnectedCities)
                 {
                     graph.Connect((uint)cityNode.City + 1, (uint)connectedCity + 1, 1, $"{cityNode.City}-{connectedCity}");
                 }
+
+                // Connect all cities with research stations together
+                if (cityNode.HasResearchStation)
+                {
+                    foreach (var researchStationCity in citiesWithResearchStations)
+                    {
+                        if (researchStationCity.City != cityNode.City)
+                        {
+                            graph.Connect((uint)cityNode.City + 1, (uint)researchStationCity.City + 1, 1, $"Shuttle:{cityNode.City}-{researchStationCity.City}");
+                        }
+                    }
+                }
             }
 
             cacheEntry = graph;
-            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(90));
-            _memoryCache.Set("Pandemic.CityGraph", cacheEntry, cacheEntryOptions);
+            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(cacheExpires);
+            _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
             
             return graph;
         }

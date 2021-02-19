@@ -7,6 +7,7 @@ namespace autoCardboard.Pandemic.State
     [Serializable]
     public class PandemicState: GameState, IPandemicState
     {
+        public string Id { get; set; }
         public Boolean IsGameOver { get; set; }
         public int TurnsPlayed { get; set; }
         public int OutbreakCount { get; set; }

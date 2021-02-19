@@ -4,13 +4,14 @@ using System.Data;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
+using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
 
 namespace autoCardBoard.Pandemic.Bots
 {
-     public class PandemicBotStandard: IPlayer<IPandemicTurn>
+    public class PandemicBotStandard: IPlayer<IPandemicTurn>
     {
         private readonly ICardboardLogger _log;
         private readonly IRouteHelper _routeHelper;
@@ -91,7 +92,7 @@ namespace autoCardBoard.Pandemic.Bots
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"I have the cards to cure {curableDiseases[0]}");
             }
 
-            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(turn.State.Cities, nextTurnStartsFromLocation, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(turn.State, nextTurnStartsFromLocation, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
             if (_actionsTaken < 4 && shouldBuildResearchStation)
             {
                 _turn.BuildResearchStation(_currentPlayerState.Location);
@@ -99,11 +100,11 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
-            var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State.Cities, nextTurnStartsFromLocation);
+            var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State, nextTurnStartsFromLocation);
             var routeToNearestResearchStation = new List<City>();
             if (nearestCityWithResearchStation != null)
             {
-                routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State.Cities , nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
+                routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
             }
 
             while (nearestCityWithResearchStation != null && _actionsTaken < 4 && curableDiseases.Any() 
@@ -115,7 +116,7 @@ namespace autoCardBoard.Pandemic.Bots
                 _turn.DriveOrFerry(moveTo);
                 nextTurnStartsFromLocation = moveTo;
                 atResearchStation = turn.State.Cities.Single(c => c.City.Equals(nextTurnStartsFromLocation)).HasResearchStation;
-                routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State.Cities , nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
+                routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
                 _actionsTaken++;
             }
 
@@ -133,16 +134,34 @@ namespace autoCardBoard.Pandemic.Bots
                 var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
                 TreatDiseases(mapNodeToTreatDiseases);
             }
-
+            
             // Use any remaining actions, to move towards nearest city with significant disease
             while (_actionsTaken < 4)
             {
-                var moveTo = _routeHelper.GetBestCityToDriveOrFerryTo(turn.State, nextTurnStartsFromLocation);
+                var moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, nextTurnStartsFromLocation);
                 _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
                 _log.Information($"Movement : P{_currentPlayerId} walking from {nextTurnStartsFromLocation} to {moveTo}");
-                _turn.DriveOrFerry(moveTo);
-                _actionsTaken++;
-                nextTurnStartsFromLocation = moveTo;
+
+                var startingNode = _turn.State.Cities.Single(n => n.City.Equals(nextTurnStartsFromLocation));
+                var destinationNode = _turn.State.Cities.Single(n => n.City.Equals(moveTo));
+
+                if (startingNode.ConnectedCities.Contains(moveTo))
+                {
+                    _turn.DriveOrFerry(moveTo);
+                    _actionsTaken++;
+                    nextTurnStartsFromLocation = moveTo;
+                }
+                else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
+                {
+                    _turn.ShuttleFlight(moveTo);
+                    _actionsTaken++;
+                    nextTurnStartsFromLocation = moveTo;
+                }
+                else
+                {
+                    throw new CardboardException("Cant make this move");
+                }
+
             }             
         }
 

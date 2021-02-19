@@ -69,21 +69,24 @@ namespace autoCardboard.Api.Controllers
         [Route("Play")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
-        public JsonResult Play(Game game)
+        public JsonResult Play(Game game, int playCount = 1)
         {
             LogMessage( $"Playing game {game}");
             var serviceProvider = ServiceProviderFactory.GetServiceProvider();
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
 
-            switch (game)
+            for (var gamesPlayed = 0; gamesPlayed < playCount; gamesPlayed++)
             {
-                case Game.Pandemic:
-                    gameState = GameFactory.CreateGame<IPandemicState, IPandemicTurn>(serviceProvider, playerConfiguration).Play();
-                    break;
-                case Game.ForSale:
-                    gameState = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration).Play();
-                    break;
+                switch (game)
+                {
+                    case Game.Pandemic:
+                        gameState = GameFactory.CreateGame<IPandemicState, IPandemicTurn>(serviceProvider, playerConfiguration).Play();
+                        break;
+                    case Game.ForSale:
+                        gameState = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(serviceProvider, playerConfiguration).Play();
+                        break;
+                }
             }
 
             LogMessage($"Finished playing game {game}");
