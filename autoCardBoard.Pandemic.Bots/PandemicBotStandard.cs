@@ -75,9 +75,8 @@ namespace autoCardBoard.Pandemic.Bots
             if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.ShouldBuildResearchStation)
             {
                 _turn.BuildResearchStation(_pandemicMetaState.PlayerState.Location); 
-                // TODO change state, so can use research station this turn
-                // TODO discard a card unless  PlayerRole.OperationsExpert
-                _pandemicMetaState.PlayerHandUpdated();
+                // note, the state ( e.g. HasResearchStation ) is updated by the game, but only after the full turn, in processturn()
+                // if we want to update state earlier, will have to call more times....
             }
 
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.PlayerState.Location)).HasResearchStation;
