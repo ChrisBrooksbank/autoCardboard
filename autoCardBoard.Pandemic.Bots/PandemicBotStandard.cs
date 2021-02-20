@@ -74,12 +74,12 @@ namespace autoCardBoard.Pandemic.Bots
         
             if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.ShouldBuildResearchStation)
             {
-                _turn.BuildResearchStation(_pandemicMetaState.PlayerState.Location); 
+                _turn.BuildResearchStation(_pandemicMetaState.NextTurnStartsFromLocation); 
                 // note, the state ( e.g. HasResearchStation ) is updated by the game, but only after the full turn, in processturn()
                 // if we want to update state earlier, will have to call more times....
             }
 
-            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.PlayerState.Location)).HasResearchStation;
+            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.NextTurnStartsFromLocation)).HasResearchStation;
 
             if (!atResearchStation)
             {
@@ -98,14 +98,13 @@ namespace autoCardBoard.Pandemic.Bots
                 var disease = _pandemicMetaState.CurableDiseases[0];
                 var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand);
                 _turn.DiscoverCure(disease, cureCardsToDiscard);
-                // TODO dont we need to remove cureCardsToDiscard from hand here ?
                 _pandemicMetaState.PlayerHandUpdated();
             }
 
             // If there is disease here, use remaining actions to treat
-            while (_turn.ActionsTaken.Count() < 4 && turn.State.Cities.Single(n => n.City ==  _pandemicMetaState.PlayerState.Location).DiseaseCubeCount > 2)
+            while (_turn.ActionsTaken.Count() < 4 && turn.State.Cities.Single(n => n.City ==  _pandemicMetaState.NextTurnStartsFromLocation).DiseaseCubeCount > 2)
             {
-                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _pandemicMetaState.PlayerState.Location);
+                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _pandemicMetaState.NextTurnStartsFromLocation);
                 TreatDiseases(mapNodeToTreatDiseases);
             }
             
