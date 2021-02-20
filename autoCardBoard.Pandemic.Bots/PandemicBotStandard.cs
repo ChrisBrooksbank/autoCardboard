@@ -70,36 +70,37 @@ namespace autoCardBoard.Pandemic.Bots
         {
             _turn = turn;
 
-            // Bot needs to track its current location as it makes turn.
-            var nextTurnStartsFromLocation = _pandemicMetaState.PlayerState.Location;
-            _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
-            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(_pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand).ToList();
+            _pandemicMetaState.UpdateLocation(_pandemicMetaState.PlayerState.Location);
         
             if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.ShouldBuildResearchStation)
             {
-                _turn.BuildResearchStation(_pandemicMetaState.PlayerState.Location);
+                _turn.BuildResearchStation(_pandemicMetaState.PlayerState.Location); 
+                // TODO change state, so can use research station this turn
+                // TODO discard a card unless  PlayerRole.OperationsExpert
+                _pandemicMetaState.PlayerHandUpdated();
             }
 
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.PlayerState.Location)).HasResearchStation;
 
             if (!atResearchStation)
             {
-               while (_pandemicMetaState.NearestCityWithResearchStation != null && _turn.ActionsTaken.Count() < 4 && curableDiseases.Any() 
+               while (_pandemicMetaState.NearestCityWithResearchStation != null && _turn.ActionsTaken.Count() < 4 && _pandemicMetaState.CurableDiseases.Any() 
                        && !atResearchStation && _pandemicMetaState.RouteToNearestResearchStation != null && _pandemicMetaState.RouteToNearestResearchStation.Count > 1)
                 {
                     var moveTo = _pandemicMetaState.RouteToNearestResearchStation[1];
                     _turn.DriveOrFerry(moveTo);
-                    nextTurnStartsFromLocation = moveTo;
-                    _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
-                    atResearchStation = turn.State.Cities.Single(c => c.City.Equals(nextTurnStartsFromLocation)).HasResearchStation;
+                    _pandemicMetaState.UpdateLocation(moveTo);
+                    atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.NextTurnStartsFromLocation)).HasResearchStation;
                 }
             }
 
-            if (_turn.ActionsTaken.Count() < 4 && curableDiseases.Any() && atResearchStation)
+            if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.CurableDiseases.Any() && atResearchStation)
             {
-                var disease = curableDiseases[0];
+                var disease = _pandemicMetaState.CurableDiseases[0];
                 var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand);
                 _turn.DiscoverCure(disease, cureCardsToDiscard);
+                // TODO dont we need to remove cureCardsToDiscard from hand here ?
+                _pandemicMetaState.PlayerHandUpdated();
             }
 
             // If there is disease here, use remaining actions to treat
@@ -112,21 +113,19 @@ namespace autoCardBoard.Pandemic.Bots
             // Use any remaining actions, to move towards nearest city with significant disease
             while (_turn.ActionsTaken.Count() < 4)
             {
-                var moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, nextTurnStartsFromLocation);
-                var startingNode = _turn.State.Cities.Single(n => n.City.Equals(nextTurnStartsFromLocation));
+                var moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, _pandemicMetaState.NextTurnStartsFromLocation);
+                var startingNode = _turn.State.Cities.Single(n => n.City.Equals(_pandemicMetaState.NextTurnStartsFromLocation));
                 var destinationNode = _turn.State.Cities.Single(n => n.City.Equals(moveTo));
 
                 if (startingNode.ConnectedCities.Contains(moveTo))
                 {
                     _turn.DriveOrFerry(moveTo);
-                    nextTurnStartsFromLocation = moveTo;
-                    _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
+                    _pandemicMetaState.UpdateLocation(moveTo);
                 }
                 else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
                 {
                     _turn.ShuttleFlight(moveTo);
-                    nextTurnStartsFromLocation = moveTo;
-                    _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
+                    _pandemicMetaState.UpdateLocation(moveTo);
                 }
                 else
                 {

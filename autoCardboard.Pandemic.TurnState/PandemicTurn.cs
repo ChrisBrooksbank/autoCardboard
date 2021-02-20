@@ -66,8 +66,6 @@ namespace autoCardboard.Pandemic.TurnState
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _log.Information($"Building research station at {city}.");
-
             _playerActions.Add(playerAction);
         }
 
@@ -80,8 +78,6 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 throw new CardboardException(validationFailures[0]);
             }
-
-            _log.Information($"Driving/Ferry to {toConnectedCity}.");
 
             _playerActions.Add(playerAction);
         }
@@ -167,7 +163,6 @@ namespace autoCardboard.Pandemic.TurnState
 
         public void TreatDisease(Disease disease)
         {
-            _log.Information($"Treating {disease}");
             var playerState = State.PlayerStates[CurrentPlayerId];
             _playerActions.Add(new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.TreatDisease, City = playerState.Location, Disease = disease });
         }
