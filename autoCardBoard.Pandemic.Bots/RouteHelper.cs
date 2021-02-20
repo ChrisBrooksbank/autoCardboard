@@ -14,11 +14,9 @@ namespace autoCardBoard.Pandemic.Bots
     public class RouteHelper : IRouteHelper
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly IMapNodeFactory _mapNodeFactory;
 
-        public RouteHelper(IMemoryCache memoryCache, IMapNodeFactory mapNodeFactory)
+        public RouteHelper(IMemoryCache memoryCache)
         {
-            _mapNodeFactory = mapNodeFactory;
             _memoryCache = memoryCache;
         }
         
@@ -32,7 +30,6 @@ namespace autoCardBoard.Pandemic.Bots
 
             if (bestCandidate != null)
             {
-                // TODO bug, doesnt look at research stations !
                 var connections = startingNode.ConnectedCities.ToList();
                 if (startingNode.HasResearchStation)
                 {
@@ -59,7 +56,6 @@ namespace autoCardBoard.Pandemic.Bots
             return moveTo;
         }
 
-        // TODO this is wrong !!!!
         public City? GetNearestCitywithResearchStation(IPandemicState state, City city)
         {
             return state.Cities.Where(n => n.HasResearchStation == true)

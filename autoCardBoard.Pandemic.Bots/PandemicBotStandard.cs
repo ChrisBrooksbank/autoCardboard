@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
@@ -17,31 +16,29 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IRouteHelper _routeHelper;
 
         private IPandemicTurn _turn;
-        private int _actionsTaken;
-        private int _currentPlayerId;
-        private PandemicPlayerState _currentPlayerState;
         private readonly IMessageSender _messageSender;
         private readonly IPlayerDeckHelper _playerDeckHelper;
         private readonly IResearchStationHelper _researchStationHelper;
+        private readonly IPandemicMetaState _pandemicMetaState;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
-            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper)
+            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper,
+            IPandemicMetaState pandemicMetaState)
         {
             _log = log;
             _routeHelper = routeHelper;
-            _actionsTaken = 0;
             _messageSender = messageSender;
             _playerDeckHelper = playerDeckHelper;
             _researchStationHelper = researchStationHelper;
+            _pandemicMetaState = pandemicMetaState;
         }
 
         public void GetTurn(IPandemicTurn turn)
         {
-            _log.Information($"Pandemic player {Id} taking turn of type {turn.TurnType}");
-
+            _pandemicMetaState.Load(turn);
             switch (turn.TurnType)
             {
                 case PandemicTurnType.TakeActions:
@@ -51,24 +48,19 @@ namespace autoCardBoard.Pandemic.Bots
                     GetDiscardCardsTurn(turn);
                     break;
             }
-
-            _log.Information($"Pandemic player {Id} has taken turn");
         }
 
         public void GetDiscardCardsTurn(IPandemicTurn turn)
         {
-            _currentPlayerId = turn.CurrentPlayerId;
-            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
-
             var maxHandSize = 7;
-            var toDiscardCount = _currentPlayerState.PlayerHand.Count - maxHandSize;
+            var toDiscardCount = _pandemicMetaState.PlayerState.PlayerHand.Count - maxHandSize;
 
             var cardsToDiscard = new List<PandemicPlayerCard>();
             while (cardsToDiscard.Count() < toDiscardCount)
             {
-                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, _pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand);
                 cardsToDiscard.Add(weakestCard);
-                _currentPlayerState.PlayerHand.Remove(weakestCard);
+                _pandemicMetaState.PlayerState.PlayerHand.Remove(weakestCard);
             }
 
             turn.CardsToDiscard = cardsToDiscard;
@@ -76,90 +68,65 @@ namespace autoCardBoard.Pandemic.Bots
 
         public void GetActionsTurn(IPandemicTurn turn)
         {
-            _actionsTaken = 0;
             _turn = turn;
-            _currentPlayerId = turn.CurrentPlayerId;
-            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
 
             // Bot needs to track its current location as it makes turn.
-            var nextTurnStartsFromLocation = _currentPlayerState.Location;
-
-            _log.Information($"Movement : P{_currentPlayerId} starting turn at {_currentPlayerState.Location}");
-
-            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(_currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand).ToList();
-            if (curableDiseases.Any())
+            var nextTurnStartsFromLocation = _pandemicMetaState.PlayerState.Location;
+            _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
+            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(_pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand).ToList();
+        
+            if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.ShouldBuildResearchStation)
             {
-                _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"I have the cards to cure {curableDiseases[0]}");
+                _turn.BuildResearchStation(_pandemicMetaState.PlayerState.Location);
             }
 
-            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(turn.State, nextTurnStartsFromLocation, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
-            if (_actionsTaken < 4 && shouldBuildResearchStation)
-            {
-                _turn.BuildResearchStation(_currentPlayerState.Location);
-                _actionsTaken++;
-            }
-
-            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
+            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.PlayerState.Location)).HasResearchStation;
 
             if (!atResearchStation)
             {
-                var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State, nextTurnStartsFromLocation);
-                var routeToNearestResearchStation = new List<City>();
-                if (nearestCityWithResearchStation != null)
+               while (_pandemicMetaState.NearestCityWithResearchStation != null && _turn.ActionsTaken.Count() < 4 && curableDiseases.Any() 
+                       && !atResearchStation && _pandemicMetaState.RouteToNearestResearchStation != null && _pandemicMetaState.RouteToNearestResearchStation.Count > 1)
                 {
-                    routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
-                }
-
-                while (nearestCityWithResearchStation != null && _actionsTaken < 4 && curableDiseases.Any() 
-                       && !atResearchStation && routeToNearestResearchStation != null && routeToNearestResearchStation.Count > 1)
-                {
-                    var moveTo = routeToNearestResearchStation[1];
-                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
-                    _log.Information($"Movement : P{_currentPlayerId} walking towards research station to {moveTo}");
+                    var moveTo = _pandemicMetaState.RouteToNearestResearchStation[1];
                     _turn.DriveOrFerry(moveTo);
                     nextTurnStartsFromLocation = moveTo;
+                    _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
                     atResearchStation = turn.State.Cities.Single(c => c.City.Equals(nextTurnStartsFromLocation)).HasResearchStation;
-                    routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
-                    _actionsTaken++;
                 }
             }
 
-            if (_actionsTaken < 4 && curableDiseases.Any() && atResearchStation)
+            if (_turn.ActionsTaken.Count() < 4 && curableDiseases.Any() && atResearchStation)
             {
                 var disease = curableDiseases[0];
-                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand);
                 _turn.DiscoverCure(disease, cureCardsToDiscard);
-                _actionsTaken++;
             }
 
             // If there is disease here, use remaining actions to treat
-            while (_actionsTaken < 4 && turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 2)
+            while (_turn.ActionsTaken.Count() < 4 && turn.State.Cities.Single(n => n.City ==  _pandemicMetaState.PlayerState.Location).DiseaseCubeCount > 2)
             {
-                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
+                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _pandemicMetaState.PlayerState.Location);
                 TreatDiseases(mapNodeToTreatDiseases);
             }
             
             // Use any remaining actions, to move towards nearest city with significant disease
-            while (_actionsTaken < 4)
+            while (_turn.ActionsTaken.Count() < 4)
             {
                 var moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, nextTurnStartsFromLocation);
-                _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Driving to {moveTo}");
-                _log.Information($"Movement : P{_currentPlayerId} walking from {nextTurnStartsFromLocation} to {moveTo}");
-
                 var startingNode = _turn.State.Cities.Single(n => n.City.Equals(nextTurnStartsFromLocation));
                 var destinationNode = _turn.State.Cities.Single(n => n.City.Equals(moveTo));
 
                 if (startingNode.ConnectedCities.Contains(moveTo))
                 {
                     _turn.DriveOrFerry(moveTo);
-                    _actionsTaken++;
                     nextTurnStartsFromLocation = moveTo;
+                    _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
                 }
                 else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
                 {
                     _turn.ShuttleFlight(moveTo);
-                    _actionsTaken++;
                     nextTurnStartsFromLocation = moveTo;
+                    _pandemicMetaState.UpdateLocation(nextTurnStartsFromLocation);
                 }
                 else
                 {
@@ -173,12 +140,10 @@ namespace autoCardBoard.Pandemic.Bots
         {
             foreach (var disease in Enum.GetValues(typeof(Disease)).Cast<Disease>())
             {
-                if (mapNode.DiseaseCubes[disease] > 0 && _actionsTaken < 4)
+                if (mapNode.DiseaseCubes[disease] > 0 && _turn.ActionsTaken.Count() < 4)
                 {
-                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{_turn.CurrentPlayerId}", $"Treating {disease} at {mapNode.City}");
                     _turn.TreatDisease(disease);
                     mapNode.DiseaseCubes[disease]--;
-                    _actionsTaken++;
                 }
             }
         }
