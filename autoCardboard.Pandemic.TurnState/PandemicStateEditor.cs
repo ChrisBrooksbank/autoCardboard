@@ -36,7 +36,7 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _state = state;
             _state.Id = Guid.NewGuid().ToString();
-            _state.TurnsPlayed = 0;
+            _state.ActionsPlayed = 0;
             var players = new List<IPlayer<IPandemicTurn>>();
             SetupPlayerStates(_state, players);
             _state.IsGameOver = false;
@@ -125,7 +125,7 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 TakePlayerAction(_state, action);
             }
-            _state.TurnsPlayed++;
+            _state.ActionsPlayed++;
         }
 
 
@@ -297,6 +297,7 @@ namespace autoCardboard.Pandemic.TurnState
             if (_state.InfectionDeck.CardCount < infectionRate)
             {
                 _state.IsGameOver = true;
+                _state.GameOverReason = "Infection deck empty";
                 return;
             }
 
@@ -343,7 +344,6 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 if (quarantineSpecialist.Location == city || _state.Cities.Single(n => n.City == quarantineSpecialist.Location).ConnectedCities.Contains(city))
                 {
-                    _log.Information($"quarantineSpecialist in {quarantineSpecialist.Location} prevented {disease} in {city}");
                     return;
                 }
             }
@@ -356,8 +356,8 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 if (_state.DiseaseCubeReserve[disease] == 0)
                 {
-                    _log.Information($"Game over. No cubes left for {disease}");
                     _state.IsGameOver = true;
+                    _state.GameOverReason = $"Ran out of {disease} disease cubes";
                     return;
                 }
 
@@ -367,13 +367,12 @@ namespace autoCardboard.Pandemic.TurnState
                 return;
             }
 
-            _log.Information($"Outbreak in {node.City}");
             _state.OutbreakCount++;
 
             if (_state.OutbreakCount > 7)
             {
-                _log.Information($"Game over. Too many outbreaks");
                 _state.IsGameOver = true;
+                _state.GameOverReason = "More than seven outbreaks";
                 return;
             }
 
@@ -505,8 +504,8 @@ namespace autoCardboard.Pandemic.TurnState
             _state = state;
             if (_state.PlayerDeck.CardCount < 2)
             {
-                _log.Information("Game over. Empty playerdeck");
                 _state.IsGameOver = true;
+                _state.GameOverReason = "Empty player deck.";
                 return new List<PandemicPlayerCard>();
             }
 

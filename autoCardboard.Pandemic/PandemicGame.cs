@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
@@ -48,16 +47,15 @@ namespace autoCardboard.Pandemic.Game
                         break;
                     }
 
-                    var turn = new PandemicTurn(_logger, _validator)
+                    for (var actionNumber = 1; actionNumber <= 4; actionNumber++)
                     {
-                        CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
-                    };
-
-                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Getting turn");
-                    player.GetTurn(turn);
-                    ProcessTurn(turn);
-                    _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Finished turn");
-
+                        var turn = new PandemicTurn(_logger, _validator) {
+                            CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
+                        };
+                        player.GetTurn(turn);
+                        ProcessTurn(turn);
+                    }
+                  
                     // draw 2 new player cards
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
                     foreach (var newPlayerCard in newPlayerCards)
@@ -68,26 +66,22 @@ namespace autoCardboard.Pandemic.Game
                         }
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
-                            _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"*** Draws Epidemic ***");
                             _stateEditor.Epidemic(_state);
                             _state.PlayerDiscardPile.AddCard(newPlayerCard);
                         }
                         else
                         {
-                            _state.PlayerStates[turn.CurrentPlayerId].PlayerHand.Add(newPlayerCard);
-                            _messageSender.SendMessageASync($"AutoCardboard/Pandemic/Player/{turn.CurrentPlayerId}", $"Draws card");
+                            _state.PlayerStates[ player.Id].PlayerHand.Add(newPlayerCard);
                         }
                     }
 
                     if (!State.IsGameOver)
                     {
-                        PlayerDiscardsDownToHandLimit(player, turn);
+                        PlayerDiscardsDownToHandLimit(player, player.Id);
                         _stateEditor.InfectCities(_state);
                     }
                 }
             }
-
-            _logger.Information("Game Over !");
             return _state;
         }
 
@@ -96,16 +90,15 @@ namespace autoCardboard.Pandemic.Game
             _stateEditor.TakeTurn(_state, turn);
         }
 
-        private void PlayerDiscardsDownToHandLimit(IPlayer<IPandemicTurn> player, IPandemicTurn turn)
+        private void PlayerDiscardsDownToHandLimit(IPlayer<IPandemicTurn> player, int playerId)
         {
-            var currentPlayerId = turn.CurrentPlayerId;
-            var playerState = _state.PlayerStates[currentPlayerId];
+            var playerState = _state.PlayerStates[playerId];
 
             while (playerState.PlayerHand.Count > PlayerHandLimit)
             {
                 var discardCardsTurn = new PandemicTurn(_logger, _validator)
                 {
-                    CurrentPlayerId =currentPlayerId, State = _state, TurnType = PandemicTurnType.DiscardCards
+                    CurrentPlayerId =playerId, State = _state, TurnType = PandemicTurnType.DiscardCards
                 };
                 player.GetTurn(discardCardsTurn);
                 ProcessTurn(discardCardsTurn);

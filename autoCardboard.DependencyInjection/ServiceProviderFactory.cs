@@ -33,6 +33,7 @@ namespace autoCardboard.DependencyInjection
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()
                 .AddScoped<IPandemicStateEditor, PandemicStateEditor>()
+                .AddScoped<IPandemicMetaState, PandemicMetaState>()
 
                 .AddScoped<IPandemicState, PandemicState>()
                 .AddScoped<IGame<IPandemicState, IPandemicTurn>, PandemicGame>()

@@ -7,7 +7,8 @@ namespace autoCardboard.Pandemic.State
     {
         string Id { get; set; }
         bool IsGameOver { get; set; }
-        int TurnsPlayed { get; set; }
+        string GameOverReason{ get; set; }
+        int ActionsPlayed { get; set; }
         PlayerDeck PlayerDeck { get; set; }
         PlayerDeck PlayerDiscardPile { get; set; }
         InfectionDeck InfectionDeck { get; set; }
