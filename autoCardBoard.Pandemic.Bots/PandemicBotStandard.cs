@@ -16,6 +16,8 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IRouteHelper _routeHelper;
 
         private IPandemicTurn _turn;
+        private int _currentPlayerId;
+        private PandemicPlayerState _currentPlayerState;
         private readonly IMessageSender _messageSender;
         private readonly IPlayerDeckHelper _playerDeckHelper;
         private readonly IResearchStationHelper _researchStationHelper;
@@ -25,8 +27,7 @@ namespace autoCardBoard.Pandemic.Bots
         public string Name { get; set; }
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
-            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper,
-            IPandemicMetaState pandemicMetaState)
+            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper, IPandemicMetaState pandemicMetaState)
         {
             _log = log;
             _routeHelper = routeHelper;
@@ -38,7 +39,6 @@ namespace autoCardBoard.Pandemic.Bots
 
         public void GetTurn(IPandemicTurn turn)
         {
-            _pandemicMetaState.Load(turn);
             switch (turn.TurnType)
             {
                 case PandemicTurnType.TakeActions:
@@ -52,15 +52,18 @@ namespace autoCardBoard.Pandemic.Bots
 
         public void GetDiscardCardsTurn(IPandemicTurn turn)
         {
+            _currentPlayerId = turn.CurrentPlayerId;
+            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
+
             var maxHandSize = 7;
-            var toDiscardCount = _pandemicMetaState.PlayerState.PlayerHand.Count - maxHandSize;
+            var toDiscardCount = _currentPlayerState.PlayerHand.Count - maxHandSize;
 
             var cardsToDiscard = new List<PandemicPlayerCard>();
             while (cardsToDiscard.Count() < toDiscardCount)
             {
-                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, _pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand);
+                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
                 cardsToDiscard.Add(weakestCard);
-                _pandemicMetaState.PlayerState.PlayerHand.Remove(weakestCard);
+                _currentPlayerState.PlayerHand.Remove(weakestCard);
             }
 
             turn.CardsToDiscard = cardsToDiscard;
@@ -68,81 +71,88 @@ namespace autoCardBoard.Pandemic.Bots
 
         public void GetActionsTurn(IPandemicTurn turn)
         {
+            City moveTo;
             _turn = turn;
+            _currentPlayerId = turn.CurrentPlayerId;
+            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
 
-            _pandemicMetaState.UpdateLocation(_pandemicMetaState.PlayerState.Location);
-        
-            if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.ShouldBuildResearchStation)
+            // Bot needs to track its current location as it makes turn.
+            var nextTurnStartsFromLocation = _currentPlayerState.Location;
+
+            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(_currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand).ToList();
+
+            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(turn.State, nextTurnStartsFromLocation, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
+            if (shouldBuildResearchStation)
             {
-                _turn.BuildResearchStation(_pandemicMetaState.NextTurnStartsFromLocation); 
-                // note, the state ( e.g. HasResearchStation ) is updated by the game, but only after the full turn, in processturn()
-                // if we want to update state earlier, will have to call more times....
+                _turn.BuildResearchStation(_currentPlayerState.Location);
+                return;
             }
 
-            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.NextTurnStartsFromLocation)).HasResearchStation;
+            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
 
             if (!atResearchStation)
             {
-               while (_pandemicMetaState.NearestCityWithResearchStation != null && _turn.ActionsTaken.Count() < 4 && _pandemicMetaState.CurableDiseases.Any() 
-                       && !atResearchStation && _pandemicMetaState.RouteToNearestResearchStation != null && _pandemicMetaState.RouteToNearestResearchStation.Count > 1)
+                var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State, nextTurnStartsFromLocation);
+                var routeToNearestResearchStation = new List<City>();
+                if (nearestCityWithResearchStation != null)
                 {
-                    var moveTo = _pandemicMetaState.RouteToNearestResearchStation[1];
+                    routeToNearestResearchStation = _routeHelper.GetShortestPath(turn.State, nextTurnStartsFromLocation, nearestCityWithResearchStation.Value);
+                }
+
+                while (nearestCityWithResearchStation != null  
+                       && curableDiseases.Any() 
+                       && routeToNearestResearchStation != null 
+                       && routeToNearestResearchStation.Count > 1)
+                {
+                    moveTo = routeToNearestResearchStation[1];
                     _turn.DriveOrFerry(moveTo);
-                    _pandemicMetaState.UpdateLocation(moveTo);
-                    atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_pandemicMetaState.NextTurnStartsFromLocation)).HasResearchStation;
+                    return;
                 }
             }
 
-            if (_turn.ActionsTaken.Count() < 4 && _pandemicMetaState.CurableDiseases.Any() && atResearchStation)
+            if (curableDiseases.Any() && atResearchStation)
             {
-                var disease = _pandemicMetaState.CurableDiseases[0];
-                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _pandemicMetaState.PlayerState.PlayerRole, _pandemicMetaState.PlayerState.PlayerHand);
+                var disease = curableDiseases[0];
+                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(turn.State, disease, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
                 _turn.DiscoverCure(disease, cureCardsToDiscard);
-                _pandemicMetaState.PlayerHandUpdated();
+                return;
             }
 
-            // If there is disease here, use remaining actions to treat
-            while (_turn.ActionsTaken.Count() < 4 && turn.State.Cities.Single(n => n.City ==  _pandemicMetaState.NextTurnStartsFromLocation).DiseaseCubeCount > 2)
+            // If there is disease here then treat it
+            while (turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 2)
             {
-                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _pandemicMetaState.NextTurnStartsFromLocation);
-                TreatDiseases(mapNodeToTreatDiseases);
+                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
+                foreach (var disease in Enum.GetValues(typeof(Disease)).Cast<Disease>())
+                {
+                    if (mapNodeToTreatDiseases.DiseaseCubes[disease] > 0)
+                    {
+                        _turn.TreatDisease(disease);
+                        mapNodeToTreatDiseases.DiseaseCubes[disease]--;
+                        return;
+                    }
+                }
             }
             
-            // Use any remaining actions, to move towards nearest city with significant disease
-            while (_turn.ActionsTaken.Count() < 4)
+            // Move towards nearest city with significant disease
+            moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, nextTurnStartsFromLocation);
+
+            var startingNode = _turn.State.Cities.Single(n => n.City.Equals(nextTurnStartsFromLocation));
+            var destinationNode = _turn.State.Cities.Single(n => n.City.Equals(moveTo));
+
+            if (startingNode.ConnectedCities.Contains(moveTo))
             {
-                var moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, _pandemicMetaState.NextTurnStartsFromLocation);
-                var startingNode = _turn.State.Cities.Single(n => n.City.Equals(_pandemicMetaState.NextTurnStartsFromLocation));
-                var destinationNode = _turn.State.Cities.Single(n => n.City.Equals(moveTo));
-
-                if (startingNode.ConnectedCities.Contains(moveTo))
-                {
-                    _turn.DriveOrFerry(moveTo);
-                    _pandemicMetaState.UpdateLocation(moveTo);
-                }
-                else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
-                {
-                    _turn.ShuttleFlight(moveTo);
-                    _pandemicMetaState.UpdateLocation(moveTo);
-                }
-                else
-                {
-                    throw new CardboardException("Cant make this move");
-                }
-
-            }             
-        }
-
-        private void TreatDiseases(MapNode mapNode)
-        {
-            foreach (var disease in Enum.GetValues(typeof(Disease)).Cast<Disease>())
-            {
-                if (mapNode.DiseaseCubes[disease] > 0 && _turn.ActionsTaken.Count() < 4)
-                {
-                    _turn.TreatDisease(disease);
-                    mapNode.DiseaseCubes[disease]--;
-                }
+                _turn.DriveOrFerry(moveTo);
             }
+            else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
+            {
+                _turn.ShuttleFlight(moveTo);
+            }
+            else
+            {
+                throw new CardboardException("Cant make this move");
+            }
+                 
         }
+     
     }
 }

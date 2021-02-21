@@ -9,7 +9,8 @@ namespace autoCardboard.Pandemic.State
     {
         public string Id { get; set; }
         public Boolean IsGameOver { get; set; }
-        public int TurnsPlayed { get; set; }
+        public string GameOverReason{ get; set; }
+        public int ActionsPlayed { get; set; }
         public int OutbreakCount { get; set; }
         public Dictionary<Disease, int> DiseaseCubeReserve { get; set; }
         public int PandemicCardCount { get; set; }
