@@ -10,14 +10,13 @@ namespace autoCardBoard.Pandemic.Bots
         int PlayerId{ get; set; }
         PandemicPlayerState PlayerState{ get; set; }
         List<Disease> CurableDiseases{ get;}
-        City NextTurnStartsFromLocation{ get; set; }
+        City City{ get; set; }
+        MapNode MapNode{ get; set; }
         bool AtResearchStation { get; set; }
         bool ShouldBuildResearchStation{ get; }
         City? NearestCityWithResearchStation{ get; }
         List<City> RouteToNearestResearchStation{ get;}
 
         void Load(IPandemicTurn turn);
-        void UpdateLocation(City city);
-        void PlayerHandUpdated();
     }
 }

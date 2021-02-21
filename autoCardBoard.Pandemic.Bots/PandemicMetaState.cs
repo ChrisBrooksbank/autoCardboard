@@ -11,8 +11,7 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IPlayerDeckHelper _playerDeckHelper;
         private readonly IResearchStationHelper _researchStationHelper;
 
-        private bool _shouldBuildResearchStationDirty, _routeToNearestResearchStationDirty, _nearestCityWithResearchStationDirty, _curableDiseasesDirty;
-        private bool _shouldBuildResearchStation;
+        private bool? _shouldBuildResearchStation;
         private List<City> _routeToNearestResearchStation;
         private City? _nearestCityWithResearchStation;
         private List<Disease> _curableDiseases;
@@ -21,7 +20,8 @@ namespace autoCardBoard.Pandemic.Bots
         public int PlayerId{get; set;}
         public PandemicPlayerState PlayerState{ get; set; }
         public List<Disease> CurableDiseases => GetCurableDiseases();
-        public City NextTurnStartsFromLocation{ get; set; }
+        public City City{ get; set; }
+        public MapNode MapNode{ get; set; }
         public bool AtResearchStation {get; set;}
         public bool ShouldBuildResearchStation => GetShouldBuildResearchStation();
         public City? NearestCityWithResearchStation => GetNearestCityWithResearchStation();
@@ -39,44 +39,23 @@ namespace autoCardBoard.Pandemic.Bots
             PandemicTurn = turn;
             PlayerId = turn.CurrentPlayerId;
             PlayerState = turn.State.PlayerStates[PlayerId];
-            UpdateLocation(PlayerState.Location);
-            PlayerHandUpdated();
+            City = PlayerState.Location;
+            MapNode = turn.State.Cities.Single(n => n.City == City);
         }
-
-        public void UpdateLocation(City city)
-        {
-            if (NextTurnStartsFromLocation != city)
-            {
-                NextTurnStartsFromLocation = city;
-                AtResearchStation = PandemicTurn.State.Cities.Single(c => c.City.Equals(NextTurnStartsFromLocation)).HasResearchStation;
-                _shouldBuildResearchStationDirty = true;
-                _routeToNearestResearchStationDirty = true;
-                _nearestCityWithResearchStationDirty = true;
-            }
-        }
-
-        public void PlayerHandUpdated()
-        {
-            _shouldBuildResearchStationDirty = true;
-            _curableDiseasesDirty = true;
-        }
-
         private bool GetShouldBuildResearchStation()
         {
-            if (_shouldBuildResearchStationDirty)
+            if (_shouldBuildResearchStation == null)
             {
-                _shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(PandemicTurn.State, NextTurnStartsFromLocation, PlayerState.PlayerRole, PlayerState.PlayerHand);
-                _shouldBuildResearchStationDirty = false;
+                _shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(PandemicTurn.State, City, PlayerState.PlayerRole, PlayerState.PlayerHand);
             }
-            return _shouldBuildResearchStation;
+            return _shouldBuildResearchStation.Value;
         }
 
         private List<City> GetRouteToNearestResearchStation()
         {
-            if (_routeToNearestResearchStationDirty)
+            if (_routeToNearestResearchStation == null)
             {
-                _routeToNearestResearchStation = NearestCityWithResearchStation == null ? new List<City>() : _routeHelper.GetShortestPath(PandemicTurn.State, NextTurnStartsFromLocation, NearestCityWithResearchStation.Value);
-                _routeToNearestResearchStationDirty = false;
+                _routeToNearestResearchStation = NearestCityWithResearchStation == null ? new List<City>() : _routeHelper.GetShortestPath(PandemicTurn.State, City, NearestCityWithResearchStation.Value);
             }
 
             return _routeToNearestResearchStation;
@@ -84,10 +63,9 @@ namespace autoCardBoard.Pandemic.Bots
 
         private City? GetNearestCityWithResearchStation()
         {
-            if (_nearestCityWithResearchStationDirty)
+            if (_nearestCityWithResearchStation == null)
             {
-                _nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(PandemicTurn.State, NextTurnStartsFromLocation);
-                _nearestCityWithResearchStationDirty = false;
+                _nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(PandemicTurn.State, City);
             }
 
             return _nearestCityWithResearchStation;
@@ -95,10 +73,9 @@ namespace autoCardBoard.Pandemic.Bots
 
         private List<Disease> GetCurableDiseases()
         {
-            if (_curableDiseasesDirty)
+            if (_curableDiseases == null)
             {
                 _curableDiseases = _playerDeckHelper.GetDiseasesCanCure(PlayerState.PlayerRole, PlayerState.PlayerHand).ToList();
-                _curableDiseasesDirty = false;
             }
 
             return _curableDiseases;
