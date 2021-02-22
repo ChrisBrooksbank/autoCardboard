@@ -118,10 +118,7 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _state = state;
             _currentPlayerId = turn.CurrentPlayerId;
-            foreach (var action in turn.ActionsTaken)
-            {
-                ApplyPlayerAction(_state, action);
-            }
+            ApplyPlayerAction(_state, turn.ActionTaken);
             _state.ActionsPlayed++;
         }
         

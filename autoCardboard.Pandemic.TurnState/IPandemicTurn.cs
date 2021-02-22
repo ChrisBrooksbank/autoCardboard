@@ -8,7 +8,7 @@ namespace autoCardboard.Pandemic.TurnState
     {
         int CurrentPlayerId { get; set; }
         PandemicTurnType TurnType { get; set; }
-        IEnumerable<PlayerAction> ActionsTaken { get; }
+        PlayerAction ActionTaken { get; }
         IPandemicState State { get; set; }
         IEnumerable<PandemicPlayerCard> CardsToDiscard{ get; set; }
 

@@ -20,13 +20,11 @@ namespace autoCardboard.Pandemic.TurnState
         // game state can only be permanently changed by game, not by players, otherwise they could cheat
         private PandemicState _state;
 
-        private List<PlayerAction> _playerActions = new List<PlayerAction>();
-
         private readonly IPandemicTurnValidator _validator;
 
         public int CurrentPlayerId { get; set; }
 
-        public IEnumerable<PlayerAction> ActionsTaken => _playerActions;
+        public PlayerAction ActionTaken { get; set; }
         public IEnumerable<PandemicPlayerCard> CardsToDiscard { get;set; }
 
         public PandemicTurnType TurnType { get; set; }
@@ -65,7 +63,7 @@ namespace autoCardboard.Pandemic.TurnState
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(playerAction);
+            ActionTaken = playerAction;
         }
 
         public void DriveOrFerry(City toConnectedCity)
@@ -78,7 +76,7 @@ namespace autoCardboard.Pandemic.TurnState
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(playerAction);
+            ActionTaken = playerAction;
         }
       
         public void DirectFlight(City discardCityCardOfDestination)
@@ -94,7 +92,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             playerState.Location = discardCityCardOfDestination;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         /// <summary>
@@ -114,7 +112,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             currentMapLocation.HasResearchStation = true;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
 
@@ -136,7 +134,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             playerState.Location = anyCityAsDestination;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         /// <summary>
@@ -157,13 +155,13 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             playerState.Location = anyCityAlsoWithResearchStation;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         public void TreatDisease(Disease disease)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
-            _playerActions.Add(new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.TreatDisease, City = playerState.Location, Disease = disease });
+            ActionTaken = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.TreatDisease, City = playerState.Location, Disease = disease };
         }
 
         public void ShareKnowledge(City shareCity, int playerId)
@@ -179,7 +177,7 @@ namespace autoCardboard.Pandemic.TurnState
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         public void DiscoverCure(Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard)
@@ -201,7 +199,7 @@ namespace autoCardboard.Pandemic.TurnState
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         public void PlayOneQuietNight()

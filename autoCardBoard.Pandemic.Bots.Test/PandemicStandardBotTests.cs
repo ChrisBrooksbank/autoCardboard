@@ -65,7 +65,7 @@ namespace autoCardBoard.Pandemic.Bots.Test
             _turn.CurrentPlayerId = 1;
             _sut.GetTurn(_turn);
 
-            Assert.AreEqual(_turn.ActionsTaken.Any(a => a.PlayerActionType == PlayerActionType.ShuttleFlight), true);
+            Assert.AreEqual(_turn.ActionTaken.PlayerActionType == PlayerActionType.ShuttleFlight, true);
         }
     }
 }
