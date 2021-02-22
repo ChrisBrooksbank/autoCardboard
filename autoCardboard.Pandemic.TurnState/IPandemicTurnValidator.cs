@@ -5,7 +5,6 @@ namespace autoCardboard.Pandemic.TurnState
 {
     public interface IPandemicTurnValidator
     {
-        IEnumerable<string> ValidatePlayerActions(int playerId, IPandemicState state,
-            IEnumerable<PlayerAction> proposedTurns, PlayerAction newProposedTurn);
+        IEnumerable<string> ValidatePlayerAction(int playerId, IPandemicState state, PlayerAction newProposedTurn);
     }
 }

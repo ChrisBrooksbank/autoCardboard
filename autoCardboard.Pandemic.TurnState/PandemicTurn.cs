@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using autoCardboard.Infrastructure;
 using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Pandemic.State;
@@ -59,7 +58,7 @@ namespace autoCardboard.Pandemic.TurnState
         {
             var playerAction = new PlayerAction {PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.BuildResearchStation, City = city};
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, playerAction).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, playerAction).ToList();
 
             if (validationFailures.Any())
             {
@@ -72,7 +71,7 @@ namespace autoCardboard.Pandemic.TurnState
         public void DriveOrFerry(City toConnectedCity)
         {
             var playerAction = new PlayerAction {PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DriveOrFerry, City = toConnectedCity};
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, playerAction).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, playerAction).ToList();
 
             if (validationFailures.Any())
             {
@@ -87,7 +86,7 @@ namespace autoCardboard.Pandemic.TurnState
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DirectFlight, City = discardCityCardOfDestination };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -107,7 +106,7 @@ namespace autoCardboard.Pandemic.TurnState
             var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.BuildResearchStation, City = playerState.Location };
 
-           var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+           var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -129,7 +128,7 @@ namespace autoCardboard.Pandemic.TurnState
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.CharterFlight, City = anyCityAsDestination };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -150,7 +149,7 @@ namespace autoCardboard.Pandemic.TurnState
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.ShuttleFlight, City = anyCityAlsoWithResearchStation };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -173,7 +172,7 @@ namespace autoCardboard.Pandemic.TurnState
 
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.ShareKnowledge, City = playerState.Location };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -195,7 +194,7 @@ namespace autoCardboard.Pandemic.TurnState
                 CardsToDiscard = cardsToDiscard
             };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {

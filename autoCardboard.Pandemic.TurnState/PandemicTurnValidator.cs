@@ -23,7 +23,7 @@ namespace autoCardboard.Pandemic.TurnState
             _stateEditor = stateEditor;
         }
 
-        public IEnumerable<string> ValidatePlayerActions(int playerId, IPandemicState state, IEnumerable<PlayerAction> playerActions, PlayerAction newPlayerAction)
+        public IEnumerable<string> ValidatePlayerAction(int playerId, IPandemicState state, PlayerAction playerAction)
         {
             _state = state.Clone() as IPandemicState;
             state = null;
@@ -32,40 +32,19 @@ namespace autoCardboard.Pandemic.TurnState
             _currentMapLocation = _state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
 
             var validationFailures = new List<string>();
-
-            if (playerActions.Count() == 4)
+            
+            var validationFailure = GetTurnValidationFailure(playerAction);
+            if (string.IsNullOrWhiteSpace(validationFailure))
             {
-                validationFailures.Add("Only four actions allowed per turn");
-            }
-
-            foreach (var proposedTurn in playerActions)
-            {
-                var validationFailure = GetTurnValidationFailure(proposedTurn);
-                if (string.IsNullOrWhiteSpace(validationFailure))
-                {
-                    _stateEditor.TakePlayerAction(_state, proposedTurn);
-                    _pandemicPlayerState = _state.PlayerStates[_playerId];
-                    _currentMapLocation = _state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
-                }
-                else
-                {
-                    validationFailures.Add(validationFailure);
-                }
-            }
-
-            var validationFailureNewAction = GetTurnValidationFailure(newPlayerAction);
-            if (string.IsNullOrWhiteSpace(validationFailureNewAction))
-            {
-                // why are _state and state different ???
-                _stateEditor.TakePlayerAction(_state, newPlayerAction);
+                _stateEditor.ApplyPlayerAction(_state, playerAction);
                 _pandemicPlayerState = _state.PlayerStates[_playerId];
                 _currentMapLocation = _state.Cities.Single(n => n.City == _pandemicPlayerState.Location);
             }
             else
             {
-                validationFailures.Add(validationFailureNewAction);
+                validationFailures.Add(validationFailure);
             }
-
+            
             return validationFailures;
         }
 

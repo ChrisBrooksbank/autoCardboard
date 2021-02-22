@@ -29,7 +29,6 @@ namespace autoCardboard.Pandemic.TurnState
             _state.PandemicCardCount = pandemicCardCount;
             SetupPlayerStates(_state, players);
             PerformInitialInfections(_state);
-            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", "Setup");
         }
 
         public void Clear(IPandemicState state, int pandemicCardCount = 6)
@@ -82,8 +81,6 @@ namespace autoCardboard.Pandemic.TurnState
             // Atlanta starts with a research station
             _state.Cities.Single(c => c.City == City.Atlanta).HasResearchStation = true;
             _state.ResearchStationStock--;
-
-            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", "Cleared");
         }
 
         public void TakeTurn(IPandemicState state, IPandemicTurn turn)
@@ -123,14 +120,12 @@ namespace autoCardboard.Pandemic.TurnState
             _currentPlayerId = turn.CurrentPlayerId;
             foreach (var action in turn.ActionsTaken)
             {
-                TakePlayerAction(_state, action);
+                ApplyPlayerAction(_state, action);
             }
             _state.ActionsPlayed++;
         }
-
-
-
-        public void TakePlayerAction(IPandemicState state, PlayerAction action)
+        
+        public void ApplyPlayerAction(IPandemicState state, PlayerAction action)
         {
             _state = state;
             _currentPlayerId = action.PlayerId;
