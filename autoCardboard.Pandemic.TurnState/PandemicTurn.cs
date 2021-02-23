@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using autoCardboard.Infrastructure;
 using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Pandemic.State;
@@ -12,7 +11,6 @@ namespace autoCardboard.Pandemic.TurnState
     // This class is responsible for presenting the choices to a IPlayer that they have in making a turn in a way thats easy to understand.
     // The state class in here is a clone of the game state as players dont have ability to directly modify the game state.
     // It performs some validation to prevent invalid player turns being presented back to the game.
-
     public class PandemicTurn : IPandemicTurn
     {
         private readonly ICardboardLogger _log;
@@ -21,13 +19,11 @@ namespace autoCardboard.Pandemic.TurnState
         // game state can only be permanently changed by game, not by players, otherwise they could cheat
         private PandemicState _state;
 
-        private List<PlayerAction> _playerActions = new List<PlayerAction>();
-
-        private readonly IPandemicTurnValidator _validator;
+        private readonly IPandemicActionValidator _validator;
 
         public int CurrentPlayerId { get; set; }
 
-        public IEnumerable<PlayerAction> ActionsTaken => _playerActions;
+        public PlayerAction ActionTaken { get; set; }
         public IEnumerable<PandemicPlayerCard> CardsToDiscard { get;set; }
 
         public PandemicTurnType TurnType { get; set; }
@@ -48,7 +44,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
         }
 
-        public PandemicTurn(ICardboardLogger log, IPandemicTurnValidator validator)
+        public PandemicTurn(ICardboardLogger log, IPandemicActionValidator validator)
         {
             _log = log;
             _validator = validator;
@@ -59,27 +55,27 @@ namespace autoCardboard.Pandemic.TurnState
         {
             var playerAction = new PlayerAction {PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.BuildResearchStation, City = city};
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, playerAction).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, playerAction).ToList();
 
             if (validationFailures.Any())
             {
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(playerAction);
+            ActionTaken = playerAction;
         }
 
         public void DriveOrFerry(City toConnectedCity)
         {
             var playerAction = new PlayerAction {PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DriveOrFerry, City = toConnectedCity};
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, playerAction).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, playerAction).ToList();
 
             if (validationFailures.Any())
             {
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(playerAction);
+            ActionTaken = playerAction;
         }
       
         public void DirectFlight(City discardCityCardOfDestination)
@@ -87,7 +83,7 @@ namespace autoCardboard.Pandemic.TurnState
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.DirectFlight, City = discardCityCardOfDestination };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -95,7 +91,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             playerState.Location = discardCityCardOfDestination;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         /// <summary>
@@ -107,7 +103,7 @@ namespace autoCardboard.Pandemic.TurnState
             var currentMapLocation = State.Cities.Single(n => n.City == playerState.Location);
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.BuildResearchStation, City = playerState.Location };
 
-           var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+           var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -115,7 +111,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             currentMapLocation.HasResearchStation = true;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
 
@@ -129,7 +125,7 @@ namespace autoCardboard.Pandemic.TurnState
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.CharterFlight, City = anyCityAsDestination };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -137,7 +133,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             playerState.Location = anyCityAsDestination;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         /// <summary>
@@ -150,7 +146,7 @@ namespace autoCardboard.Pandemic.TurnState
             var playerState = State.PlayerStates[CurrentPlayerId];
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.ShuttleFlight, City = anyCityAlsoWithResearchStation };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
@@ -158,13 +154,13 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             playerState.Location = anyCityAlsoWithResearchStation;
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         public void TreatDisease(Disease disease)
         {
             var playerState = State.PlayerStates[CurrentPlayerId];
-            _playerActions.Add(new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.TreatDisease, City = playerState.Location, Disease = disease });
+            ActionTaken = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.TreatDisease, City = playerState.Location, Disease = disease };
         }
 
         public void ShareKnowledge(City shareCity, int playerId)
@@ -173,14 +169,14 @@ namespace autoCardboard.Pandemic.TurnState
 
             var newPlayerTurn = new PlayerAction { PlayerId = CurrentPlayerId, PlayerActionType = PlayerActionType.ShareKnowledge, City = playerState.Location };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         public void DiscoverCure(Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard)
@@ -195,14 +191,14 @@ namespace autoCardboard.Pandemic.TurnState
                 CardsToDiscard = cardsToDiscard
             };
 
-            var validationFailures = _validator.ValidatePlayerActions(CurrentPlayerId, State, _playerActions, newPlayerTurn).ToList();
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
 
             if (validationFailures.Any())
             {
                 throw new CardboardException(validationFailures[0]);
             }
 
-            _playerActions.Add(newPlayerTurn);
+            ActionTaken = newPlayerTurn;
         }
 
         public void PlayOneQuietNight()

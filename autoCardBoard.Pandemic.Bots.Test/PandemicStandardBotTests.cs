@@ -34,7 +34,7 @@ namespace autoCardBoard.Pandemic.Bots.Test
             _stateEditor.Clear(_state, 6);
 
             var cardboardLogger = A.Fake<ICardboardLogger>();
-            var turnValidator = A.Fake<IPandemicTurnValidator>();
+            var turnValidator = A.Fake<IPandemicActionValidator>();
             _turn = new PandemicTurn(cardboardLogger, turnValidator);
         }
 
@@ -65,7 +65,7 @@ namespace autoCardBoard.Pandemic.Bots.Test
             _turn.CurrentPlayerId = 1;
             _sut.GetTurn(_turn);
 
-            Assert.AreEqual(_turn.ActionsTaken.Any(a => a.PlayerActionType == PlayerActionType.ShuttleFlight), true);
+            Assert.AreEqual(_turn.ActionTaken.PlayerActionType == PlayerActionType.ShuttleFlight, true);
         }
     }
 }

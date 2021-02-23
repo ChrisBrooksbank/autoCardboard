@@ -38,7 +38,7 @@ namespace autoCardboard.DependencyInjection
                 .AddScoped<IPandemicState, PandemicState>()
                 .AddScoped<IGame<IPandemicState, IPandemicTurn>, PandemicGame>()
                 .AddScoped<IPlayerFactory<IPandemicTurn>, PandemicPlayerFactory>()
-                .AddScoped<IPandemicTurnValidator, PandemicTurnValidator>()
+                .AddScoped<IPandemicActionValidator, PandemicActionValidator>()
 
                 .BuildServiceProvider();
 

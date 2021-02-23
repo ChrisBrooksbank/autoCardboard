@@ -44,15 +44,15 @@ namespace autoCardBoard.Pandemic.Bots
             switch (turn.TurnType)
             {
                 case PandemicTurnType.TakeActions:
-                    GetActionsTurn(turn);
+                    GetAction(turn);
                     break;
                 case PandemicTurnType.DiscardCards:
-                    GetDiscardCardsTurn(turn);
+                    GetCardsToDiscard(turn);
                     break;
             }
         }
 
-        public void GetDiscardCardsTurn(IPandemicTurn turn)
+        public void GetCardsToDiscard(IPandemicTurn turn)
         {
             _currentPlayerId = turn.CurrentPlayerId;
             _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
@@ -71,7 +71,7 @@ namespace autoCardBoard.Pandemic.Bots
             turn.CardsToDiscard = cardsToDiscard;
         }
 
-        public void GetActionsTurn(IPandemicTurn turn)
+        public void GetAction(IPandemicTurn turn)
         {
             City moveTo;
             _turn = turn;
