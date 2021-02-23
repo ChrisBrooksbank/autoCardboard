@@ -83,7 +83,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state.ResearchStationStock--;
         }
 
-        public void TakeTurn(IPandemicState state, IPandemicTurn turn)
+        public void ApplyTurn(IPandemicState state, IPandemicTurn turn)
         {
             switch (turn.TurnType)
             {

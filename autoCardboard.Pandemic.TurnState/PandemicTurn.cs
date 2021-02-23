@@ -11,7 +11,6 @@ namespace autoCardboard.Pandemic.TurnState
     // This class is responsible for presenting the choices to a IPlayer that they have in making a turn in a way thats easy to understand.
     // The state class in here is a clone of the game state as players dont have ability to directly modify the game state.
     // It performs some validation to prevent invalid player turns being presented back to the game.
-
     public class PandemicTurn : IPandemicTurn
     {
         private readonly ICardboardLogger _log;
@@ -20,7 +19,7 @@ namespace autoCardboard.Pandemic.TurnState
         // game state can only be permanently changed by game, not by players, otherwise they could cheat
         private PandemicState _state;
 
-        private readonly IPandemicTurnValidator _validator;
+        private readonly IPandemicActionValidator _validator;
 
         public int CurrentPlayerId { get; set; }
 
@@ -45,7 +44,7 @@ namespace autoCardboard.Pandemic.TurnState
             }
         }
 
-        public PandemicTurn(ICardboardLogger log, IPandemicTurnValidator validator)
+        public PandemicTurn(ICardboardLogger log, IPandemicActionValidator validator)
         {
             _log = log;
             _validator = validator;

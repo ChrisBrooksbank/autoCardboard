@@ -17,7 +17,7 @@ namespace autoCardboard.Pandemic.Game
         private readonly ICardboardLogger _logger;
         private readonly IPandemicState _state;
         private readonly IPandemicStateEditor _stateEditor;
-        private readonly IPandemicTurnValidator _validator;
+        private readonly IPandemicActionValidator _validator;
         private readonly IMessageSender _messageSender;
 
         public IPandemicState State => _state;
@@ -25,7 +25,7 @@ namespace autoCardboard.Pandemic.Game
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
         public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor, 
-            IPandemicTurnValidator validator, IMessageSender messageSender )
+            IPandemicActionValidator validator, IMessageSender messageSender )
         {
             _logger = logger;
             _state = gamestate;
@@ -53,7 +53,7 @@ namespace autoCardboard.Pandemic.Game
                             CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
                         };
                         player.GetTurn(turn);
-                        ProcessTurn(turn);
+                        _stateEditor.ApplyTurn(_state, turn);
                     }
                   
                     // draw 2 new player cards
@@ -84,12 +84,7 @@ namespace autoCardboard.Pandemic.Game
             }
             return _state;
         }
-
-        private void ProcessTurn(IPandemicTurn turn)
-        {
-            _stateEditor.TakeTurn(_state, turn);
-        }
-
+        
         private void PlayerDiscardsDownToHandLimit(IPlayer<IPandemicTurn> player, int playerId)
         {
             var playerState = _state.PlayerStates[playerId];
@@ -101,7 +96,7 @@ namespace autoCardboard.Pandemic.Game
                     CurrentPlayerId =playerId, State = _state, TurnType = PandemicTurnType.DiscardCards
                 };
                 player.GetTurn(discardCardsTurn);
-                ProcessTurn(discardCardsTurn);
+                _stateEditor.ApplyTurn(_state, discardCardsTurn);
             }
         }
 

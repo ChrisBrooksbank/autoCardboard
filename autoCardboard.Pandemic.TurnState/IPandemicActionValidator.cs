@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace autoCardboard.Pandemic.TurnState
 {
-    public interface IPandemicTurnValidator
+    public interface IPandemicActionValidator
     {
         IEnumerable<string> ValidatePlayerAction(int playerId, IPandemicState state, PlayerAction newProposedTurn);
     }

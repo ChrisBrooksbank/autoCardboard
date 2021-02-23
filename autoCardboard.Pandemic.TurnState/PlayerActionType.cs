@@ -3,6 +3,10 @@
     public enum PlayerActionType
     {
         /// <summary>
+        /// Pass.
+        /// </summary>
+        Pass,
+        /// <summary>
         /// Move to a city connected by a white line.
         /// </summary>
         DriveOrFerry,
