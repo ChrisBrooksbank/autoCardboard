@@ -45,7 +45,6 @@ namespace autoCardBoard.Pandemic.Bots
             }
         }
 
-      
         /// <summary>
         /// Bot is being asked to select an action, by calling relevant method on the supplied IPandemicTurn
         /// </summary>
