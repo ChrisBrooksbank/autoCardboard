@@ -8,7 +8,6 @@ using autoCardBoard.Pandemic.Bots;
 using autoCardboard.Pandemic.Game;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,7 +32,6 @@ namespace autoCardboard.DependencyInjection
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()
                 .AddScoped<IPlayerFactory<IForSaleGameTurn>, ForSalePlayerFactory>()
                 .AddScoped<IPandemicStateEditor, PandemicStateEditor>()
-                .AddScoped<IPandemicMetaState, PandemicMetaState>()
 
                 .AddScoped<IPandemicState, PandemicState>()
                 .AddScoped<IGame<IPandemicState, IPandemicTurn>, PandemicGame>()
