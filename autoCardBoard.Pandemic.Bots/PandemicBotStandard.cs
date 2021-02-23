@@ -14,37 +14,30 @@ namespace autoCardBoard.Pandemic.Bots
     {
         private readonly ICardboardLogger _log;
         private readonly IRouteHelper _routeHelper;
-
-        private IPandemicTurn _turn;
-        private int _currentPlayerId;
-        private PandemicPlayerState _currentPlayerState;
+        
         private readonly IMessageSender _messageSender;
         private readonly IPlayerDeckHelper _playerDeckHelper;
         private readonly IResearchStationHelper _researchStationHelper;
-        private readonly IPandemicMetaState _pandemicMetaState;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
-            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper, IPandemicMetaState pandemicMetaState)
+            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper)
         {
             _log = log;
             _routeHelper = routeHelper;
             _messageSender = messageSender;
             _playerDeckHelper = playerDeckHelper;
             _researchStationHelper = researchStationHelper;
-            _pandemicMetaState = pandemicMetaState;
         }
 
         public void GetTurn(IPandemicTurn turn)
         {
-            _pandemicMetaState.Load(turn);
-            
             switch (turn.TurnType)
             {
                 case PandemicTurnType.TakeActions:
-                    GetActionsTurn(turn);
+                    GetActionTurn(turn);
                     break;
                 case PandemicTurnType.DiscardCards:
                     GetDiscardCardsTurn(turn);
@@ -52,101 +45,139 @@ namespace autoCardBoard.Pandemic.Bots
             }
         }
 
-        public void GetDiscardCardsTurn(IPandemicTurn turn)
+      
+        /// <summary>
+        /// Bot is being asked to select an action, by calling relevant method on the supplied IPandemicTurn
+        /// </summary>
+        /// <param name="turn"></param>
+        public void GetActionTurn(IPandemicTurn turn)
         {
-            _currentPlayerId = turn.CurrentPlayerId;
-            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
+            var currentPlayerId = turn.CurrentPlayerId;
+            var currentPlayerState = turn.State.PlayerStates[currentPlayerId];
+            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(currentPlayerState.PlayerRole, currentPlayerState.PlayerHand).ToList();
+            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(currentPlayerState.Location)).HasResearchStation;
 
-            var maxHandSize = 7;
-            var toDiscardCount = _currentPlayerState.PlayerHand.Count - maxHandSize;
-
-            var cardsToDiscard = new List<PandemicPlayerCard>();
-            while (cardsToDiscard.Count() < toDiscardCount)
-            {
-                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
-                cardsToDiscard.Add(weakestCard);
-                _currentPlayerState.PlayerHand.Remove(weakestCard);
-            }
-
-            turn.CardsToDiscard = cardsToDiscard;
+            if (CureIfAtResearchStationAndHaveCure(turn, curableDiseases, atResearchStation, currentPlayerState)) return;
+            if (MoveTowardsNearestResearchStationIfHaveCure(turn, atResearchStation, currentPlayerState, curableDiseases)) return;
+            if (IfThereIsDiseaseHereThenTreatIt(turn, currentPlayerState)) return;
+            if (BuildResearchStationIfSensible(turn, currentPlayerState)) return;
+            MoveTowardsNearestDiseaseWithoutDiscarding(turn, currentPlayerState);
+            return;
         }
 
-        public void GetActionsTurn(IPandemicTurn turn)
+        private void MoveTowardsNearestDiseaseWithoutDiscarding(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
         {
-            City moveTo;
-            _turn = turn;
-            _currentPlayerId = turn.CurrentPlayerId;
-            _currentPlayerState = turn.State.PlayerStates[_currentPlayerId];
-           
-            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(_currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand).ToList();
-            var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(_currentPlayerState.Location)).HasResearchStation;
-
-            // If we have a cure, and are at a research station, then cure
-            if (curableDiseases.Any() && atResearchStation)
+            var bestCityToTravelToWithoutDiscard =
+                _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, currentPlayerState.Location);
+            var startingNode = turn.State.Cities.Single(n => n.City.Equals(currentPlayerState.Location));
+            var destinationNode = turn.State.Cities.Single(n => n.City.Equals(bestCityToTravelToWithoutDiscard));
+            if (startingNode.ConnectedCities.Contains(bestCityToTravelToWithoutDiscard))
             {
-                var disease = curableDiseases[0];
-                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(
-                    turn.State, disease, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
-                _turn.DiscoverCure(disease, cureCardsToDiscard);
-                return;
-            }
-            
-            // If we have a cure, but are not at a research station, then move towards the nearest research station
-            if (!atResearchStation)
-            {
-                var nearestCityWithResearchStation = _routeHelper.GetNearestCitywithResearchStation(turn.State, _currentPlayerState.Location);
-                var routeToNearestResearchStation = nearestCityWithResearchStation == null ? new List<City>() : _routeHelper.GetShortestPath(turn.State, _currentPlayerState.Location, nearestCityWithResearchStation.Value);
-                if (nearestCityWithResearchStation != null  
-                    && curableDiseases.Any() 
-                    && routeToNearestResearchStation != null 
-                    && routeToNearestResearchStation.Count > 1)
-                {
-                    _turn.DriveOrFerry(routeToNearestResearchStation[1]);
-                    return;
-                }
-            }
-
-            // If there is disease here then treat it
-            while (turn.State.Cities.Single(n => n.City ==  _currentPlayerState.Location).DiseaseCubeCount > 2)
-            {
-                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == _currentPlayerState.Location);
-                foreach (var disease in Enum.GetValues(typeof(Disease)).Cast<Disease>())
-                {
-                    if (mapNodeToTreatDiseases.DiseaseCubes[disease] > 0)
-                    {
-                        _turn.TreatDisease(disease);
-                        return;
-                    }
-                }
-            }
-
-            // Consider building a research station here
-            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(turn.State, _currentPlayerState.Location, _currentPlayerState.PlayerRole, _currentPlayerState.PlayerHand);
-            if (shouldBuildResearchStation)
-            {
-                _turn.BuildResearchStation(_currentPlayerState.Location);
-                return;
-            }
-            
-            // Move towards nearest city with significant disease
-            moveTo = _routeHelper.GetBestCityToTravelToWithoutDiscarding(turn.State, _currentPlayerState.Location);
-            var startingNode = _turn.State.Cities.Single(n => n.City.Equals(_currentPlayerState.Location));
-            var destinationNode = _turn.State.Cities.Single(n => n.City.Equals(moveTo));
-            if (startingNode.ConnectedCities.Contains(moveTo))
-            {
-                _turn.DriveOrFerry(moveTo);
+                turn.DriveOrFerry(bestCityToTravelToWithoutDiscard);
                 return;
             }
             else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
             {
-                _turn.ShuttleFlight(moveTo);
+                turn.ShuttleFlight(bestCityToTravelToWithoutDiscard);
                 return;
             }
             else
             {
                 throw new CardboardException("Cant make this move");
             }
-                 
+        }
+
+        private bool BuildResearchStationIfSensible(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
+        {
+            var shouldBuildResearchStation = _researchStationHelper.ShouldBuildResearchStation(
+                turn.State, currentPlayerState.Location, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
+            if (shouldBuildResearchStation)
+            {
+                turn.BuildResearchStation(currentPlayerState.Location);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IfThereIsDiseaseHereThenTreatIt(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
+        {
+            while (turn.State.Cities.Single(n => n.City == currentPlayerState.Location).DiseaseCubeCount > 2)
+            {
+                var mapNodeToTreatDiseases = turn.State.Cities.Single(n => n.City == currentPlayerState.Location);
+                foreach (var disease in Enum.GetValues(typeof(Disease)).Cast<Disease>())
+                {
+                    if (mapNodeToTreatDiseases.DiseaseCubes[disease] > 0)
+                    {
+                        turn.TreatDisease(disease);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool MoveTowardsNearestResearchStationIfHaveCure(IPandemicTurn turn, bool atResearchStation,
+            PandemicPlayerState currentPlayerState, List<Disease> curableDiseases)
+        {
+            if (!atResearchStation)
+            {
+                var nearestCityWithResearchStation =
+                    _routeHelper.GetNearestCitywithResearchStation(turn.State, currentPlayerState.Location);
+                var routeToNearestResearchStation = nearestCityWithResearchStation == null
+                    ? new List<City>()
+                    : _routeHelper.GetShortestPath(turn.State, currentPlayerState.Location,
+                        nearestCityWithResearchStation.Value);
+                if (nearestCityWithResearchStation != null
+                    && curableDiseases.Any()
+                    && routeToNearestResearchStation != null
+                    && routeToNearestResearchStation.Count > 1)
+                {
+                    turn.DriveOrFerry(routeToNearestResearchStation[1]);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool CureIfAtResearchStationAndHaveCure(IPandemicTurn turn, List<Disease> curableDiseases, bool atResearchStation,
+            PandemicPlayerState currentPlayerState)
+        {
+            if (curableDiseases.Any() && atResearchStation)
+            {
+                var disease = curableDiseases[0];
+                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(
+                    turn.State, disease, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
+                turn.DiscoverCure(disease, cureCardsToDiscard);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Bot is being asked to discard cards down to hand limit
+        /// </summary>
+        /// <param name="turn"></param>
+        public void GetDiscardCardsTurn(IPandemicTurn turn)
+        {
+            var currentPlayerId = turn.CurrentPlayerId;
+            var currentPlayerState = turn.State.PlayerStates[currentPlayerId];
+
+            var maxHandSize = 7;
+            var toDiscardCount = currentPlayerState.PlayerHand.Count - maxHandSize;
+
+            var cardsToDiscard = new List<PandemicPlayerCard>();
+            while (cardsToDiscard.Count() < toDiscardCount)
+            {
+                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
+                cardsToDiscard.Add(weakestCard);
+                currentPlayerState.PlayerHand.Remove(weakestCard);
+            }
+
+            turn.CardsToDiscard = cardsToDiscard;
         }
      
     }
