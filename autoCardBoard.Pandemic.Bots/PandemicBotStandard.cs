@@ -16,14 +16,14 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IRouteHelper _routeHelper;
         
         private readonly IMessageSender _messageSender;
-        private readonly IPlayerDeckHelper _playerDeckHelper;
+        private readonly IHandManagementHelper _playerDeckHelper;
         private readonly IResearchStationHelper _researchStationHelper;
 
         public int Id { get; set; }
         public string Name { get; set; }
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
-            IPlayerDeckHelper playerDeckHelper, IResearchStationHelper researchStationHelper)
+            IHandManagementHelper playerDeckHelper, IResearchStationHelper researchStationHelper)
         {
             _log = log;
             _routeHelper = routeHelper;
@@ -60,8 +60,35 @@ namespace autoCardBoard.Pandemic.Bots
             if (MoveTowardsNearestResearchStationIfHaveCure(turn, atResearchStation, currentPlayerState, curableDiseases)) return;
             if (IfThereIsDiseaseHereThenTreatIt(turn, currentPlayerState)) return;
             if (BuildResearchStationIfSensible(turn, currentPlayerState)) return;
+            if (TakeDirectFlightIfSensible(turn, currentPlayerState)) return;
             MoveTowardsNearestDiseaseWithoutDiscarding(turn, currentPlayerState);
             return;
+        }
+
+        private bool TakeDirectFlightIfSensible(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
+        {
+            var weakCityCards = _playerDeckHelper.GetWeakCityCards(turn.State, 
+                currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
+            if (weakCityCards == null || !weakCityCards.Any())
+            {
+                return false;
+            }
+
+            var valueOfCurrentLocation = _routeHelper.GetLocationValue(turn.State, currentPlayerState.Location);
+
+            foreach (var candidateCity in weakCityCards)
+            {
+                var valueOfCandidateCity =  _routeHelper.GetLocationValue(turn.State, (City)candidateCity.Value);
+                var distanceToCandidateCity = _routeHelper.GetDistance(turn.State, currentPlayerState.Location, (City)candidateCity.Value);
+
+                if ( (valueOfCandidateCity - valueOfCurrentLocation > 3) && distanceToCandidateCity > 3)
+                {
+                    turn.DirectFlight((City)candidateCity.Value);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void MoveTowardsNearestDiseaseWithoutDiscarding(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
