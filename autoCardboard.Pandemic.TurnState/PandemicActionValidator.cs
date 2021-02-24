@@ -42,7 +42,7 @@ namespace autoCardboard.Pandemic.TurnState
 
             if (playerAction.PlayerActionType == PlayerActionType.DirectFlight)
             {
-                if (!playerState.PlayerHand.Exists(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == currentMapLocation.City))
+                if (!playerState.PlayerHand.Exists(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == playerAction.City))
                 {
                     return "Cant take directflight without citycard of destination";
                 }
