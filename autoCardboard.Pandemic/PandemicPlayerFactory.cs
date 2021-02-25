@@ -12,11 +12,11 @@ namespace autoCardboard.Pandemic.Game
         private readonly ICardboardLogger _log;
         private readonly IRouteHelper _routeHelper;
         private readonly IResearchStationHelper _researchStationHelper;
-        private readonly IPlayerDeckHelper _playerDeckHelper;
+        private readonly IHandManagementHelper _playerDeckHelper;
         private readonly IMessageSender _messageSender;
 
         public PandemicPlayerFactory(ICardboardLogger log, IRouteHelper routeHelper, 
-            IResearchStationHelper researchStationHelper, IPlayerDeckHelper playerDeckHelper,
+            IResearchStationHelper researchStationHelper, IHandManagementHelper playerDeckHelper,
             IMessageSender messageSender)
         {
             _log = log;

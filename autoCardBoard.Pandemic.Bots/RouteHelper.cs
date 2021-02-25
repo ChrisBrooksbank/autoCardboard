@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Pandemic.State;
-using autoCardboard.Pandemic.TurnState;
 using Dijkstra.NET.Graph;
 using Dijkstra.NET.ShortestPath;
 using Microsoft.Extensions.Caching.Memory;
-using autoCardboard.Pandemic.TurnState;
 
 namespace autoCardBoard.Pandemic.Bots
 {
@@ -142,6 +140,27 @@ namespace autoCardBoard.Pandemic.Bots
             _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
             
             return graph;
+        }
+
+        public int GetLocationValue(IPandemicState state, City city)
+        {
+            var locationValue = 0;
+            var cityNode = state.Cities.Single( n => n.City == city);
+
+            locationValue += cityNode.DiseaseCubeCount * 3;
+
+            foreach (var neighbour in cityNode.ConnectedCities)
+            {
+                var neighbourNode =  state.Cities.Single( n => n.City == neighbour);
+                locationValue += neighbourNode.DiseaseCubeCount * 2;
+            }
+
+            if (cityNode.HasResearchStation)
+            {
+                locationValue += 3;
+            }
+            
+            return locationValue;
         }
     }
 }

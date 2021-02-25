@@ -5,7 +5,7 @@ using autoCardboard.Infrastructure.Exceptions;
 
 namespace autoCardBoard.Pandemic.Bots
 {
-    public class PlayerDeckHelper : IPlayerDeckHelper
+    public class HandManagementHelper : IHandManagementHelper
     {
         public Dictionary<Disease, List<PandemicPlayerCard>> GetCityCardsByColour(IEnumerable<PandemicPlayerCard> cards)
         {
@@ -39,7 +39,7 @@ namespace autoCardBoard.Pandemic.Bots
 
         public PandemicPlayerCard GetWeakCard(IPandemicState state, PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards)
         {
-            var cardsByColour = GetCityCardsByColour(cards);
+         
             var playerCards = cards.ToList();
 
             // If we have a event card, we consider this weak
@@ -51,33 +51,37 @@ namespace autoCardBoard.Pandemic.Bots
                 return eventCard;
             }
 
-            // If we have a city card for a cured or eradicated disease then we can return that as weak
+            var weakCityCards = GetWeakCityCards(state, playerRole, cards);
+            return weakCityCards == null || !weakCityCards.Any() ? null : weakCityCards[0];
+        }
+
+        public List<PandemicPlayerCard> GetWeakCityCards(IPandemicState state, PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards)
+        {
+            var weakCityCards = new List<PandemicPlayerCard>();
+            var cardsByColour = GetCityCardsByColour(cards);
+
+            // If we have a city card for a cured or eradicated disease then we can consider that as weak
             var diseaseStates = state.DiscoveredCures;
             foreach (var diseaseState in diseaseStates)
             {
+                // if we have a card relating to a cured or eradicated disease, then is a weak card
+                // ( we are not taking into account, if card is useful to facilitate flights here )
                 if (diseaseState.Value == DiseaseState.Cured || diseaseState.Value == DiseaseState.Eradicated)
                 {
-                    // if we have a card relating to a cured or eradicated disease, then is a weak card
-                    // ( we are not taking into account, if card is useful to facilitate flights here )
-                    if (cardsByColour[diseaseState.Key].Count > 0)
+                    weakCityCards.AddRange(cardsByColour[diseaseState.Key]);
+                }
+                else
+                {
+                    // card still considered weak, for uncured diseases, if there are only 1-2 of these colour in hand
+                    // TODO this logic may change when we add in Share-Knowledge action, if other player needs that card
+                    if (cardsByColour[diseaseState.Key].Count < 3 )
                     {
-                        return cardsByColour[diseaseState.Key][0];
+                        weakCityCards.AddRange(cardsByColour[diseaseState.Key]);
                     }
                 }
             }
 
-            // If we have a colour, where we have at least one city card, but its less than the max of another colour, thats weak
-            var maxCount = cardsByColour.Max( c => c.Value.Count);
-            foreach (var cardByColour in cardsByColour)
-            {
-                if (cardByColour.Value.Count > 0 && cardByColour.Value.Count < maxCount)
-                {
-                    return cardByColour.Value[0];
-                }
-            }
-
-            // If we have got here, we simply discard the first card
-            return playerCards[0];
+            return weakCityCards;
         }
 
         public List<PandemicPlayerCard> GetCardsToDiscardToCure(IPandemicState state, Disease disease, PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards)

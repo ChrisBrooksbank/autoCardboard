@@ -25,7 +25,7 @@ namespace autoCardboard.DependencyInjection
                 .AddSingleton<IMessageSender,MessageSender>()
                 .AddSingleton<IMemoryCache>(memoryCache)
                 .AddSingleton<IRouteHelper, RouteHelper>()
-                .AddSingleton<IPlayerDeckHelper, PlayerDeckHelper>()
+                .AddSingleton<IHandManagementHelper, HandManagementHelper>()
                 .AddSingleton<IResearchStationHelper, ResearchStationHelper>()
                 .AddSingleton<IMapNodeFactory, MapNodeFactory>()
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
