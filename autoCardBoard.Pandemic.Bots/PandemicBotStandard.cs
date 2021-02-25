@@ -18,6 +18,7 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IMessageSender _messageSender;
         private readonly IHandManagementHelper _playerDeckHelper;
         private readonly IResearchStationHelper _researchStationHelper;
+        private readonly Die _d20 = new Die(20);
 
         public int Id { get; set; }
         public string Name { get; set; }
@@ -70,6 +71,11 @@ namespace autoCardBoard.Pandemic.Bots
             var weakCityCards = _playerDeckHelper.GetWeakCityCards(turn.State, 
                 currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
             if (weakCityCards == null || !weakCityCards.Any())
+            {
+                return false;
+            }
+
+            if (_d20.Roll() >= 14)
             {
                 return false;
             }
