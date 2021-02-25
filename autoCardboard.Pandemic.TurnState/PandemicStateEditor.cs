@@ -98,10 +98,15 @@ namespace autoCardboard.Pandemic.TurnState
 
         public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
         {
+            if (!turn.CardsToDiscard.Any())
+            {
+                return;
+            }
+
             _state = state;
             _currentPlayerId = turn.CurrentPlayerId;
             var playerState = _state.PlayerStates[_currentPlayerId];
-
+            
             foreach (var cardToDiscard in turn.CardsToDiscard)
             {
                 var cardInPlayerDeck = playerState.PlayerHand
