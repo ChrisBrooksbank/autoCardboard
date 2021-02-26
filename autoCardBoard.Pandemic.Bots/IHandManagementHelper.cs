@@ -10,5 +10,6 @@ namespace autoCardBoard.Pandemic.Bots
         PandemicPlayerCard GetWeakCard(IPandemicState state, PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards);
         IEnumerable<Disease> GetDiseasesCanCure(PlayerRole playerRole, IEnumerable<PandemicPlayerCard> cards);
         Dictionary<Disease, List<PandemicPlayerCard>> GetCityCardsByColour(IEnumerable<PandemicPlayerCard> cards);
+        bool HasCityCardForCurrentLocation(PandemicPlayerState playerState);
     }
 }

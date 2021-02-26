@@ -44,7 +44,6 @@ namespace autoCardboard.Api.Controllers
         [Produces("application/json")]
         public JsonResult GetNewGame(Game game)
         {
-            LogMessage($"Getting new game {game}");
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
 
@@ -61,7 +60,6 @@ namespace autoCardboard.Api.Controllers
                     break;
             }
 
-            LogMessage($"Got new game {game}");
             return new JsonResult(gameState);
         }
 
@@ -71,7 +69,6 @@ namespace autoCardboard.Api.Controllers
         [Produces("application/json")]
         public JsonResult Play(Game game, int playCount = 1)
         {
-            LogMessage( $"Playing game {game}");
             var serviceProvider = ServiceProviderFactory.GetServiceProvider();
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
@@ -89,15 +86,7 @@ namespace autoCardboard.Api.Controllers
                 }
             }
 
-            LogMessage($"Finished playing game {game}");
             return new JsonResult(gameState);;
         }
-
-        private void LogMessage(string message, string topic = "AutoCardboard")
-        {
-            _logger.Information(message);
-            _messageSender.SendMessageASync(topic, message);
-        }
-
     }
 }
