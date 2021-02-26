@@ -18,7 +18,7 @@ namespace autoCardboard.Pandemic.Test
         public void Setup()
         {
             _gameState = new PandemicState();
-            _stateEditor = new PandemicStateEditor(new CardboardLogger(), new MessageSender());
+            _stateEditor = new PandemicStateEditor(new CardboardLogger(), new MessageSender(), new PandemicActionValidator());
             _stateEditor.Clear(_gameState);
             var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState, players);

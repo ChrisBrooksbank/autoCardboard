@@ -10,6 +10,7 @@ namespace autoCardboard.Pandemic.State
         string GameOverReason{ get; set; }
         int ActionsPlayed { get; set; }
         PlayerDeck PlayerDeck { get; set; }
+        PlayerDeck EventCardsQueue{ get; set; }
         PlayerDeck PlayerDiscardPile { get; set; }
         InfectionDeck InfectionDeck { get; set; }
         CardDeck<Card> InfectionDiscardPile { get; set; }
@@ -24,6 +25,5 @@ namespace autoCardboard.Pandemic.State
         Dictionary<Disease, DiseaseState> DiscoveredCures { get; set; }
         Dictionary<Disease, int> DiseaseCubeReserve { get; set; }
         int ResearchStationStock { get; set; }
-        bool OneQuietNight { get; set; }
     }
 }

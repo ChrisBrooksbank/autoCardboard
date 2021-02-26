@@ -43,14 +43,23 @@ namespace autoCardBoard.Pandemic.Bots
                 case PandemicTurnType.DiscardCards:
                     GetDiscardCardsTurn(turn);
                     break;
+                case PandemicTurnType.PlayEventCards:
+                    GetEventCardsToPlay(turn);
+                    break;
             }
+        }
+
+        private void GetEventCardsToPlay(IPandemicTurn turn)
+        {
+            // TODO
+            // turn.PlayEventCard(card);
         }
 
         /// <summary>
         /// Bot is being asked to select an action, by calling relevant method on the supplied IPandemicTurn
         /// </summary>
         /// <param name="turn"></param>
-        public void GetActionTurn(IPandemicTurn turn)
+        private void GetActionTurn(IPandemicTurn turn)
         {
             var currentPlayerId = turn.CurrentPlayerId;
             var currentPlayerState = turn.State.PlayerStates[currentPlayerId];

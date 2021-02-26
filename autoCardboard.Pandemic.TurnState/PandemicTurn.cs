@@ -28,8 +28,6 @@ namespace autoCardboard.Pandemic.TurnState
 
         public PandemicTurnType TurnType { get; set; }
 
-        public bool OneQuietNight { get; set; }
-
         public IPandemicState State
         {
             get
@@ -49,6 +47,12 @@ namespace autoCardboard.Pandemic.TurnState
             _log = log;
             _validator = validator;
             CardsToDiscard = new List<PandemicPlayerCard>();
+        }
+
+        // TODO
+        public void PlayEventCard(PandemicPlayerCard eventCard)
+        {
+
         }
 
         public void BuildResearchStation(City city)
@@ -199,11 +203,6 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             ActionTaken = newPlayerTurn;
-        }
-
-        public void PlayOneQuietNight()
-        {
-            this.OneQuietNight = true;
         }
     }
 }

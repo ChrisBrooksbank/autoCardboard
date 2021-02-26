@@ -21,9 +21,9 @@ namespace autoCardboard.Pandemic.State
         public InfectionDeck InfectionDeck { get; set; }
         public CardDeck<Card> InfectionDiscardPile { get; set; }
         public PlayerDeck PlayerDeck { get; set; }
+        public PlayerDeck EventCardsQueue{ get; set; }
         public PlayerDeck PlayerDiscardPile { get; set; }
         public int[] InfectionRateTrack { get; set; }
         public List<MapNode> Cities { get; set; }
-        public bool OneQuietNight { get; set; }
     }
 }

@@ -10,5 +10,6 @@ namespace autoCardboard.Pandemic.TurnState
         public City City { get; set; }
         public Disease Disease { get; set; }
         public IEnumerable<PandemicPlayerCard> CardsToDiscard { get; set; }
+        public IEnumerable<PandemicPlayerCard> EventCardsToPlay { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
@@ -47,6 +48,7 @@ namespace autoCardboard.Pandemic.Game
                         break;
                     }
 
+                    AllowPlayersToPlayEventCards();
                     for (var actionNumber = 1; actionNumber <= 4; actionNumber++)
                     {
                         var turn = new PandemicTurn(_logger, _validator) {
@@ -77,6 +79,7 @@ namespace autoCardboard.Pandemic.Game
 
                     if (!State.IsGameOver)
                     {
+                        AllowPlayersToPlayEventCards();
                         PlayerDiscardsDownToHandLimit(player, player.Id);
                         _stateEditor.InfectCities(_state);
                     }
@@ -84,7 +87,31 @@ namespace autoCardboard.Pandemic.Game
             }
             return _state;
         }
-        
+
+        private void AllowPlayersToPlayEventCards()
+        {
+            if (_state.IsGameOver)
+            {
+                return;
+            }
+
+            foreach (var player in Players)
+            {
+                var playerState = _state.PlayerStates[player.Id];
+                if (playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.Event))
+                {
+                    var playEventsTurn = new PandemicTurn(_logger, _validator)
+                    {
+                        CurrentPlayerId =player.Id, State = _state, TurnType = PandemicTurnType.PlayEventCards
+                    };
+
+                    player.GetTurn(playEventsTurn);
+                    _stateEditor.ApplyTurn(_state, playEventsTurn);
+                }
+            }
+
+        }
+
         private void PlayerDiscardsDownToHandLimit(IPlayer<IPandemicTurn> player, int playerId)
         {
             var playerState = _state.PlayerStates[playerId];

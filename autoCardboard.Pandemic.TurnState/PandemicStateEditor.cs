@@ -48,6 +48,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state.InfectionDeck = new InfectionDeck();
             _state.InfectionDiscardPile = new CardDeck<Card>();
             _state.PlayerDeck = new PlayerDeck();
+            _state.EventCardsQueue = new PlayerDeck();
             _state.PandemicCardCount = pandemicCardCount;
             _state.PlayerDiscardPile = new PlayerDeck();
             SetupPlayerDeck(_state);
@@ -97,7 +98,15 @@ namespace autoCardboard.Pandemic.TurnState
                 case PandemicTurnType.DiscardCards:
                     TakeDiscardCardsTurn(state,turn);
                     break;
+                case PandemicTurnType.PlayEventCards:
+                    TakePlayEventCardsTurn(state,turn);
+                    break;
             }
+        }
+
+        // TODO
+        public void TakePlayEventCardsTurn(IPandemicState state, IPandemicTurn turn)
+        {
         }
 
         public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
@@ -288,10 +297,12 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _state = state;
 
-            if (_state.OneQuietNight)
+            var oneQuietNightCard = _state.EventCardsQueue.Cards
+                .SingleOrDefault(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.OneQuietNight);
+            if (oneQuietNightCard != null)
             {
-                _state.OneQuietNight = false;
-                // TODO discard OneQuietNight card
+                state.PlayerDiscardPile.AddCard(oneQuietNightCard);
+                state.EventCardsQueue.Cards.Remove(oneQuietNightCard);
                 return;
             }
 
