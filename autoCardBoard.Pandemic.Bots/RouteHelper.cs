@@ -162,5 +162,11 @@ namespace autoCardBoard.Pandemic.Bots
             
             return locationValue;
         }
+
+        public City GetBestLocationOnBoard(List<MapNode> cities)
+        {
+            var cityWithMostDisease = cities.OrderByDescending(c => c.DiseaseCubeCount).First();
+            return cityWithMostDisease.City;
+        }
     }
 }

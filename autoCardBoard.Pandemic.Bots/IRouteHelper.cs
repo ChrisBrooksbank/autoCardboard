@@ -14,5 +14,6 @@ namespace autoCardBoard.Pandemic.Bots
         List<City> GetShortestPath(IPandemicState state, City fromCity, City toCity);
         Graph<City, string> GetCityGraph(IPandemicState state);
         int GetLocationValue(IPandemicState state, City city);
+        City GetBestLocationOnBoard(List<MapNode> cities);
     }
 }

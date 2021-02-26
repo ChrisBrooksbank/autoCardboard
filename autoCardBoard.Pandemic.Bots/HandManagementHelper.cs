@@ -96,5 +96,10 @@ namespace autoCardBoard.Pandemic.Bots
             
             return candidateDiscards.Take(cardCountToDiscard).ToList();
         }
+
+        public bool HasCityCardForCurrentLocation(PandemicPlayerState playerState)
+        {
+            return playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == playerState.Location );
+        }
     }
 }

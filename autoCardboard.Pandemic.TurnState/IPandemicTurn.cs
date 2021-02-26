@@ -18,6 +18,7 @@ namespace autoCardboard.Pandemic.TurnState
         void BuildResearchStation(City city);
         void DiscoverCure(Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard);
         void DirectFlight(City city);
+        void CharterFlight(City anyCityAsDestination);
         void PlayOneQuietNight();
     }
 }

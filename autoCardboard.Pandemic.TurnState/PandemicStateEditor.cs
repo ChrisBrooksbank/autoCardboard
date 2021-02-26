@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
+using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 
@@ -15,11 +16,13 @@ namespace autoCardboard.Pandemic.TurnState
         private int _currentPlayerId;
         private IPandemicState _state;
         private readonly IMessageSender _messageSender;
+        private readonly IPandemicActionValidator _validator;
 
-        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender)
+        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender, IPandemicActionValidator validator)
         {
             _log = logger;
             _messageSender = messageSender;
+            _validator = validator;
         }
 
         public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
@@ -36,6 +39,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state = state;
             _state.Id = Guid.NewGuid().ToString();
             _state.ActionsPlayed = 0;
+            _state.OutbreakCount = 0;
             var players = new List<IPlayer<IPandemicTurn>>();
             SetupPlayerStates(_state, players);
             _state.IsGameOver = false;
@@ -131,6 +135,12 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _state = state;
             _currentPlayerId = action.PlayerId;
+
+            var validationFailures = _validator.ValidatePlayerAction(_currentPlayerId, state, action).ToList();
+            if (validationFailures.Any())
+            {
+                throw new CardboardException(validationFailures[0]);
+            }
 
             switch(action.PlayerActionType)
             {
@@ -264,7 +274,6 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _state = state;
             var bottomCard = _state.InfectionDeck.DrawBottom();
-            _log.Information($"Epidemic in {(City)bottomCard.Value}");
             _state.InfectionDiscardPile.AddCard(bottomCard);
             AddDiseaseCubes(_state, (City)bottomCard.Value, 3);
 
@@ -273,8 +282,6 @@ namespace autoCardboard.Pandemic.TurnState
             _state.InfectionDeck.AddCardDeck(_state.InfectionDiscardPile, CardDeckPosition.Top);
 
             _state.InfectionRateMarker++;
-
-            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Epidemic handled at {(City)bottomCard.Value}");
         }
 
         public void InfectCities(IPandemicState state)
@@ -289,7 +296,6 @@ namespace autoCardboard.Pandemic.TurnState
             }
 
             var infectionRate = _state.InfectionRateTrack[_state.InfectionRateMarker];
-            _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Infecting Cities. Rate = {infectionRate}");
 
             if (_state.InfectionDeck.CardCount < infectionRate)
             {
@@ -307,14 +313,12 @@ namespace autoCardboard.Pandemic.TurnState
                     var city = (City)infectionCard.Value;
                     var disease = city.GetDefaultDisease();
                     AddDiseaseCube(_state, disease, city);
-                    _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Infected {city} with {disease}");
                 }
             }
 
             if (!state.IsGameOver)
             {
                 _state.InfectionDiscardPile.AddCards(infectionCards);
-                _messageSender.SendMessageASync("AutoCardboard/Pandemic/StateEditor", $"Finished infecting Cities.");
             }
         }
 
@@ -344,8 +348,6 @@ namespace autoCardboard.Pandemic.TurnState
                     return;
                 }
             }
-
-            _log.Information($"Adding {disease} to {city}");
 
             ignoreCities = ignoreCities ?? new List<City>();
 
@@ -378,8 +380,6 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 AddDiseaseCube(_state, disease, connectedCity, ignoreCities);
             }
-
-            _log.Information($"Finished adding {disease} to {city}");
         }
 
         private void SetupPlayerStates(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players)
@@ -470,7 +470,6 @@ namespace autoCardboard.Pandemic.TurnState
         private void PerformInitialInfections(IPandemicState state)
         {
             _state = state;
-            _log.Information("Starting initial infections");
 
             var infectionCards = _state.InfectionDeck.Draw(3).ToList();
             _state.InfectionDiscardPile.AddCards(infectionCards);
@@ -493,7 +492,6 @@ namespace autoCardboard.Pandemic.TurnState
                 AddDiseaseCubes(_state, (City)infectionCard.Value, 1);
             }
 
-            _log.Information("Finished initial infections");
         }
 
         public IEnumerable<PandemicPlayerCard> DrawPlayerCards(IPandemicState state)

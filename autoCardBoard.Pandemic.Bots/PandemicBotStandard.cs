@@ -16,7 +16,7 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IRouteHelper _routeHelper;
         
         private readonly IMessageSender _messageSender;
-        private readonly IHandManagementHelper _playerDeckHelper;
+        private readonly IHandManagementHelper _handManagementHelper;
         private readonly IResearchStationHelper _researchStationHelper;
         private readonly Die _d20 = new Die(20);
 
@@ -24,12 +24,12 @@ namespace autoCardBoard.Pandemic.Bots
         public string Name { get; set; }
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
-            IHandManagementHelper playerDeckHelper, IResearchStationHelper researchStationHelper)
+            IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper)
         {
             _log = log;
             _routeHelper = routeHelper;
             _messageSender = messageSender;
-            _playerDeckHelper = playerDeckHelper;
+            _handManagementHelper = handManagementHelper;
             _researchStationHelper = researchStationHelper;
         }
 
@@ -54,7 +54,7 @@ namespace autoCardBoard.Pandemic.Bots
         {
             var currentPlayerId = turn.CurrentPlayerId;
             var currentPlayerState = turn.State.PlayerStates[currentPlayerId];
-            var curableDiseases = _playerDeckHelper.GetDiseasesCanCure(currentPlayerState.PlayerRole, currentPlayerState.PlayerHand).ToList();
+            var curableDiseases = _handManagementHelper.GetDiseasesCanCure(currentPlayerState.PlayerRole, currentPlayerState.PlayerHand).ToList();
             var atResearchStation = turn.State.Cities.Single(c => c.City.Equals(currentPlayerState.Location)).HasResearchStation;
 
             if (CureIfAtResearchStationAndHaveCure(turn, curableDiseases, atResearchStation, currentPlayerState)) return;
@@ -62,13 +62,14 @@ namespace autoCardBoard.Pandemic.Bots
             if (IfThereIsDiseaseHereThenTreatIt(turn, currentPlayerState)) return;
             if (BuildResearchStationIfSensible(turn, currentPlayerState)) return;
             if (TakeDirectFlightIfSensible(turn, currentPlayerState)) return;
+            if (TakeCharterFlightIfSensible(turn, currentPlayerState)) return;
             MoveTowardsNearestDiseaseWithoutDiscarding(turn, currentPlayerState);
             return;
         }
 
         private bool TakeDirectFlightIfSensible(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
         {
-            var weakCityCards = _playerDeckHelper.GetWeakCityCards(turn.State, 
+            var weakCityCards = _handManagementHelper.GetWeakCityCards(turn.State, 
                 currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
             if (weakCityCards == null || !weakCityCards.Any())
             {
@@ -95,6 +96,27 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             return false;
+        }
+
+        private bool TakeCharterFlightIfSensible(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
+        {
+            if (!_handManagementHelper.HasCityCardForCurrentLocation(currentPlayerState))
+            {
+                return false;
+            }
+
+            var currentCityValue = _routeHelper.GetLocationValue(turn.State,  currentPlayerState.Location);
+            var bestCity = _routeHelper.GetBestLocationOnBoard(turn.State.Cities);
+            var bestCityValue = _routeHelper.GetLocationValue(turn.State, bestCity);
+            var distanceToBestCity = _routeHelper.GetDistance( turn.State, currentPlayerState.Location, bestCity);
+            if ((bestCityValue - currentCityValue <= 3) || distanceToBestCity <= 3)
+            {
+                return false;
+            }
+
+            turn.CharterFlight(bestCity);
+            return true;
+
         }
 
         private void MoveTowardsNearestDiseaseWithoutDiscarding(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
@@ -180,7 +202,7 @@ namespace autoCardBoard.Pandemic.Bots
             if (curableDiseases.Any() && atResearchStation)
             {
                 var disease = curableDiseases[0];
-                var cureCardsToDiscard = _playerDeckHelper.GetCardsToDiscardToCure(
+                var cureCardsToDiscard = _handManagementHelper.GetCardsToDiscardToCure(
                     turn.State, disease, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
                 turn.DiscoverCure(disease, cureCardsToDiscard);
                 return true;
@@ -204,7 +226,7 @@ namespace autoCardBoard.Pandemic.Bots
             var cardsToDiscard = new List<PandemicPlayerCard>();
             while (cardsToDiscard.Count() < toDiscardCount)
             {
-                var weakestCard = _playerDeckHelper.GetWeakCard(turn.State, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
+                var weakestCard = _handManagementHelper.GetWeakCard(turn.State, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
                 if (weakestCard == null)
                 {
                     weakestCard = currentPlayerState.PlayerHand[0];
