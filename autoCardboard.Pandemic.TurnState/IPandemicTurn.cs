@@ -9,6 +9,7 @@ namespace autoCardboard.Pandemic.TurnState
         int CurrentPlayerId { get; set; }
         PandemicTurnType TurnType { get; set; }
         PlayerAction ActionTaken { get; }
+        IEnumerable<PlayerEventPlayed> EventCardsPlayed{ get; set; }
         IPandemicState State { get; set; }
         IEnumerable<PandemicPlayerCard> CardsToDiscard{ get; set; }
 
@@ -19,6 +20,6 @@ namespace autoCardboard.Pandemic.TurnState
         void DiscoverCure(Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard);
         void DirectFlight(City city);
         void CharterFlight(City anyCityAsDestination);
-        void PlayOneQuietNight();
+        void PlayEventCard(EventCard eventCard);
     }
 }

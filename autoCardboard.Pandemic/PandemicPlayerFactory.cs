@@ -13,16 +13,18 @@ namespace autoCardboard.Pandemic.Game
         private readonly IRouteHelper _routeHelper;
         private readonly IResearchStationHelper _researchStationHelper;
         private readonly IHandManagementHelper _playerDeckHelper;
+        private readonly IEventCardHelper _eventCardHelper;
         private readonly IMessageSender _messageSender;
 
         public PandemicPlayerFactory(ICardboardLogger log, IRouteHelper routeHelper, 
             IResearchStationHelper researchStationHelper, IHandManagementHelper playerDeckHelper,
-            IMessageSender messageSender)
+            IEventCardHelper eventCardHelper, IMessageSender messageSender)
         {
             _log = log;
             _routeHelper = routeHelper;
             _researchStationHelper = researchStationHelper;
             _playerDeckHelper = playerDeckHelper;
+            _eventCardHelper = eventCardHelper;
             _messageSender = messageSender;
         }
 
@@ -31,7 +33,7 @@ namespace autoCardboard.Pandemic.Game
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
             for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
-                var newPlayer = new PandemicBotStandard(_log, _routeHelper, _messageSender, _playerDeckHelper, _researchStationHelper)
+                var newPlayer = new PandemicBotStandard(_log, _routeHelper, _messageSender, _playerDeckHelper, _researchStationHelper, _eventCardHelper)
                 {
                     Id = player,
                     Name = player.ToString()

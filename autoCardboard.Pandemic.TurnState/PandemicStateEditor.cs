@@ -48,6 +48,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state.InfectionDeck = new InfectionDeck();
             _state.InfectionDiscardPile = new CardDeck<Card>();
             _state.PlayerDeck = new PlayerDeck();
+            _state.EventCardsQueue = new PlayerDeck();
             _state.PandemicCardCount = pandemicCardCount;
             _state.PlayerDiscardPile = new PlayerDeck();
             SetupPlayerDeck(_state);
@@ -97,6 +98,31 @@ namespace autoCardboard.Pandemic.TurnState
                 case PandemicTurnType.DiscardCards:
                     TakeDiscardCardsTurn(state,turn);
                     break;
+                case PandemicTurnType.PlayEventCards:
+                    TakePlayEventCardsTurn(state,turn);
+                    break;
+            }
+        }
+
+        public void TakePlayEventCardsTurn(IPandemicState state, IPandemicTurn turn)
+        {
+            if (turn.EventCardsPlayed == null || !turn.EventCardsPlayed.Any())
+            {
+                return;
+            }
+
+            _state = state;
+            _currentPlayerId = turn.CurrentPlayerId;
+            var playerState = _state.PlayerStates[_currentPlayerId];
+
+            foreach (var eventCardToPlay in turn.EventCardsPlayed)
+            {
+                if (eventCardToPlay.EventCard == EventCard.OneQuietNight)
+                {
+                    var card = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.OneQuietNight );
+                    _state.EventCardsQueue.AddCard(card);
+                    playerState.PlayerHand.Remove(card);
+                }
             }
         }
 
@@ -288,10 +314,12 @@ namespace autoCardboard.Pandemic.TurnState
         {
             _state = state;
 
-            if (_state.OneQuietNight)
+            var oneQuietNightCard = _state.EventCardsQueue.Cards
+                .SingleOrDefault(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.OneQuietNight);
+            if (oneQuietNightCard != null)
             {
-                _state.OneQuietNight = false;
-                // TODO discard OneQuietNight card
+                state.PlayerDiscardPile.AddCard(oneQuietNightCard);
+                state.EventCardsQueue.Cards.Remove(oneQuietNightCard);
                 return;
             }
 
