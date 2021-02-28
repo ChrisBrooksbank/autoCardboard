@@ -12,15 +12,28 @@ namespace autoCardboard.Pandemic.TurnState
     /// </summary>
     public class PandemicActionValidator: IPandemicActionValidator
     {
-        public IEnumerable<string> ValidatePlayerAction(int playerId, IPandemicState state, PlayerAction playerAction)
+        public IEnumerable<string> ValidatePlayerAction(int playerId, IPandemicState state, PlayerAction newPlayerAction)
         {
             var validationFailures = new List<string>();
-            var validationFailure = GetActionValidationFailures(state, playerId, playerAction);
+            var validationFailure = GetActionValidationFailures(state, playerId, newPlayerAction);
             if (!string.IsNullOrWhiteSpace(validationFailure))
             {
                 validationFailures.Add(validationFailure);
             }
             
+            return validationFailures;
+        }
+
+        public IEnumerable<string> ValidatePlayerEventPlayed(int playerId, IPandemicState state, PlayerEventPlayed newEventCard)
+        {
+            var validationFailures = new List<string>();
+            var playerState = state.PlayerStates[playerId];
+
+            if (!playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == newEventCard.EventCard))
+            {
+                validationFailures.Add($"Player doesn't have event card {newEventCard.EventCard}");
+            }
+
             return validationFailures;
         }
 

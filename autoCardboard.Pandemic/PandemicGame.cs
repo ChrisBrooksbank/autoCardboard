@@ -106,6 +106,7 @@ namespace autoCardboard.Pandemic.Game
                     };
 
                     player.GetTurn(playEventsTurn);
+                    // TODO handle onquietnight, by ading to eventCardQueue
                     _stateEditor.ApplyTurn(_state, playEventsTurn);
                 }
             }

@@ -18,19 +18,22 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IMessageSender _messageSender;
         private readonly IHandManagementHelper _handManagementHelper;
         private readonly IResearchStationHelper _researchStationHelper;
+        private readonly IEventCardHelper _eventCardHelper;
         private readonly Die _d20 = new Die(20);
 
         public int Id { get; set; }
         public string Name { get; set; }
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
-            IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper)
+            IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper,
+            IEventCardHelper eventCardHelper)
         {
             _log = log;
             _routeHelper = routeHelper;
             _messageSender = messageSender;
             _handManagementHelper = handManagementHelper;
             _researchStationHelper = researchStationHelper;
+            _eventCardHelper = eventCardHelper;
         }
 
         public void GetTurn(IPandemicTurn turn)
@@ -51,8 +54,16 @@ namespace autoCardBoard.Pandemic.Bots
 
         private void GetEventCardsToPlay(IPandemicTurn turn)
         {
-            // TODO
-            // turn.PlayEventCard(card);
+            var currentPlayerId = turn.CurrentPlayerId;
+            var currentPlayerState = turn.State.PlayerStates[currentPlayerId];
+
+            // One Quiet Night
+            var oneQuietNightCard = currentPlayerState.PlayerHand.SingleOrDefault(c =>
+                c.PlayerCardType == PlayerCardType.Event && (EventCard) c.Value == EventCard.OneQuietNight);
+            if (oneQuietNightCard != null && !_eventCardHelper.ShouldPlayOneQuietNight(turn.State))
+            {
+                turn.PlayEventCard(EventCard.OneQuietNight);
+            }
         }
 
         /// <summary>

@@ -26,6 +26,8 @@ namespace autoCardboard.Pandemic.TurnState
         public PlayerAction ActionTaken { get; set; }
         public IEnumerable<PandemicPlayerCard> CardsToDiscard { get;set; }
 
+        public IEnumerable<PlayerEventPlayed> EventCardsPlayed{ get;set; }
+
         public PandemicTurnType TurnType { get; set; }
 
         public IPandemicState State
@@ -47,12 +49,21 @@ namespace autoCardboard.Pandemic.TurnState
             _log = log;
             _validator = validator;
             CardsToDiscard = new List<PandemicPlayerCard>();
+            EventCardsPlayed = new List<PlayerEventPlayed>();
         }
 
-        // TODO
-        public void PlayEventCard(PandemicPlayerCard eventCard)
+        public void PlayEventCard(EventCard eventCard)
         {
+            var eventPlayed = new PlayerEventPlayed() {PlayerId = CurrentPlayerId, EventCard = eventCard };
 
+            var validationFailures = _validator.ValidatePlayerEventPlayed(CurrentPlayerId, State, eventPlayed).ToList();
+            if (validationFailures.Any())
+            {
+                throw new CardboardException(validationFailures[0]);
+            }
+
+         
+            EventCardsPlayed = new PlayerEventPlayed[] { eventPlayed };
         }
 
         public void BuildResearchStation(City city)

@@ -42,10 +42,11 @@ namespace autoCardBoard.Pandemic.Bots
          
             var playerCards = cards.ToList();
 
-            // If we have a event card, we consider this weak
+            // If we have a event card, we consider this weak, unless its one quiet night
             // Mainly because the code doesnt yet support the playing of these
             // that logic will change !
-            var eventCard = playerCards.FirstOrDefault( c => c.PlayerCardType == PlayerCardType.Event);
+            var eventCard = playerCards
+                .FirstOrDefault( c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value != EventCard.OneQuietNight );
             if (eventCard != null)
             {
                 return eventCard;

@@ -104,9 +104,26 @@ namespace autoCardboard.Pandemic.TurnState
             }
         }
 
-        // TODO
         public void TakePlayEventCardsTurn(IPandemicState state, IPandemicTurn turn)
         {
+            if (turn.EventCardsPlayed == null || !turn.EventCardsPlayed.Any())
+            {
+                return;
+            }
+
+            _state = state;
+            _currentPlayerId = turn.CurrentPlayerId;
+            var playerState = _state.PlayerStates[_currentPlayerId];
+
+            foreach (var eventCardToPlay in turn.EventCardsPlayed)
+            {
+                if (eventCardToPlay.EventCard == EventCard.OneQuietNight)
+                {
+                    var card = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.OneQuietNight );
+                    _state.EventCardsQueue.AddCard(card);
+                    playerState.PlayerHand.Remove(card);
+                }
+            }
         }
 
         public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
