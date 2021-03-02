@@ -6,6 +6,6 @@ namespace autoCardboard.Pandemic.TurnState
     {
         public int PlayerId { get; set; }
         public EventCard EventCard{ get; set; }
-        public City City { get; set; }
+        public City? City { get; set; }
     }
 }

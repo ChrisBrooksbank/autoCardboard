@@ -122,6 +122,15 @@ namespace autoCardboard.Pandemic.TurnState
                     var card = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.OneQuietNight );
                     _state.EventCardsQueue.AddCard(card);
                     playerState.PlayerHand.Remove(card);
+                    state.PlayerDiscardPile.AddCard(card);
+                }
+
+                if (eventCardToPlay.EventCard == EventCard.GovernmentGrant)
+                {
+                    var card = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.GovernmentGrant );
+                    BuildResearchStation(_state, eventCardToPlay.City.Value);
+                    playerState.PlayerHand.Remove(card);
+                    state.PlayerDiscardPile.AddCard(card);
                 }
             }
         }

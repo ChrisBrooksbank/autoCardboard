@@ -15,5 +15,6 @@ namespace autoCardBoard.Pandemic.Bots
         Graph<City, string> GetCityGraph(IPandemicState state);
         int GetLocationValue(IPandemicState state, City city);
         City GetBestLocationOnBoard(List<MapNode> cities);
+        City? GetBestLocationForNewResearchStation(IPandemicState state);
     }
 }

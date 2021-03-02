@@ -168,5 +168,29 @@ namespace autoCardBoard.Pandemic.Bots
             var cityWithMostDisease = cities.OrderByDescending(c => c.DiseaseCubeCount).First();
             return cityWithMostDisease.City;
         }
+
+        public City? GetBestLocationForNewResearchStation(IPandemicState state)
+        {
+            var nodesWithoutResearchStation = state.Cities.Where( n => !n.HasResearchStation).ToList();
+
+            City? isolatedCity = null;
+            var furthestDistance = 0;
+            foreach (var nodeWithoutResearchStation in nodesWithoutResearchStation)
+            {
+                var nearestResearchStation = GetNearestCitywithResearchStation(state, nodeWithoutResearchStation.City);
+                if (nearestResearchStation.HasValue)
+                {
+                    var distanceToNearestResearchStation =
+                        GetDistance(state, nodeWithoutResearchStation.City, nearestResearchStation.Value);
+                    if (distanceToNearestResearchStation > furthestDistance)
+                    {
+                        isolatedCity = nodeWithoutResearchStation.City;
+                        furthestDistance = distanceToNearestResearchStation;
+                    }
+                }
+            }
+
+            return isolatedCity;
+        }
     }
 }
