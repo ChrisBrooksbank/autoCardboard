@@ -5,6 +5,11 @@ namespace autoCardBoard.Pandemic.Bots
 {
     public class EventCardHelper : IEventCardHelper
     {
+        public bool ShouldPlayGovernmentGrant(IPandemicState state)
+        {
+            return true;
+        }
+
         public bool ShouldPlayOneQuietNight(IPandemicState state)
         {
             var citiesWithThreeOfOneDisease = state.Cities

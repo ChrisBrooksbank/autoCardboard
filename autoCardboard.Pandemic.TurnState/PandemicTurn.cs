@@ -52,9 +52,9 @@ namespace autoCardboard.Pandemic.TurnState
             EventCardsPlayed = new List<PlayerEventPlayed>();
         }
 
-        public void PlayEventCard(EventCard eventCard)
+        public void PlayEventCard(EventCard eventCard, City? city = null)
         {
-            var eventPlayed = new PlayerEventPlayed() {PlayerId = CurrentPlayerId, EventCard = eventCard };
+            var eventPlayed = new PlayerEventPlayed() {PlayerId = CurrentPlayerId, EventCard = eventCard, City = city };
 
             var validationFailures = _validator.ValidatePlayerEventPlayed(CurrentPlayerId, State, eventPlayed).ToList();
             if (validationFailures.Any())

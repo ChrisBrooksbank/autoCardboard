@@ -64,6 +64,18 @@ namespace autoCardBoard.Pandemic.Bots
             {
                 turn.PlayEventCard(EventCard.OneQuietNight);
             }
+
+            // Government Grant
+            var governmentGrantCard = currentPlayerState.PlayerHand.SingleOrDefault(c =>
+                c.PlayerCardType == PlayerCardType.Event && (EventCard) c.Value == EventCard.GovernmentGrant);
+            if (governmentGrantCard != null && _eventCardHelper.ShouldPlayGovernmentGrant(turn.State))
+            {
+                var locationForNewResearchStation = _routeHelper.GetBestLocationForNewResearchStation(turn.State);
+                if (locationForNewResearchStation.HasValue)
+                {
+                    turn.PlayEventCard(EventCard.GovernmentGrant, locationForNewResearchStation.Value);
+                }
+            }
         }
 
         /// <summary>
