@@ -6,5 +6,6 @@ namespace autoCardBoard.Pandemic.Bots
     {
         bool ShouldPlayOneQuietNight(IPandemicState state);
         bool ShouldPlayGovernmentGrant(IPandemicState state);
+        bool ShouldPlayAirLift(IPandemicState state);
     }
 }

@@ -128,7 +128,15 @@ namespace autoCardboard.Pandemic.TurnState
                 if (eventCardToPlay.EventCard == EventCard.GovernmentGrant)
                 {
                     var card = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.GovernmentGrant );
-                    BuildResearchStation(_state, eventCardToPlay.City.Value);
+                    BuildResearchStationWithGovernmentGrant(_state, eventCardToPlay.City.Value);
+                    playerState.PlayerHand.Remove(card);
+                    state.PlayerDiscardPile.AddCard(card);
+                }
+
+                if (eventCardToPlay.EventCard == EventCard.Airlift)
+                {
+                    var card = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.Airlift );
+                    _state.PlayerStates[eventCardToPlay.PlayerId].Location = eventCardToPlay.City.Value;
                     playerState.PlayerHand.Remove(card);
                     state.PlayerDiscardPile.AddCard(card);
                 }
@@ -255,7 +263,12 @@ namespace autoCardboard.Pandemic.TurnState
             _state.PlayerDiscardPile.AddCard(cardToDiscard);
         }
 
-        private void BuildResearchStation(IPandemicState state, City city)
+        private void BuildResearchStationWithGovernmentGrant(IPandemicState state, City city)
+        {
+            BuildResearchStation(state, city, true);
+        }
+
+        private void BuildResearchStation(IPandemicState state, City city, bool haveGrant = false)
         {
             _state = state;
             var playerState = _state.PlayerStates[_currentPlayerId];
@@ -264,14 +277,14 @@ namespace autoCardboard.Pandemic.TurnState
             node.HasResearchStation = true;
             _state.ResearchStationStock--;
 
-            if (playerState.PlayerRole != PlayerRole.OperationsExpert)
+            if (!haveGrant && playerState.PlayerRole != PlayerRole.OperationsExpert)
             {
                 var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
                 playerState.PlayerHand.Remove(cardToDiscard);
                 _state.PlayerDiscardPile.AddCard(cardToDiscard);
             }
         }
-
+        
         private void DriveOrFerry(IPandemicState state, City city)
         {
             _state = state;

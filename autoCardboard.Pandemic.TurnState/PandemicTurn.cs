@@ -52,17 +52,26 @@ namespace autoCardboard.Pandemic.TurnState
             EventCardsPlayed = new List<PlayerEventPlayed>();
         }
 
+        public void PlayEventCard(EventCard eventCard, int playerId, City? city = null)
+        {
+            var eventPlayed = new PlayerEventPlayed() {EventCard = eventCard, PlayerId = playerId, City = city };
+            PlayEventCard(eventPlayed);
+        }
+
         public void PlayEventCard(EventCard eventCard, City? city = null)
         {
             var eventPlayed = new PlayerEventPlayed() {PlayerId = CurrentPlayerId, EventCard = eventCard, City = city };
+            PlayEventCard(eventPlayed);
+        }
 
+        private void PlayEventCard(PlayerEventPlayed eventPlayed)
+        {
             var validationFailures = _validator.ValidatePlayerEventPlayed(CurrentPlayerId, State, eventPlayed).ToList();
             if (validationFailures.Any())
             {
                 throw new CardboardException(validationFailures[0]);
             }
-
-         
+            
             EventCardsPlayed = new PlayerEventPlayed[] { eventPlayed };
         }
 
@@ -215,5 +224,6 @@ namespace autoCardboard.Pandemic.TurnState
 
             ActionTaken = newPlayerTurn;
         }
+
     }
 }
