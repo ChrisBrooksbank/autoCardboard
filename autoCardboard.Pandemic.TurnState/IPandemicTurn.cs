@@ -21,5 +21,6 @@ namespace autoCardboard.Pandemic.TurnState
         void DirectFlight(City city);
         void CharterFlight(City anyCityAsDestination);
         void PlayEventCard(EventCard eventCard, City? city = null);
+        void PlayEventCard(EventCard eventCard, int playerId, City? city = null);
     }
 }

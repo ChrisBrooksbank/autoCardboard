@@ -76,6 +76,19 @@ namespace autoCardBoard.Pandemic.Bots
                     turn.PlayEventCard(EventCard.GovernmentGrant, locationForNewResearchStation.Value);
                 }
             }
+
+            // Airlift
+            var airliftCard = currentPlayerState.PlayerHand.SingleOrDefault(c =>
+                c.PlayerCardType == PlayerCardType.Event && (EventCard) c.Value == EventCard.Airlift);
+            if (airliftCard != null && _eventCardHelper.ShouldPlayAirLift(turn.State))
+            {
+                var locationToAirliftTo = _routeHelper.GetBestLocationOnBoard(turn.State.Cities);
+                var playerToAirlift =
+                    turn.State.PlayerStates
+                        .OrderBy(p => _routeHelper.GetLocationValue(turn.State, p.Value.Location))
+                        .Select(ps => ps.Key).First();
+                turn.PlayEventCard(EventCard.Airlift, playerToAirlift, locationToAirliftTo);
+            }
         }
 
         /// <summary>
