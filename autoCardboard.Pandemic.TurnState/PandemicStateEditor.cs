@@ -25,7 +25,7 @@ namespace autoCardboard.Pandemic.TurnState
             _validator = validator;
         }
 
-        public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
+        public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 4)
         {
             _state = state;
             Clear(_state);
@@ -34,7 +34,7 @@ namespace autoCardboard.Pandemic.TurnState
             PerformInitialInfections(_state);
         }
 
-        public void Clear(IPandemicState state, int pandemicCardCount = 6)
+        public void Clear(IPandemicState state, int pandemicCardCount = 4)
         {
             _state = state;
             _state.Id = Guid.NewGuid().ToString();
@@ -209,16 +209,36 @@ namespace autoCardboard.Pandemic.TurnState
                     DiscoverCure(_state, action.Disease, action.CardsToDiscard);
                     break;
                 case PlayerActionType.ShareKnowledge:
-                    ShareKnowledge();
+                    ShareKnowledge(_state, action.City, action.PlayerId, action.OtherPlayerId);
                     break;
             }
 
         }
 
-        // TODO
-        private void ShareKnowledge()
-        {
-                        
+        private void ShareKnowledge(IPandemicState state, City city, int playerId, int otherPlayerId)
+        { 
+            _state = state;
+            var player = _state.PlayerStates.SingleOrDefault(p => p.Key == playerId);
+            var otherPlayer = _state.PlayerStates.SingleOrDefault(p => p.Key == otherPlayerId);
+
+            var cityCardInPlayersHand = player.Value.PlayerHand
+                .SingleOrDefault( c=> c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
+            var cityCardInOtherPlayersHand = otherPlayer.Value.PlayerHand
+                .SingleOrDefault( c=> c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
+
+            if (cityCardInPlayersHand != null)
+            {
+                otherPlayer.Value.PlayerHand.Add(cityCardInPlayersHand);
+                player.Value.PlayerHand.Remove(cityCardInPlayersHand);
+            }
+            else
+            {
+                if (cityCardInOtherPlayersHand != null)
+                {
+                    player.Value.PlayerHand.Add(cityCardInOtherPlayersHand);
+                    otherPlayer.Value.PlayerHand.Remove(cityCardInOtherPlayersHand);
+                }
+            }
         }
 
         private void DiscoverCure(IPandemicState state, Disease disease, IEnumerable<PandemicPlayerCard> cardsToDiscard)

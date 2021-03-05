@@ -41,6 +41,9 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 // Clone the game state, so if a inmemory player modifies it, this doesnt modify the actual game state
                 _state = value.Clone() as PandemicState;
+                // hide some information from the bots
+                _state.InfectionDeck = null;
+                _state.PlayerDeck = null;
             }
         }
 
@@ -225,5 +228,29 @@ namespace autoCardboard.Pandemic.TurnState
             ActionTaken = newPlayerTurn;
         }
 
+        public void KnowledgeShare(KnowledgeShare knowledgeShare)
+        {
+            var playerState = State.PlayerStates[CurrentPlayerId];
+            var otherPlayerId = CurrentPlayerId == knowledgeShare.Player1
+                ? knowledgeShare.Player2
+                : knowledgeShare.Player1;
+
+            var newPlayerTurn = new PlayerAction
+            {
+                PlayerId = CurrentPlayerId, 
+                OtherPlayerId = otherPlayerId,
+                PlayerActionType = PlayerActionType.ShareKnowledge, 
+                City = playerState.Location, 
+            };
+
+            var validationFailures = _validator.ValidatePlayerAction(CurrentPlayerId, State, newPlayerTurn).ToList();
+
+            if (validationFailures.Any())
+            {
+                throw new CardboardException(validationFailures[0]);
+            }
+
+            ActionTaken = newPlayerTurn;
+        }
     }
 }

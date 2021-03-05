@@ -103,17 +103,17 @@ namespace autoCardboard.Pandemic.TurnState
                 {
                     return "Can only share in same city";
                 }
+
+                var otherPlayerState = state.PlayerStates.SingleOrDefault(p => p.Key == playerAction.OtherPlayerId).Value;
+
                 var currentPlayerHasCityCard = playerState.PlayerHand
                     .Any(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == currentMapLocation.City);
-                if (!currentPlayerHasCityCard)
+                var otherPlayerHasCityCard = otherPlayerState.PlayerHand
+                    .Any(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == currentMapLocation.City);
+                if (!currentPlayerHasCityCard && !otherPlayerHasCityCard && playerState.PlayerRole != PlayerRole.Researcher && otherPlayerState.PlayerRole != PlayerRole.Researcher)
                 {
-                    return "Doesnt have city card";
+                    return "Neither player has city card, of current location, and neither is a researcher";
                 }
-                
-                
-                // TODO check that another player at same location, has current location city card in hand
-
-
             }
 
             if ( playerAction.PlayerActionType == PlayerActionType.DiscoverCure )

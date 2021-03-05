@@ -28,6 +28,7 @@ namespace autoCardboard.DependencyInjection
                 .AddSingleton<IEventCardHelper, EventCardHelper>()
                 .AddSingleton<IHandManagementHelper, HandManagementHelper>()
                 .AddSingleton<IResearchStationHelper, ResearchStationHelper>()
+                .AddSingleton<IKnowledgeShareHelper, KnowledgeShareHelper>()
                 .AddSingleton<IMapNodeFactory, MapNodeFactory>()
                 .AddScoped<IForSaleGameState, ForSaleGameState>()
                 .AddScoped<IGame<IForSaleGameState, IForSaleGameTurn>, ForSaleGame>()

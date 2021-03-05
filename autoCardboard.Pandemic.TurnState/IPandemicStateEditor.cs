@@ -6,8 +6,8 @@ namespace autoCardboard.Pandemic.TurnState
 {
     public interface IPandemicStateEditor
     {
-        void Clear(IPandemicState state, int pandemicCardCount = 6);
-        void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6);
+        void Clear(IPandemicState state, int pandemicCardCount = 4);
+        void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 4);
         void SetupPlayerDeck(IPandemicState state);
         void Epidemic(IPandemicState state);
         void InfectCities(IPandemicState state);
