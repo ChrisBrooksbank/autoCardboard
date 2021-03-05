@@ -25,6 +25,5 @@ namespace autoCardboard.Pandemic.State
         public PlayerDeck PlayerDiscardPile { get; set; }
         public int[] InfectionRateTrack { get; set; }
         public List<MapNode> Cities { get; set; }
-        public List<PlayerMeetingRequest> MeetingRequests { get; set; }
     }
 }

@@ -2,8 +2,8 @@
 {
     public class KnowledgeShare
     {
-        public int GivingPlayerId { get; set; }
-        public int ReceivingPlayerId { get; set; }
+        public int Player1 { get; set; }
+        public int Player2 { get; set; }
         public City CityCardToGive { get; set; }
     }
 }

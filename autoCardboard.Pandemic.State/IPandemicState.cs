@@ -25,6 +25,5 @@ namespace autoCardboard.Pandemic.State
         Dictionary<Disease, DiseaseState> DiscoveredCures { get; set; }
         Dictionary<Disease, int> DiseaseCubeReserve { get; set; }
         int ResearchStationStock { get; set; }
-        List<PlayerMeetingRequest> MeetingRequests { get; set; }
     }
 }
