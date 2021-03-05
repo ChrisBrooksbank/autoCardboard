@@ -41,6 +41,9 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 // Clone the game state, so if a inmemory player modifies it, this doesnt modify the actual game state
                 _state = value.Clone() as PandemicState;
+                // hide some information from the bots
+                _state.InfectionDeck = null;
+                _state.PlayerDeck = null;
             }
         }
 
@@ -225,5 +228,9 @@ namespace autoCardboard.Pandemic.TurnState
             ActionTaken = newPlayerTurn;
         }
 
+        // TODO 
+        public void KnowledgeShare(KnowledgeShare knowledgeShare)
+        {
+        }
     }
 }

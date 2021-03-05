@@ -25,7 +25,7 @@ namespace autoCardboard.Pandemic.TurnState
             _validator = validator;
         }
 
-        public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
+        public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 4)
         {
             _state = state;
             Clear(_state);
@@ -34,7 +34,7 @@ namespace autoCardboard.Pandemic.TurnState
             PerformInitialInfections(_state);
         }
 
-        public void Clear(IPandemicState state, int pandemicCardCount = 6)
+        public void Clear(IPandemicState state, int pandemicCardCount = 4)
         {
             _state = state;
             _state.Id = Guid.NewGuid().ToString();
@@ -51,6 +51,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state.EventCardsQueue = new PlayerDeck();
             _state.PandemicCardCount = pandemicCardCount;
             _state.PlayerDiscardPile = new PlayerDeck();
+            _state.MeetingRequests = new List<PlayerMeetingRequest>();
             SetupPlayerDeck(_state);
 
             _state.DiscoveredCures = new Dictionary<Disease, DiseaseState>();

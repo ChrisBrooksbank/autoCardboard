@@ -92,6 +92,7 @@ namespace autoCardboard.Pandemic.TurnState
                 }
             }
 
+            // TODO check this validation, probably needs adjusting
             if (playerAction.PlayerActionType == PlayerActionType.ShareKnowledge)
             {
                 if (!playersAtSameLocation.Any())

@@ -19,6 +19,7 @@ namespace autoCardBoard.Pandemic.Bots
         private readonly IHandManagementHelper _handManagementHelper;
         private readonly IResearchStationHelper _researchStationHelper;
         private readonly IEventCardHelper _eventCardHelper;
+        private readonly IKnowledgeShareHelper _knowledgeShareHelper;
         private readonly Die _d20 = new Die(20);
 
         public int Id { get; set; }
@@ -26,7 +27,7 @@ namespace autoCardBoard.Pandemic.Bots
 
         public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
             IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper,
-            IEventCardHelper eventCardHelper)
+            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper)
         {
             _log = log;
             _routeHelper = routeHelper;
@@ -34,6 +35,7 @@ namespace autoCardBoard.Pandemic.Bots
             _handManagementHelper = handManagementHelper;
             _researchStationHelper = researchStationHelper;
             _eventCardHelper = eventCardHelper;
+            _knowledgeShareHelper = knowledgeShareHelper;
         }
 
         public void GetTurn(IPandemicTurn turn)
@@ -104,6 +106,7 @@ namespace autoCardBoard.Pandemic.Bots
 
             if (CureIfAtResearchStationAndHaveCure(turn, curableDiseases, atResearchStation, currentPlayerState)) return;
             if (MoveTowardsNearestResearchStationIfHaveCure(turn, atResearchStation, currentPlayerState, curableDiseases)) return;
+            if (KnowledgeShareIfSensible(turn)) return;
             if (IfThereIsDiseaseHereThenTreatIt(turn, currentPlayerState)) return;
             if (BuildResearchStationIfSensible(turn, currentPlayerState)) return;
             if (TakeDirectFlightIfSensible(turn, currentPlayerState)) return;
@@ -194,6 +197,21 @@ namespace autoCardBoard.Pandemic.Bots
             {
                 turn.BuildResearchStation(currentPlayerState.Location);
                 return true;
+            }
+
+            return false;
+        }
+
+        private bool KnowledgeShareIfSensible(IPandemicTurn turn)
+        {
+            if (_knowledgeShareHelper.CanKnowledgeShare(turn.CurrentPlayerId, turn.State))
+            {
+                var suggestedKnowledgeShare = _knowledgeShareHelper.GetSuggestedKnowledgeShare(turn.CurrentPlayerId, turn.State);
+                if (suggestedKnowledgeShare != null)
+                {
+                    turn.KnowledgeShare( suggestedKnowledgeShare);
+                    return true;
+                }
             }
 
             return false;
