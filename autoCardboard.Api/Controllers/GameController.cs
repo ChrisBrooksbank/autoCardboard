@@ -10,6 +10,7 @@ using autoCardboard.Pandemic.TurnState;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace autoCardboard.Api.Controllers
 {
@@ -18,10 +19,12 @@ namespace autoCardboard.Api.Controllers
     public class GameController : ControllerBase
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly MessageSenderConfiguration _messageSenderconfiguration;
 
-        public GameController()
+        public GameController(IOptions<MessageSenderConfiguration> configuration)
         {
-            _serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            _messageSenderconfiguration = configuration.Value;
+            _serviceProvider = ServiceProviderFactory.GetServiceProvider(_messageSenderconfiguration);
         }
 
         [HttpGet]
@@ -40,7 +43,7 @@ namespace autoCardboard.Api.Controllers
         [Produces("application/json")]
         public JsonResult Play(Game game, int playCount = 1)
         {
-            var serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            var serviceProvider = ServiceProviderFactory.GetServiceProvider(_messageSenderconfiguration);
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
 

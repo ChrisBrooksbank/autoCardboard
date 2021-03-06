@@ -15,7 +15,7 @@ namespace autoCardboard.DependencyInjection
 {
     public class ServiceProviderFactory
     {
-        public static IServiceProvider GetServiceProvider()
+        public static IServiceProvider GetServiceProvider(MessageSenderConfiguration messageSenderConfiguration)
         {
             var memoryCache = new MemoryCache(new MemoryCacheOptions());
 
@@ -39,6 +39,7 @@ namespace autoCardboard.DependencyInjection
                 .AddScoped<IGame<IPandemicState, IPandemicTurn>, PandemicGame>()
                 .AddScoped<IPlayerFactory<IPandemicTurn>, PandemicPlayerFactory>()
                 .AddScoped<IPandemicActionValidator, PandemicActionValidator>()
+                .AddSingleton<MessageSenderConfiguration>(messageSenderConfiguration)
 
                 .BuildServiceProvider();
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Publishing;
@@ -12,21 +13,14 @@ namespace autoCardboard.Messaging
     {
         private readonly IManagedMqttClient _messageClient;
 
-        public IManagedMqttClient Client => _messageClient;
-
         public MessageSender()
         {
-            var mqttUri = "localhost";
-            int mqttPort = 1884;
-            var clientId = Guid.NewGuid().ToString();
-            var mqttSecure = false;
-
             var messageBuilder = new MqttClientOptionsBuilder()
-                .WithClientId(clientId)
-                .WithTcpServer(mqttUri, mqttPort)
+                .WithClientId("cardboardAPI")
+                .WithTcpServer("localhost", 1884)
                 .WithCleanSession();
 
-            var options = mqttSecure ? messageBuilder.WithTls().Build() : messageBuilder.Build();
+            var options = false? messageBuilder.WithTls().Build() : messageBuilder.Build();
 
             var managedOptions = new ManagedMqttClientOptionsBuilder()
                 .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
@@ -37,7 +31,6 @@ namespace autoCardboard.Messaging
             _messageClient = clientFactory.CreateManagedMqttClient();
 
             _messageClient.StartAsync(managedOptions);
-            SendMessageASync("AutoCardboard", "Started messenger client");
         }
 
         public Task<MqttClientPublishResult> SendMessageASync(string topic, string payload)

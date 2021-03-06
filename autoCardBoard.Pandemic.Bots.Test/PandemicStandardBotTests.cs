@@ -4,6 +4,7 @@ using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.DependencyInjection;
 using autoCardboard.Infrastructure;
+using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
 using FakeItEasy;
@@ -24,7 +25,7 @@ namespace autoCardBoard.Pandemic.Bots.Test
         [SetUp]
         public void Setup()
         {
-            _serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            _serviceProvider = ServiceProviderFactory.GetServiceProvider(new MessageSenderConfiguration());
             _stateEditor = _serviceProvider.GetService<IPandemicStateEditor>();
             _playerFactory = _serviceProvider.GetService<IPlayerFactory<IPandemicTurn>>();
 

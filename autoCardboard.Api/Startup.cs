@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using autoCardboard.Messaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,12 +11,12 @@ namespace autoCardboard.Api
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+           Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -24,6 +25,9 @@ namespace autoCardboard.Api
                .AddControllers()
                .AddNewtonsoftJson()
                .AddJsonOptions(opts => opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()) );
+        
+           services.Configure<MessageSenderConfiguration>(Configuration.GetSection("Messaging"));
+           services.AddOptions();
 
            services.AddSwaggerGen(c =>
            {

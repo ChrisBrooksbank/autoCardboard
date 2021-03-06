@@ -433,7 +433,7 @@ namespace autoCardboard.Pandemic.TurnState
                 _state.DiseaseCubeReserve[disease]--;
                 _stateDeltas.Add( new DiseaseChangedDelta()
                 {
-                    GameId = _state.Id, City = city, Disease = disease, NewAmount = node.DiseaseCubes[disease]
+                    City = city, Disease = disease, NewAmount = node.DiseaseCubes[disease]
                 } );
 
                 return;
@@ -469,7 +469,7 @@ namespace autoCardboard.Pandemic.TurnState
                     Location = City.Atlanta,
                     PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
                 };
-                _stateDeltas.Add( new PlayerMovedDelta{ GameId = _state.Id, PlayerId = player.Id, City = City.Atlanta} );
+                _stateDeltas.Add( new PlayerMovedDelta{ PlayerId = player.Id, City = City.Atlanta} );
             }
 
             SetupPlayerDeck(_state);
