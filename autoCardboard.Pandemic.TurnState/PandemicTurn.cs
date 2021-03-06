@@ -13,8 +13,6 @@ namespace autoCardboard.Pandemic.TurnState
     // It performs some validation to prevent invalid player turns being presented back to the game.
     public class PandemicTurn : IPandemicTurn
     {
-        private readonly ICardboardLogger _log;
-
         // _state is a clone of the game state 
         // game state can only be permanently changed by game, not by players, otherwise they could cheat
         private PandemicState _state;
@@ -47,9 +45,8 @@ namespace autoCardboard.Pandemic.TurnState
             }
         }
 
-        public PandemicTurn(ICardboardLogger log, IPandemicActionValidator validator)
+        public PandemicTurn(IPandemicActionValidator validator)
         {
-            _log = log;
             _validator = validator;
             CardsToDiscard = new List<PandemicPlayerCard>();
             EventCardsPlayed = new List<PlayerEventPlayed>();

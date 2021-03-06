@@ -8,5 +8,6 @@
         public string ClientId { get; set; }
         public bool Secure { get; set; }
         public int AutoConnectDelaySeconds { get; set; }
+        public string TopicStateDelta { get; set; }
     }
 }

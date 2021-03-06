@@ -36,7 +36,7 @@ namespace autoCardBoard.Pandemic.Bots.Test
 
             var cardboardLogger = A.Fake<ICardboardLogger>();
             var turnValidator = A.Fake<IPandemicActionValidator>();
-            _turn = new PandemicTurn(cardboardLogger, turnValidator);
+            _turn = new PandemicTurn(turnValidator);
         }
 
         [Test]

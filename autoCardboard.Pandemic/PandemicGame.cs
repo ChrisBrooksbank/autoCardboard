@@ -8,7 +8,6 @@ using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.State.Delta;
 using autoCardboard.Pandemic.TurnState;
-using MQTTnet.Client.Publishing;
 using Newtonsoft.Json;
 
 namespace autoCardboard.Pandemic.Game
@@ -20,24 +19,25 @@ namespace autoCardboard.Pandemic.Game
     {
         private const int PlayerHandLimit = 7;
 
-        private readonly ICardboardLogger _logger;
         private readonly IPandemicState _state;
         private readonly IPandemicStateEditor _stateEditor;
         private readonly IPandemicActionValidator _validator;
         private readonly IMessageSender _messageSender;
+        private readonly MessageSenderConfiguration _messageSenderConfiguration;
 
         public IPandemicState State => _state;
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor,
-            IPandemicActionValidator validator, IMessageSender messageSender)
+        public PandemicGame(IPandemicState gamestate, IPandemicStateEditor stateEditor,
+            IPandemicActionValidator validator, IMessageSender messageSender,
+            MessageSenderConfiguration messageSenderConfiguration)
         {
-            _logger = logger;
             _state = gamestate;
             _stateEditor = stateEditor;
             _validator = validator;
             _messageSender = messageSender;
+            _messageSenderConfiguration = messageSenderConfiguration;
         }
 
         public IGameState Play()
@@ -56,7 +56,7 @@ namespace autoCardboard.Pandemic.Game
                     AllowPlayersToPlayEventCards();
                     for (var actionNumber = 1; actionNumber <= 4; actionNumber++)
                     {
-                        var turn = new PandemicTurn(_logger, _validator)
+                        var turn = new PandemicTurn(_validator)
                         {
                             CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
                         };
@@ -109,7 +109,7 @@ namespace autoCardboard.Pandemic.Game
                 var playerState = _state.PlayerStates[player.Id];
                 if (playerState.PlayerHand.Any(c => c.PlayerCardType == PlayerCardType.Event))
                 {
-                    var playEventsTurn = new PandemicTurn(_logger, _validator)
+                    var playEventsTurn = new PandemicTurn(_validator)
                     {
                         CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.PlayEventCards
                     };
@@ -127,7 +127,7 @@ namespace autoCardboard.Pandemic.Game
 
             while (playerState.PlayerHand.Count > PlayerHandLimit)
             {
-                var discardCardsTurn = new PandemicTurn(_logger, _validator)
+                var discardCardsTurn = new PandemicTurn(_validator)
                 {
                     CurrentPlayerId = playerId, State = _state, TurnType = PandemicTurnType.DiscardCards
                 };
@@ -140,7 +140,8 @@ namespace autoCardboard.Pandemic.Game
         {
             var deltas = _stateEditor.Setup(_state, players);
             Players = players;
-            BroadCastStateDeltas($"autoCardboard/pandemic/{_state.Id}/stateDelta", deltas);
+            var topic = _messageSenderConfiguration.TopicStateDelta.Replace("gameId",_state.Id);
+            BroadCastStateDeltas(topic, deltas);
         }
 
         // TODO
