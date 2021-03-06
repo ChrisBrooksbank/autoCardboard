@@ -12,10 +12,8 @@ namespace autoCardBoard.Pandemic.Bots
 {
     public class PandemicBotStandard: IPlayer<IPandemicTurn>
     {
-        private readonly ICardboardLogger _log;
         private readonly IRouteHelper _routeHelper;
         
-        private readonly IMessageSender _messageSender;
         private readonly IHandManagementHelper _handManagementHelper;
         private readonly IResearchStationHelper _researchStationHelper;
         private readonly IEventCardHelper _eventCardHelper;
@@ -25,13 +23,11 @@ namespace autoCardBoard.Pandemic.Bots
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public PandemicBotStandard(ICardboardLogger log, IRouteHelper routeHelper, IMessageSender messageSender, 
+        public PandemicBotStandard(IRouteHelper routeHelper, 
             IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper,
             IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper)
         {
-            _log = log;
             _routeHelper = routeHelper;
-            _messageSender = messageSender;
             _handManagementHelper = handManagementHelper;
             _researchStationHelper = researchStationHelper;
             _eventCardHelper = eventCardHelper;

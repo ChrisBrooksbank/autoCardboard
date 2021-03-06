@@ -1,14 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using autoCardboard.Common;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.State.Delta;
 using autoCardboard.Pandemic.TurnState;
+using MQTTnet.Client.Publishing;
+using Newtonsoft.Json;
 
 namespace autoCardboard.Pandemic.Game
 {
-   /// <summary>
+    /// <summary>
     /// Implements game of pandemic
     /// </summary>
     public class PandemicGame : IGame<IPandemicState, IPandemicTurn>
@@ -25,8 +30,8 @@ namespace autoCardboard.Pandemic.Game
 
         public IEnumerable<IPlayer<IPandemicTurn>> Players { get; set; }
 
-        public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor, 
-            IPandemicActionValidator validator, IMessageSender messageSender )
+        public PandemicGame(ICardboardLogger logger, IPandemicState gamestate, IPandemicStateEditor stateEditor,
+            IPandemicActionValidator validator, IMessageSender messageSender)
         {
             _logger = logger;
             _state = gamestate;
@@ -51,13 +56,15 @@ namespace autoCardboard.Pandemic.Game
                     AllowPlayersToPlayEventCards();
                     for (var actionNumber = 1; actionNumber <= 4; actionNumber++)
                     {
-                        var turn = new PandemicTurn(_logger, _validator) {
+                        var turn = new PandemicTurn(_logger, _validator)
+                        {
                             CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
                         };
                         player.GetTurn(turn);
                         _stateEditor.ApplyTurn(_state, turn);
+                        BroadCastDeltaForTurn(_state, turn);
                     }
-                  
+
                     // draw 2 new player cards
                     var newPlayerCards = _state.PlayerDeck.Draw(2);
                     foreach (var newPlayerCard in newPlayerCards)
@@ -66,6 +73,7 @@ namespace autoCardboard.Pandemic.Game
                         {
                             break;
                         }
+
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
                             _stateEditor.Epidemic(_state);
@@ -73,7 +81,7 @@ namespace autoCardboard.Pandemic.Game
                         }
                         else
                         {
-                            _state.PlayerStates[ player.Id].PlayerHand.Add(newPlayerCard);
+                            _state.PlayerStates[player.Id].PlayerHand.Add(newPlayerCard);
                         }
                     }
 
@@ -85,6 +93,7 @@ namespace autoCardboard.Pandemic.Game
                     }
                 }
             }
+
             return _state;
         }
 
@@ -102,7 +111,7 @@ namespace autoCardboard.Pandemic.Game
                 {
                     var playEventsTurn = new PandemicTurn(_logger, _validator)
                     {
-                        CurrentPlayerId =player.Id, State = _state, TurnType = PandemicTurnType.PlayEventCards
+                        CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.PlayEventCards
                     };
 
                     player.GetTurn(playEventsTurn);
@@ -120,7 +129,7 @@ namespace autoCardboard.Pandemic.Game
             {
                 var discardCardsTurn = new PandemicTurn(_logger, _validator)
                 {
-                    CurrentPlayerId =playerId, State = _state, TurnType = PandemicTurnType.DiscardCards
+                    CurrentPlayerId = playerId, State = _state, TurnType = PandemicTurnType.DiscardCards
                 };
                 player.GetTurn(discardCardsTurn);
                 _stateEditor.ApplyTurn(_state, discardCardsTurn);
@@ -129,9 +138,23 @@ namespace autoCardboard.Pandemic.Game
 
         public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
-            var stateDeltas = _stateEditor.Setup(_state, players); 
+            var deltas = _stateEditor.Setup(_state, players);
             Players = players;
-            // TODO broadcast stateDeltas, maybe reduce amount sent first, combine them
+            BroadCastStateDeltas($"autoCardboard/pandemic/{_state.Id}/stateDelta", deltas);
         }
-    }
+
+        // TODO
+        private void BroadCastDeltaForTurn(IPandemicState state, PandemicTurn turn)
+        {
+        }
+
+        private void BroadCastStateDeltas(string topic, IEnumerable<IDelta> deltas)
+        {
+            var tasks = deltas
+                .Select(stateDelta => JsonConvert.SerializeObject(stateDelta, Formatting.Indented))
+                .Select(payLoad => _messageSender.SendMessageASync(topic, payLoad)).ToArray();
+            Task.WaitAll(tasks, CancellationToken.None);
+        }
+
+}
 }

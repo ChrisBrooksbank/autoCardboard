@@ -1,7 +1,10 @@
-﻿namespace autoCardboard.Messaging
+﻿using System.Threading.Tasks;
+using MQTTnet.Client.Publishing;
+
+namespace autoCardboard.Messaging
 {
     public interface IMessageSender
     {
-        void SendMessageASync(string topic, string payload);
+        Task<MqttClientPublishResult> SendMessageASync(string topic, string payload);
     }
 }

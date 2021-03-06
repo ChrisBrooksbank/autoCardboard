@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
-using autoCardboard.Infrastructure;
 using autoCardboard.Infrastructure.Exceptions;
-using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.State.Delta;
 
@@ -12,23 +10,18 @@ namespace autoCardboard.Pandemic.TurnState
 {
     public class PandemicStateEditor: IPandemicStateEditor
     {
-        private readonly ICardboardLogger _log;
-
         private List<IDelta> _stateDeltas;
 
         private int _currentPlayerId;
         private IPandemicState _state;
-        private readonly IMessageSender _messageSender;
         private readonly IPandemicActionValidator _validator;
 
-        public PandemicStateEditor(ICardboardLogger logger, IMessageSender messageSender, IPandemicActionValidator validator)
+        public PandemicStateEditor(IPandemicActionValidator validator)
         {
-            _log = logger;
-            _messageSender = messageSender;
             _validator = validator;
         }
 
-        public IEnumerable<IDelta> Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 4)
+        public IEnumerable<IDelta> Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 6)
         {
             _state = state;
             _stateDeltas = new List<IDelta>();
@@ -39,7 +32,7 @@ namespace autoCardboard.Pandemic.TurnState
             return _stateDeltas;
         }
 
-        public void Clear(IPandemicState state, int pandemicCardCount = 4)
+        public void Clear(IPandemicState state, int pandemicCardCount = 6)
         {
             _state = state;
             _state.Id = Guid.NewGuid().ToString();

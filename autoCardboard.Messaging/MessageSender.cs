@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Client.Options;
+using MQTTnet.Client.Publishing;
 using MQTTnet.Extensions.ManagedClient;
 
 namespace autoCardboard.Messaging
@@ -38,7 +40,7 @@ namespace autoCardboard.Messaging
             SendMessageASync("AutoCardboard", "Started messenger client");
         }
 
-        public async void SendMessageASync(string topic, string payload)
+        public Task<MqttClientPublishResult> SendMessageASync(string topic, string payload)
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
@@ -47,7 +49,7 @@ namespace autoCardboard.Messaging
                 .WithRetainFlag()
                 .Build();
 
-            await _messageClient.PublishAsync(message, CancellationToken.None);
+            return _messageClient.PublishAsync(message, CancellationToken.None);
         }
 
     }
