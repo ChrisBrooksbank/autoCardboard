@@ -129,8 +129,9 @@ namespace autoCardboard.Pandemic.Game
 
         public void Setup(IEnumerable<IPlayer<IPandemicTurn>> players)
         {
-            _stateEditor.Setup(_state, players); 
+            var stateDeltas = _stateEditor.Setup(_state, players); 
             Players = players;
+            // TODO broadcast stateDeltas, maybe reduce amount sent first, combine them
         }
     }
 }

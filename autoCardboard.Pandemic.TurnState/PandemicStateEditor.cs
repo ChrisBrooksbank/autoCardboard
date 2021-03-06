@@ -6,12 +6,15 @@ using autoCardboard.Infrastructure;
 using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
+using autoCardboard.Pandemic.State.Delta;
 
 namespace autoCardboard.Pandemic.TurnState
 {
     public class PandemicStateEditor: IPandemicStateEditor
     {
         private readonly ICardboardLogger _log;
+
+        private List<IDelta> _stateDeltas;
 
         private int _currentPlayerId;
         private IPandemicState _state;
@@ -25,19 +28,22 @@ namespace autoCardboard.Pandemic.TurnState
             _validator = validator;
         }
 
-        public void Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 4)
+        public IEnumerable<IDelta> Setup(IPandemicState state, IEnumerable<IPlayer<IPandemicTurn>> players, int pandemicCardCount = 4)
         {
             _state = state;
+            _stateDeltas = new List<IDelta>();
             Clear(_state);
             _state.PandemicCardCount = pandemicCardCount;
             SetupPlayerStates(_state, players);
             PerformInitialInfections(_state);
+            return _stateDeltas;
         }
 
         public void Clear(IPandemicState state, int pandemicCardCount = 4)
         {
             _state = state;
             _state.Id = Guid.NewGuid().ToString();
+            _stateDeltas = new List<IDelta>();
             _state.ActionsPlayed = 0;
             _state.OutbreakCount = 0;
             var players = new List<IPlayer<IPandemicTurn>>();
@@ -432,6 +438,10 @@ namespace autoCardboard.Pandemic.TurnState
 
                 node.DiseaseCubes[disease] += 1;
                 _state.DiseaseCubeReserve[disease]--;
+                _stateDeltas.Add( new DiseaseChangedDelta()
+                {
+                    GameId = _state.Id, City = city, Disease = disease, NewAmount = node.DiseaseCubes[disease]
+                } );
 
                 return;
             }
@@ -466,6 +476,7 @@ namespace autoCardboard.Pandemic.TurnState
                     Location = City.Atlanta,
                     PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
                 };
+                _stateDeltas.Add( new PlayerMovedDelta{ GameId = _state.Id, PlayerId = player.Id, City = City.Atlanta} );
             }
 
             SetupPlayerDeck(_state);
@@ -543,6 +554,7 @@ namespace autoCardboard.Pandemic.TurnState
 
             var infectionCards = _state.InfectionDeck.Draw(3).ToList();
             _state.InfectionDiscardPile.AddCards(infectionCards);
+           
             foreach (var infectionCard in infectionCards)
             {
                 AddDiseaseCubes(_state, (City)infectionCard.Value, 3);
