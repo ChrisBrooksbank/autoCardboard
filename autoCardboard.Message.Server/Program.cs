@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using MQTTnet;
 using MQTTnet.Server;
 
@@ -13,26 +15,35 @@ namespace autoCardboard.Message.Server
     /// </summary>
     class Program
     {
+        private static IConfiguration _configuration;
+
         static void Main(string[] args)
         {
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true, true)
+                .Build();
+
             StartServer();
         }
 
         static async void StartServer()
         {
             var optionsBuilder = new MqttServerOptionsBuilder()
-                .WithConnectionBacklog(100)
-                .WithDefaultEndpointPort(1884);
+                .WithConnectionBacklog(int.Parse(_configuration["backlog"]))
+                .WithDefaultEndpointPort(int.Parse(_configuration["portNumber"]));
 
             var mqttServer = new MqttFactory().CreateMqttServer();
 
-            mqttServer.UseClientConnectedHandler(ClientConnectedHandler);
-            mqttServer.UseClientDisconnectedHandler(ClientDisconnectedHandler);
-            mqttServer.UseApplicationMessageReceivedHandler(MessageReceivedHandler);
-
+            if (bool.Parse(_configuration["echo"]))
+            {
+                mqttServer.UseClientConnectedHandler(ClientConnectedHandler);
+                mqttServer.UseClientDisconnectedHandler(ClientDisconnectedHandler);
+                mqttServer.UseApplicationMessageReceivedHandler(MessageReceivedHandler);
+            }
+          
             await mqttServer.StartAsync(optionsBuilder.Build());
 
-            Console.WriteLine("AutoCardboard messaging server listening on port 1884 - press enter to exit.");
+            Console.WriteLine($"Mqtt broker listening on port {_configuration["portNumber"]} - press enter to exit.");
             Console.ReadLine();
             await mqttServer.StopAsync();
         }

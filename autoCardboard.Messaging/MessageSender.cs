@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Client.Options;
+using MQTTnet.Client.Publishing;
 using MQTTnet.Extensions.ManagedClient;
 
 namespace autoCardboard.Messaging
@@ -9,25 +11,26 @@ namespace autoCardboard.Messaging
     public class MessageSender: IMessageSender
     {
         private readonly IManagedMqttClient _messageClient;
+        private readonly MessageSenderConfiguration _messageSenderConfiguration;
 
-        public IManagedMqttClient Client => _messageClient;
-
-        public MessageSender()
+        public MessageSender(MessageSenderConfiguration messageSenderConfiguration)
         {
-            var mqttUri = "localhost";
-            int mqttPort = 1884;
-            var clientId = Guid.NewGuid().ToString();
-            var mqttSecure = false;
+            _messageSenderConfiguration = messageSenderConfiguration;
+
+            if (!_messageSenderConfiguration.Enabled)
+            {
+                return;
+            }
 
             var messageBuilder = new MqttClientOptionsBuilder()
-                .WithClientId(clientId)
-                .WithTcpServer(mqttUri, mqttPort)
+                .WithClientId(messageSenderConfiguration.ClientId)
+                .WithTcpServer(messageSenderConfiguration.Uri, messageSenderConfiguration.PortNumber)
                 .WithCleanSession();
 
-            var options = mqttSecure ? messageBuilder.WithTls().Build() : messageBuilder.Build();
+            var options = messageSenderConfiguration.Secure? messageBuilder.WithTls().Build() : messageBuilder.Build();
 
             var managedOptions = new ManagedMqttClientOptionsBuilder()
-                .WithAutoReconnectDelay(TimeSpan.FromSeconds(5))
+                .WithAutoReconnectDelay(TimeSpan.FromSeconds(messageSenderConfiguration.AutoConnectDelaySeconds))
                 .WithClientOptions(options)
                 .Build();
 
@@ -35,11 +38,18 @@ namespace autoCardboard.Messaging
             _messageClient = clientFactory.CreateManagedMqttClient();
 
             _messageClient.StartAsync(managedOptions);
-            SendMessageASync("AutoCardboard", "Started messenger client");
         }
 
-        public async void SendMessageASync(string topic, string payload)
+        public Task<MqttClientPublishResult> SendMessageASync(string topic, string payload)
         {
+            if (!_messageSenderConfiguration.Enabled)
+            {
+                return Task.FromResult(new MqttClientPublishResult
+                {
+                    ReasonString = "Messaging disabled"
+                });
+            }
+
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
                 .WithPayload(payload)
@@ -47,7 +57,7 @@ namespace autoCardboard.Messaging
                 .WithRetainFlag()
                 .Build();
 
-            await _messageClient.PublishAsync(message, CancellationToken.None);
+            return _messageClient.PublishAsync(message, CancellationToken.None);
         }
 
     }

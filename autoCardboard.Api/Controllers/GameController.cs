@@ -10,6 +10,7 @@ using autoCardboard.Pandemic.TurnState;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace autoCardboard.Api.Controllers
 {
@@ -18,14 +19,12 @@ namespace autoCardboard.Api.Controllers
     public class GameController : ControllerBase
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ICardboardLogger _logger;
-        private readonly IMessageSender _messageSender;
+        private readonly MessageSenderConfiguration _messageSenderconfiguration;
 
-        public GameController()
+        public GameController(IOptions<MessageSenderConfiguration> configuration)
         {
-            _serviceProvider = ServiceProviderFactory.GetServiceProvider();
-            _logger = _serviceProvider.GetService<ICardboardLogger>();
-            _messageSender = _serviceProvider.GetService<IMessageSender>();
+            _messageSenderconfiguration = configuration.Value;
+            _serviceProvider = ServiceProviderFactory.GetServiceProvider(_messageSenderconfiguration);
         }
 
         [HttpGet]
@@ -39,37 +38,12 @@ namespace autoCardboard.Api.Controllers
         }
 
         [HttpGet]
-        [Route("GetNewGame")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [Produces("application/json")]
-        public JsonResult GetNewGame(Game game)
-        {
-            var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
-            IGameState gameState = null;
-
-            switch (game)
-            {
-                case Game.Pandemic:
-                    var pandemicGame = GameFactory.CreateGame<IPandemicState, IPandemicTurn>(_serviceProvider, playerConfiguration) as PandemicGame;
-                    pandemicGame.Setup(pandemicGame.Players);
-                    gameState = pandemicGame.State;
-                    break;
-                case Game.ForSale:
-                    var forSaleGame = GameFactory.CreateGame<IForSaleGameState, IForSaleGameTurn>(_serviceProvider, playerConfiguration);
-                    gameState = forSaleGame.State;
-                    break;
-            }
-
-            return new JsonResult(gameState);
-        }
-
-        [HttpGet]
         [Route("Play")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Produces("application/json")]
         public JsonResult Play(Game game, int playCount = 1)
         {
-            var serviceProvider = ServiceProviderFactory.GetServiceProvider();
+            var serviceProvider = ServiceProviderFactory.GetServiceProvider(_messageSenderconfiguration);
             var playerConfiguration = new PlayerConfiguration { PlayerCount = 2 };
             IGameState gameState = null;
 

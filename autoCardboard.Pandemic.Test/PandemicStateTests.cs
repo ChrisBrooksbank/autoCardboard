@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using autoCardboard.Infrastructure;
-using autoCardboard.Messaging;
 using autoCardBoard.Pandemic.Bots;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
@@ -12,13 +10,13 @@ namespace autoCardboard.Pandemic.Test
     class PandemicStateTests
     {
         private IPandemicState _gameState;
-        private IPandemicStateEditor _stateEditor;
+        private PandemicStateEditor _stateEditor;
 
         [SetUp]
         public void Setup()
         {
             _gameState = new PandemicState();
-            _stateEditor = new PandemicStateEditor(new CardboardLogger(), new MessageSender(), new PandemicActionValidator());
+            _stateEditor = new PandemicStateEditor(new PandemicActionValidator());
             _stateEditor.Clear(_gameState);
         }
 
