@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using autoCardboard.Common;
@@ -87,8 +88,10 @@ namespace autoCardboard.Pandemic.TurnState
             _state.ResearchStationStock--;
         }
 
-        public void ApplyTurn(IPandemicState state, IPandemicTurn turn)
+        public IEnumerable<IDelta> ApplyTurn(IPandemicState state, IPandemicTurn turn)
         {
+            _stateDeltas = new List<IDelta>();
+
             switch (turn.TurnType)
             {
                 case PandemicTurnType.TakeActions:
@@ -101,6 +104,8 @@ namespace autoCardboard.Pandemic.TurnState
                     TakePlayEventCardsTurn(state,turn);
                     break;
             }
+
+            return _stateDeltas;
         }
 
         public void TakePlayEventCardsTurn(IPandemicState state, IPandemicTurn turn)
@@ -122,6 +127,7 @@ namespace autoCardboard.Pandemic.TurnState
                     _state.EventCardsQueue.AddCard(card);
                     playerState.PlayerHand.Remove(card);
                     state.PlayerDiscardPile.AddCard(card);
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = card, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
                 }
 
                 if (eventCardToPlay.EventCard == EventCard.GovernmentGrant)
@@ -130,6 +136,7 @@ namespace autoCardboard.Pandemic.TurnState
                     BuildResearchStationWithGovernmentGrant(_state, eventCardToPlay.City.Value);
                     playerState.PlayerHand.Remove(card);
                     state.PlayerDiscardPile.AddCard(card);
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = card, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
                 }
 
                 if (eventCardToPlay.EventCard == EventCard.Airlift)
@@ -138,9 +145,11 @@ namespace autoCardboard.Pandemic.TurnState
                     _state.PlayerStates[eventCardToPlay.PlayerId].Location = eventCardToPlay.City.Value;
                     playerState.PlayerHand.Remove(card);
                     state.PlayerDiscardPile.AddCard(card);
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = card, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
                 }
             }
         }
+
 
         public void TakeDiscardCardsTurn(IPandemicState state, IPandemicTurn turn)
         {
@@ -160,6 +169,8 @@ namespace autoCardboard.Pandemic.TurnState
                 if (cardInPlayerDeck != null)
                 {
                     playerState.PlayerHand.Remove(cardInPlayerDeck);
+                    state.PlayerDiscardPile.AddCard(cardInPlayerDeck);
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = cardInPlayerDeck, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
                 }
             }
 
@@ -173,7 +184,7 @@ namespace autoCardboard.Pandemic.TurnState
             _state.ActionsPlayed++;
         }
         
-        public void ApplyPlayerAction(IPandemicState state, PlayerAction action)
+        private void ApplyPlayerAction(IPandemicState state, PlayerAction action)
         {
             _state = state;
             _currentPlayerId = action.PlayerId;
@@ -229,6 +240,8 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 otherPlayer.Value.PlayerHand.Add(cityCardInPlayersHand);
                 player.Value.PlayerHand.Remove(cityCardInPlayersHand);
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = playerId, PandemicPlayerCard = cityCardInPlayersHand, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = otherPlayerId, PandemicPlayerCard = cityCardInPlayersHand, DrawnOrDiscarded = DrawnOrDiscarded.Drawn});
             }
             else
             {
@@ -236,6 +249,8 @@ namespace autoCardboard.Pandemic.TurnState
                 {
                     player.Value.PlayerHand.Add(cityCardInOtherPlayersHand);
                     otherPlayer.Value.PlayerHand.Remove(cityCardInOtherPlayersHand);
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = otherPlayerId, PandemicPlayerCard = cityCardInPlayersHand, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = playerId, PandemicPlayerCard = cityCardInPlayersHand, DrawnOrDiscarded = DrawnOrDiscarded.Drawn});
                 }
             }
         }
@@ -247,9 +262,15 @@ namespace autoCardboard.Pandemic.TurnState
             foreach (var cardToDiscard in cardsToDiscard)
             {
                 _state.PlayerStates[_currentPlayerId].PlayerHand.Remove(cardToDiscard);
-                                                   _state.PlayerDiscardPile.AddCard(cardToDiscard);
+                _state.PlayerDiscardPile.AddCard(cardToDiscard);
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = cardToDiscard, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
             }
-           
+
+            _stateDeltas.Add(new DiseaseStateChanged()
+            {
+              Disease = disease,
+              DiseaseState = _state.DiscoveredCures[disease]
+            });
         }
 
         private void ShuttleFlight(IPandemicState state, City city)
@@ -257,6 +278,12 @@ namespace autoCardboard.Pandemic.TurnState
             _state = state;
             var playerState = _state.PlayerStates[_currentPlayerId];
             playerState.Location = city;
+
+            _stateDeltas.Add(new PlayerMovedDelta()
+            {
+                PlayerId = _currentPlayerId,
+                City = city
+            });
         }
 
         private void DirectFlight(IPandemicState state, City city)
@@ -268,6 +295,13 @@ namespace autoCardboard.Pandemic.TurnState
             var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
             playerState.PlayerHand.Remove(cardToDiscard);
             _state.PlayerDiscardPile.AddCard(cardToDiscard);
+            _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = cardToDiscard, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
+
+            _stateDeltas.Add(new PlayerMovedDelta()
+            {
+                PlayerId = _currentPlayerId,
+                City = city
+            });
         }
 
         private void CharterFlight(IPandemicState state, City city)
@@ -280,6 +314,13 @@ namespace autoCardboard.Pandemic.TurnState
             var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == startingCity);
             playerState.PlayerHand.Remove(cardToDiscard);
             _state.PlayerDiscardPile.AddCard(cardToDiscard);
+            _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = cardToDiscard, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
+
+            _stateDeltas.Add(new PlayerMovedDelta()
+            {
+                PlayerId = _currentPlayerId,
+                City = city
+            });
         }
 
         private void BuildResearchStationWithGovernmentGrant(IPandemicState state, City city)
@@ -301,7 +342,13 @@ namespace autoCardboard.Pandemic.TurnState
                 var cardToDiscard = playerState.PlayerHand.Single(c => c.PlayerCardType == PlayerCardType.City && (City)c.Value == city);
                 playerState.PlayerHand.Remove(cardToDiscard);
                 _state.PlayerDiscardPile.AddCard(cardToDiscard);
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = cardToDiscard, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
             }
+
+            _stateDeltas.Add(new ResearchStationDelta()
+            {
+                City = city
+            });
         }
         
         private void DriveOrFerry(IPandemicState state, City city)
@@ -309,6 +356,11 @@ namespace autoCardboard.Pandemic.TurnState
             _state = state;
             var playerState = _state.PlayerStates[_currentPlayerId];
             playerState.Location = city;
+            _stateDeltas.Add(new PlayerMovedDelta()
+            {
+               PlayerId = _currentPlayerId,
+               City = city
+            });
         }
 
         private void TreatDisease(IPandemicState state, City city, Disease disease)
@@ -334,12 +386,19 @@ namespace autoCardboard.Pandemic.TurnState
                 node.DiseaseCubes[disease]--;
                 _state.DiseaseCubeReserve[disease]++;
             }
-          
+
+            _stateDeltas.Add(new DiseaseChangedDelta()
+            {
+                City = node.City,
+                Disease = disease,
+                NewAmount = node.DiseaseCubes[disease]
+            });
         }
 
-        public void Epidemic(IPandemicState state)
+        public IEnumerable<IDelta> Epidemic(IPandemicState state)
         {
             _state = state;
+            _stateDeltas = new List<IDelta>();
             var bottomCard = _state.InfectionDeck.DrawBottom();
             _state.InfectionDiscardPile.AddCard(bottomCard);
             AddDiseaseCubes(_state, (City)bottomCard.Value, 3);
@@ -349,11 +408,14 @@ namespace autoCardboard.Pandemic.TurnState
             _state.InfectionDeck.AddCardDeck(_state.InfectionDiscardPile, CardDeckPosition.Top);
 
             _state.InfectionRateMarker++;
+            return _stateDeltas;
         }
 
-        public void InfectCities(IPandemicState state)
+        // TODO state deltas
+        public IEnumerable<IDelta> InfectCities(IPandemicState state)
         {
             _state = state;
+            _stateDeltas = new List<IDelta>();
 
             var oneQuietNightCard = _state.EventCardsQueue.Cards
                 .SingleOrDefault(c => c.PlayerCardType == PlayerCardType.Event && (EventCard)c.Value == EventCard.OneQuietNight);
@@ -361,7 +423,8 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 state.PlayerDiscardPile.AddCard(oneQuietNightCard);
                 state.EventCardsQueue.Cards.Remove(oneQuietNightCard);
-                return;
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = oneQuietNightCard, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
+                return _stateDeltas;
             }
 
             var infectionRate = _state.InfectionRateTrack[_state.InfectionRateMarker];
@@ -370,7 +433,7 @@ namespace autoCardboard.Pandemic.TurnState
             {
                 _state.IsGameOver = true;
                 _state.GameOverReason = "Infection deck empty";
-                return;
+                return _stateDeltas;
             }
 
             var infectionCards = _state.InfectionDeck.Draw(infectionRate).ToList();
@@ -388,10 +451,19 @@ namespace autoCardboard.Pandemic.TurnState
             if (!state.IsGameOver)
             {
                 _state.InfectionDiscardPile.AddCards(infectionCards);
+                foreach (var infectionCard in infectionCards)
+                {
+                    _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta
+                    {
+                        InfectionCard = (City)infectionCard.Value,
+                        DrawnOrDiscarded = DrawnOrDiscarded.Discarded
+                    });
+                }
             }
-        }
 
-        public void AddDiseaseCubes(IPandemicState state, City city, int count = 1)
+            return _stateDeltas;
+        }
+        private void AddDiseaseCubes(IPandemicState state, City city, int count = 1)
         {
             _state = state;
             var disease = city.GetDefaultDisease();
@@ -469,7 +541,12 @@ namespace autoCardboard.Pandemic.TurnState
                     Location = City.Atlanta,
                     PlayerRole = (PlayerRole)roleDeck.DrawTop().Value
                 };
-                _stateDeltas.Add( new PlayerMovedDelta{ PlayerId = player.Id, City = City.Atlanta} );
+                _stateDeltas.Add( new PlayerSetupDelta
+                {
+                    PlayerId = player.Id, 
+                    City = _state.PlayerStates[player.Id].Location, 
+                    PlayerRole = _state.PlayerStates[player.Id].PlayerRole
+                } );
             }
 
             SetupPlayerDeck(_state);
@@ -483,13 +560,15 @@ namespace autoCardboard.Pandemic.TurnState
             // Add city cards
             foreach (var city in Enum.GetValues(typeof(City)))
             {
-                _state.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)city, Name = city.ToString(), PlayerCardType = PlayerCardType.City});
+                var card = new PandemicPlayerCard{Value = (int) city, Name = city.ToString(), PlayerCardType = PlayerCardType.City};
+                _state.PlayerDeck.AddCard(card);
             }
 
             // Add event cards
             foreach (var eventCard in Enum.GetValues(typeof(EventCard)))
             {
-                _state.PlayerDeck.AddCard(new PandemicPlayerCard{ Value = (int)eventCard, Name = eventCard.ToString(), PlayerCardType = PlayerCardType.Event});
+                var card = new PandemicPlayerCard{Value = (int) eventCard, Name = eventCard.ToString(), PlayerCardType = PlayerCardType.Event};
+                _state.PlayerDeck.AddCard(card);
             }
 
             _state.PlayerDeck.Shuffle();
@@ -503,6 +582,7 @@ namespace autoCardboard.Pandemic.TurnState
                     foreach (var card in newPlayerCards)
                     {
                         player.Value.PlayerHand.Add(card);
+                        _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {PlayerId = _currentPlayerId, PandemicPlayerCard = card, DrawnOrDiscarded = DrawnOrDiscarded.Drawn});
                     }
                 }
             }
@@ -551,6 +631,7 @@ namespace autoCardboard.Pandemic.TurnState
             foreach (var infectionCard in infectionCards)
             {
                 AddDiseaseCubes(_state, (City)infectionCard.Value, 3);
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {InfectionCard = (City)infectionCard.Value, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
             }
 
             infectionCards = _state.InfectionDeck.Draw(3).ToList();
@@ -558,6 +639,7 @@ namespace autoCardboard.Pandemic.TurnState
             foreach (var infectionCard in infectionCards)
             {
                 AddDiseaseCubes(_state, (City)infectionCard.Value, 2);
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {InfectionCard = (City)infectionCard.Value, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
             }
 
             infectionCards = _state.InfectionDeck.Draw(3).ToList();
@@ -565,27 +647,9 @@ namespace autoCardboard.Pandemic.TurnState
             foreach (var infectionCard in infectionCards)
             {
                 AddDiseaseCubes(_state, (City)infectionCard.Value, 1);
+                _stateDeltas.Add( new CardIsDrawnOrDiscardedDelta {InfectionCard = (City)infectionCard.Value, DrawnOrDiscarded = DrawnOrDiscarded.Discarded});
             }
 
-        }
-
-        public IEnumerable<PandemicPlayerCard> DrawPlayerCards(IPandemicState state)
-        {
-            _state = state;
-            if (_state.PlayerDeck.CardCount < 2)
-            {
-                _state.IsGameOver = true;
-                _state.GameOverReason = "Empty player deck.";
-                return new List<PandemicPlayerCard>();
-            }
-
-            return _state.PlayerDeck.Draw(2);
-        }
-
-        public void RemoveUnknownStateForPlayer(IPandemicState state, int playerId)
-        {
-            state.PlayerDeck = new PlayerDeck();
-            state.InfectionDeck = new InfectionDeck();
         }
 
     }

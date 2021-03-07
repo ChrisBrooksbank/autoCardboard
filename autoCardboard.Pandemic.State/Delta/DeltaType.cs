@@ -4,6 +4,9 @@
     {
         PlayerLocation,
         Disease,
-        ResearchStation
+        ResearchStation,
+        DiseaseStateChanged,
+        PlayerSetup,
+        CardDrawnOrDiscarded
     }
 }

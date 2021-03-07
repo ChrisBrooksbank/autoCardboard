@@ -10,7 +10,7 @@ namespace autoCardboard.Pandemic.Test
     class PandemicStateTests
     {
         private IPandemicState _gameState;
-        private IPandemicStateEditor _stateEditor;
+        private PandemicStateEditor _stateEditor;
 
         [SetUp]
         public void Setup()

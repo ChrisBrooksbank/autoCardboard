@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using autoCardboard.Common;
-using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.State.Delta;
@@ -61,8 +60,8 @@ namespace autoCardboard.Pandemic.Game
                             CurrentPlayerId = player.Id, State = _state, TurnType = PandemicTurnType.TakeActions
                         };
                         player.GetTurn(turn);
-                        _stateEditor.ApplyTurn(_state, turn);
-                        BroadCastDeltaForTurn(_state, turn);
+                        var stateDeltas =_stateEditor.ApplyTurn(_state, turn);
+                        BroadCastStateDeltas(stateDeltas);
                     }
 
                     // draw 2 new player cards
@@ -76,20 +75,29 @@ namespace autoCardboard.Pandemic.Game
 
                         if (newPlayerCard.PlayerCardType == PlayerCardType.Epidemic)
                         {
-                            _stateEditor.Epidemic(_state);
+                            var stateDeltas = _stateEditor.Epidemic(_state);
+                            BroadCastStateDeltas(stateDeltas);
                             _state.PlayerDiscardPile.AddCard(newPlayerCard);
                         }
                         else
                         {
                             _state.PlayerStates[player.Id].PlayerHand.Add(newPlayerCard);
+                            var stateDeltas = new List<IDelta>() { new CardIsDrawnOrDiscardedDelta
+                            {
+                                PlayerId = player.Id,
+                                PandemicPlayerCard = newPlayerCard,
+                                DrawnOrDiscarded = DrawnOrDiscarded.Drawn
+                            } };
+                            BroadCastStateDeltas(stateDeltas);
                         }
                     }
 
                     if (!State.IsGameOver)
                     {
-                        AllowPlayersToPlayEventCards();
-                        PlayerDiscardsDownToHandLimit(player, player.Id);
-                        _stateEditor.InfectCities(_state);
+                       AllowPlayersToPlayEventCards();
+                       PlayerDiscardsDownToHandLimit(player, player.Id);
+                       var stateDeltas =  _stateEditor.InfectCities(_state);
+                       BroadCastStateDeltas(stateDeltas);
                     }
                 }
             }
@@ -115,7 +123,8 @@ namespace autoCardboard.Pandemic.Game
                     };
 
                     player.GetTurn(playEventsTurn);
-                    _stateEditor.ApplyTurn(_state, playEventsTurn);
+                    var stateDeltas = _stateEditor.ApplyTurn(_state, playEventsTurn);
+                    BroadCastStateDeltas(stateDeltas);
                 }
             }
 
@@ -132,7 +141,8 @@ namespace autoCardboard.Pandemic.Game
                     CurrentPlayerId = playerId, State = _state, TurnType = PandemicTurnType.DiscardCards
                 };
                 player.GetTurn(discardCardsTurn);
-                _stateEditor.ApplyTurn(_state, discardCardsTurn);
+                var stateDeltas = _stateEditor.ApplyTurn(_state, discardCardsTurn);
+                BroadCastStateDeltas(stateDeltas);
             }
         }
 
@@ -140,22 +150,21 @@ namespace autoCardboard.Pandemic.Game
         {
             var deltas = _stateEditor.Setup(_state, players);
             Players = players;
-            var topic = _messageSenderConfiguration.TopicStateDelta.Replace("gameId",_state.Id);
-            BroadCastStateDeltas(topic, deltas);
+            BroadCastStateDeltas(deltas);
         }
-
-        // TODO
-        private void BroadCastDeltaForTurn(IPandemicState state, PandemicTurn turn)
+        
+        private void BroadCastStateDeltas(IEnumerable<IDelta> deltas)
         {
-        }
-
-        private void BroadCastStateDeltas(string topic, IEnumerable<IDelta> deltas)
-        {
+            var topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicStateDelta);
             var tasks = deltas
                 .Select(stateDelta => JsonConvert.SerializeObject(stateDelta, Formatting.Indented))
                 .Select(payLoad => _messageSender.SendMessageASync(topic, payLoad)).ToArray();
             Task.WaitAll(tasks, CancellationToken.None);
         }
 
-}
+        private string ExpandPlaceHolders(string withPlaceHolders)
+        {
+            return withPlaceHolders.Replace("gameId",_state.Id);
+        }
+  }
 }
