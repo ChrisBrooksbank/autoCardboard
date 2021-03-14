@@ -36,7 +36,7 @@ namespace autoCardboard.Pandemic.TurnState
         public void Clear(IPandemicState state, int pandemicCardCount = 6)
         {
             _state = state;
-            _state.Id = Guid.NewGuid().ToString();
+            _state.Id = "1"; // TODO Guid.NewGuid().ToString();
             _stateDeltas = new List<IDelta>();
             _state.ActionsPlayed = 0;
             _state.OutbreakCount = 0;

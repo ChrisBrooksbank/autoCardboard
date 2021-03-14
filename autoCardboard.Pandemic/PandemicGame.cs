@@ -7,6 +7,7 @@ using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.State.Delta;
 using autoCardboard.Pandemic.TurnState;
+using MQTTnet.Client.Publishing;
 using Newtonsoft.Json;
 
 namespace autoCardboard.Pandemic.Game
@@ -41,6 +42,7 @@ namespace autoCardboard.Pandemic.Game
 
         public IGameState Play()
         {
+            BroadcastGameStart();
             Setup(Players);
 
             while (!_state.IsGameOver)
@@ -102,6 +104,8 @@ namespace autoCardboard.Pandemic.Game
                 }
             }
 
+            BroadcastGameEnd();
+
             return _state;
         }
 
@@ -153,18 +157,89 @@ namespace autoCardboard.Pandemic.Game
             BroadCastStateDeltas(deltas);
         }
         
-        private void BroadCastStateDeltas(IEnumerable<IDelta> deltas)
+        private void BroadcastGameStart()
         {
-            var topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicStateDelta);
-            var tasks = deltas
-                .Select(stateDelta => JsonConvert.SerializeObject(stateDelta, Formatting.Indented))
-                .Select(payLoad => _messageSender.SendMessageASync(topic, payLoad)).ToArray();
-            Task.WaitAll(tasks, CancellationToken.None);
+            var topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicGameStart);
+            var payload = "OK";
+            Task.WaitAll(_messageSender.SendMessageASync(topic, payload));
         }
 
-        private string ExpandPlaceHolders(string withPlaceHolders)
+        private async void BroadcastGameEnd()
         {
-            return withPlaceHolders.Replace("gameId",_state.Id);
+            var topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicGameEnd);
+            var payload = JsonConvert.SerializeObject(new { _state.GameOverReason });
+            Task.WaitAll(_messageSender.SendMessageASync(topic, payload));
+        }
+
+        private void BroadCastStateDeltas(IEnumerable<IDelta> deltas)
+        {
+            var broadCastTasks = new List<Task<MqttClientPublishResult>>();
+            foreach (var delta in deltas)
+            {
+                var topicAndPayLoad = MapDeltaToTopicAndPayLoad(delta);
+                if (!string.IsNullOrEmpty(topicAndPayLoad.Item1) && !string.IsNullOrEmpty(topicAndPayLoad.Item2))
+                {
+                    var broadCastTask = _messageSender.SendMessageASync(topicAndPayLoad.Item1, topicAndPayLoad.Item2);
+                    broadCastTasks.Add(broadCastTask);
+                }
+            }
+
+            Task.WaitAll(broadCastTasks.ToArray(), CancellationToken.None);
+        }
+
+        private (string, string) MapDeltaToTopicAndPayLoad(IDelta delta)
+        {
+            var topic = string.Empty;
+            var payload = string.Empty;
+
+            switch (delta.DeltaType)
+            {
+                case DeltaType.PlayerSetup:
+                    var setupDelta = delta as PlayerSetupDelta;
+                    topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBotSetup);
+                    payload = JsonConvert.SerializeObject(new { setupDelta.PlayerId, setupDelta.PlayerRole, setupDelta.City});
+                    break;
+                case DeltaType.PlayerLocation:
+                    var locationDelta = delta as PlayerMovedDelta;
+                    topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBotMoved);
+                    payload =  JsonConvert.SerializeObject(new { Id = locationDelta.PlayerId, City = locationDelta.City});
+                    break;
+                case DeltaType.Disease:
+                    var diseaseDelta = delta as DiseaseChangedDelta;
+                    topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicInfect);
+                    payload = JsonConvert.SerializeObject(new { diseaseDelta.City, diseaseDelta.Disease, diseaseDelta.NewAmount});
+                    break;
+                case DeltaType.DiseaseStateChanged:
+                    var diseaseStateDelta = delta as DiseaseStateChanged;
+                    topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicCure);
+                    payload = JsonConvert.SerializeObject(new {diseaseStateDelta.Disease, diseaseStateDelta.DiseaseState });
+                    break;
+                case DeltaType.ResearchStation:
+                    var buildDelta = delta as ResearchStationDelta;
+                    topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBuilt);
+                    payload = JsonConvert.SerializeObject(new { buildDelta.City});
+                    break;
+                case DeltaType.CardDrawnOrDiscarded:
+                    var cardDelta = delta as CardIsDrawnOrDiscardedDelta;
+                    if (cardDelta.DrawnOrDiscarded == DrawnOrDiscarded.Discarded)
+                    {
+                        topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBotDiscarded);
+                        payload = JsonConvert.SerializeObject(new { cardDelta.PlayerId, cardDelta.PandemicPlayerCard});
+                    }
+                    else
+                    {
+                        topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBotDrew);
+                        payload = JsonConvert.SerializeObject(new { cardDelta.PlayerId, cardDelta.PandemicPlayerCard});
+                    }
+                    break;
+            }
+
+            return (topic,payload);
+        }
+        
+        private string ExpandPlaceHolders(string payLoad)
+        {
+            return payLoad.Replace("{gameId}",_state.Id);
         }
   }
 }

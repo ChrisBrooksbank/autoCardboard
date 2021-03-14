@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using autoCardboard.Common;
+using autoCardboard.Messaging;
 using autoCardBoard.Pandemic.Bots;
 using autoCardboard.Pandemic.TurnState;
 
@@ -12,16 +13,21 @@ namespace autoCardboard.Pandemic.Game
         private readonly IHandManagementHelper _playerDeckHelper;
         private readonly IEventCardHelper _eventCardHelper;
         private readonly IKnowledgeShareHelper _knowledgeShareHelper;
+        private readonly IMessageSender _messageSender;
+        private readonly MessageSenderConfiguration _messageSenderConfiguration;
 
         public PandemicPlayerFactory(IRouteHelper routeHelper, 
             IResearchStationHelper researchStationHelper, IHandManagementHelper playerDeckHelper,
-            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper)
+            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper,
+            IMessageSender messageSender, MessageSenderConfiguration messageSenderConfiguration)
         {
             _routeHelper = routeHelper;
             _researchStationHelper = researchStationHelper;
             _playerDeckHelper = playerDeckHelper;
             _eventCardHelper = eventCardHelper;
             _knowledgeShareHelper = knowledgeShareHelper;
+            _messageSender = messageSender;
+            _messageSenderConfiguration = messageSenderConfiguration;
         }
 
         public IEnumerable<IPlayer<IPandemicTurn>> CreatePlayers(PlayerConfiguration playerConfiguration)
@@ -29,7 +35,7 @@ namespace autoCardboard.Pandemic.Game
             List<IPlayer<IPandemicTurn>> players = new List<IPlayer<IPandemicTurn>>();
             for (int player = 1; player <= playerConfiguration.PlayerCount; player++)
             {
-                var newPlayer = new PandemicBotStandard(_routeHelper, _playerDeckHelper, _researchStationHelper, _eventCardHelper, _knowledgeShareHelper)
+                var newPlayer = new PandemicBotStandard(_routeHelper, _playerDeckHelper, _researchStationHelper, _eventCardHelper, _knowledgeShareHelper, _messageSender, _messageSenderConfiguration)
                 {
                     Id = player,
                     Name = player.ToString()

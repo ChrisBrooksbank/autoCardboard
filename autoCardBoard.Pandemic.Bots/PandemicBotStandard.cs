@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using autoCardboard.Common;
-using autoCardboard.Infrastructure;
 using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
+using Newtonsoft.Json;
 
 namespace autoCardBoard.Pandemic.Bots
 {
+
     public class PandemicBotStandard: IPlayer<IPandemicTurn>
     {
+        private readonly IMessageSender _messageSender;
+        private IPandemicTurn _currentTurn;
+        private readonly MessageSenderConfiguration _messageSenderConfiguration;
         private readonly IRouteHelper _routeHelper;
-        
         private readonly IHandManagementHelper _handManagementHelper;
         private readonly IResearchStationHelper _researchStationHelper;
         private readonly IEventCardHelper _eventCardHelper;
@@ -25,17 +29,22 @@ namespace autoCardBoard.Pandemic.Bots
 
         public PandemicBotStandard(IRouteHelper routeHelper, 
             IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper,
-            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper)
+            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper, 
+            IMessageSender messageSender, MessageSenderConfiguration messageSenderConfiguration)
         {
             _routeHelper = routeHelper;
             _handManagementHelper = handManagementHelper;
             _researchStationHelper = researchStationHelper;
             _eventCardHelper = eventCardHelper;
             _knowledgeShareHelper = knowledgeShareHelper;
+            _messageSender = messageSender;
+            _messageSenderConfiguration = messageSenderConfiguration;
         }
 
         public void GetTurn(IPandemicTurn turn)
         {
+            _currentTurn = turn;
+
             switch (turn.TurnType)
             {
                 case PandemicTurnType.TakeActions:
@@ -60,6 +69,7 @@ namespace autoCardBoard.Pandemic.Bots
                 c.PlayerCardType == PlayerCardType.Event && (EventCard) c.Value == EventCard.OneQuietNight);
             if (oneQuietNightCard != null && !_eventCardHelper.ShouldPlayOneQuietNight(turn.State))
             {
+                BroadCastThought("I should play One Quiet Night");
                 turn.PlayEventCard(EventCard.OneQuietNight);
             }
 
@@ -71,6 +81,7 @@ namespace autoCardBoard.Pandemic.Bots
                 var locationForNewResearchStation = _routeHelper.GetBestLocationForNewResearchStation(turn.State);
                 if (locationForNewResearchStation.HasValue)
                 {
+                    BroadCastThought($"I should play government grant in {locationForNewResearchStation}");
                     turn.PlayEventCard(EventCard.GovernmentGrant, locationForNewResearchStation.Value);
                 }
             }
@@ -85,6 +96,7 @@ namespace autoCardBoard.Pandemic.Bots
                     turn.State.PlayerStates
                         .OrderBy(p => _routeHelper.GetLocationValue(turn.State, p.Value.Location))
                         .Select(ps => ps.Key).First();
+                BroadCastThought($"I should play airlift on {playerToAirlift} and move them to {locationToAirliftTo}");
                 turn.PlayEventCard(EventCard.Airlift, playerToAirlift, locationToAirliftTo);
             }
         }
@@ -134,6 +146,7 @@ namespace autoCardBoard.Pandemic.Bots
 
                 if ( (valueOfCandidateCity - valueOfCurrentLocation > 3) && distanceToCandidateCity > 3)
                 {
+                    BroadCastThought($"I should take a direct flight to {(City)candidateCity.Value}");
                     turn.DirectFlight((City)candidateCity.Value);
                     return true;
                 }
@@ -158,6 +171,7 @@ namespace autoCardBoard.Pandemic.Bots
                 return false;
             }
 
+            BroadCastThought($"I should take a charter flight to {bestCity}");
             turn.CharterFlight(bestCity);
             return true;
 
@@ -171,11 +185,13 @@ namespace autoCardBoard.Pandemic.Bots
             var destinationNode = turn.State.Cities.Single(n => n.City.Equals(bestCityToTravelToWithoutDiscard));
             if (startingNode.ConnectedCities.Contains(bestCityToTravelToWithoutDiscard))
             {
+                BroadCastThought($"I should drive/ferry to {bestCityToTravelToWithoutDiscard} so I can move towards disease");
                 turn.DriveOrFerry(bestCityToTravelToWithoutDiscard);
                 return;
             }
             else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
             {
+                BroadCastThought($"I should tale a shuttle flight to {destinationNode.City} so I can move towards disease");
                 turn.ShuttleFlight(bestCityToTravelToWithoutDiscard);
                 return;
             }
@@ -191,6 +207,7 @@ namespace autoCardBoard.Pandemic.Bots
                 turn.State, currentPlayerState.Location, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
             if (shouldBuildResearchStation)
             {
+                BroadCastThought($"I should build a research station at {currentPlayerState.Location}");
                 turn.BuildResearchStation(currentPlayerState.Location);
                 return true;
             }
@@ -205,6 +222,7 @@ namespace autoCardBoard.Pandemic.Bots
                 var suggestedKnowledgeShare = _knowledgeShareHelper.GetSuggestedKnowledgeShare(turn.CurrentPlayerId, turn.State);
                 if (suggestedKnowledgeShare != null)
                 {
+                    BroadCastThought($"I should knowledge share");
                     turn.KnowledgeShare( suggestedKnowledgeShare);
                     return true;
                 }
@@ -213,7 +231,7 @@ namespace autoCardBoard.Pandemic.Bots
             return false;
         }
 
-        private static bool IfThereIsDiseaseHereThenTreatIt(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
+        private bool IfThereIsDiseaseHereThenTreatIt(IPandemicTurn turn, PandemicPlayerState currentPlayerState)
         {
             while (turn.State.Cities.Single(n => n.City == currentPlayerState.Location).DiseaseCubeCount > 2)
             {
@@ -222,6 +240,7 @@ namespace autoCardBoard.Pandemic.Bots
                 {
                     if (mapNodeToTreatDiseases.DiseaseCubes[disease] > 0)
                     {
+                        BroadCastThought($"I should treat the disease {disease} in my city of {currentPlayerState.Location}");
                         turn.TreatDisease(disease);
                         return true;
                     }
@@ -247,6 +266,7 @@ namespace autoCardBoard.Pandemic.Bots
                     && routeToNearestResearchStation != null
                     && routeToNearestResearchStation.Count > 1)
                 {
+                    BroadCastThought($"I should move torwards the research station at {nearestCityWithResearchStation} so I can cure a disease");
                     turn.DriveOrFerry(routeToNearestResearchStation[1]);
                     return true;
                 }
@@ -264,6 +284,7 @@ namespace autoCardBoard.Pandemic.Bots
                 var cureCardsToDiscard = _handManagementHelper.GetCardsToDiscardToCure(
                     turn.State, disease, currentPlayerState.PlayerRole, currentPlayerState.PlayerHand);
                 turn.DiscoverCure(disease, cureCardsToDiscard);
+                BroadCastThought($"I should cure {disease}");
                 return true;
             }
 
@@ -295,6 +316,18 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             turn.CardsToDiscard = cardsToDiscard;
+        }
+
+        private void BroadCastThought(string thought)
+        {
+            var topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBotThought);
+            var payload = JsonConvert.SerializeObject(new {  bot = _currentTurn.CurrentPlayerId, thought });
+            Task.WaitAll(_messageSender.SendMessageASync(topic, payload));
+        }
+
+        private string ExpandPlaceHolders(string payLoad)
+        {
+            return payLoad.Replace("{gameId}",_currentTurn.State.Id);
         }
      
     }
