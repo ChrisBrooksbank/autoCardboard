@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using autoCardboard.Common;
-using autoCardboard.Infrastructure;
 using autoCardboard.Infrastructure.Exceptions;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
+using Newtonsoft.Json;
 
 namespace autoCardBoard.Pandemic.Bots
 {
     public class PandemicBotStandard: IPlayer<IPandemicTurn>
     {
+        private readonly IMessageSender _messageSender;
+        private readonly MessageSenderConfiguration _messageSenderConfiguration;
         private readonly IRouteHelper _routeHelper;
-        
         private readonly IHandManagementHelper _handManagementHelper;
         private readonly IResearchStationHelper _researchStationHelper;
         private readonly IEventCardHelper _eventCardHelper;
@@ -25,13 +28,16 @@ namespace autoCardBoard.Pandemic.Bots
 
         public PandemicBotStandard(IRouteHelper routeHelper, 
             IHandManagementHelper handManagementHelper, IResearchStationHelper researchStationHelper,
-            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper)
+            IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper, 
+            IMessageSender messageSender, MessageSenderConfiguration messageSenderConfiguration)
         {
             _routeHelper = routeHelper;
             _handManagementHelper = handManagementHelper;
             _researchStationHelper = researchStationHelper;
             _eventCardHelper = eventCardHelper;
             _knowledgeShareHelper = knowledgeShareHelper;
+            _messageSender = messageSender;
+            _messageSenderConfiguration = messageSenderConfiguration;
         }
 
         public void GetTurn(IPandemicTurn turn)
@@ -295,6 +301,23 @@ namespace autoCardBoard.Pandemic.Bots
             }
 
             turn.CardsToDiscard = cardsToDiscard;
+        }
+
+        // TODO add a new type for BotThought, and pass in a IEnumerable
+        // add topic to config
+        private void BroadCastThoughts(string thought)
+        {
+            var topic = ExpandPlaceHolders(_messageSenderConfiguration.TopicBotThought);
+            //var tasks = deltas
+            //    .Select(stateDelta => JsonConvert.SerializeObject(stateDelta, Formatting.Indented))
+            //    .Select(payLoad => _messageSender.SendMessageASync(topic, payLoad)).ToArray();
+            //Task.WaitAll(tasks, CancellationToken.None);
+        }
+
+        // TODO
+        private string ExpandPlaceHolders(string input)
+        {
+            return input;
         }
      
     }

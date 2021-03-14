@@ -34,7 +34,9 @@ namespace autoCardboard.Message.Server
 
             var mqttServer = new MqttFactory().CreateMqttServer();
 
-            if (bool.Parse(_configuration["echo"]))
+            var isEchoOn = bool.Parse(_configuration["echo"]);
+
+            if (isEchoOn)
             {
                 mqttServer.UseClientConnectedHandler(ClientConnectedHandler);
                 mqttServer.UseClientDisconnectedHandler(ClientDisconnectedHandler);
@@ -43,20 +45,20 @@ namespace autoCardboard.Message.Server
           
             await mqttServer.StartAsync(optionsBuilder.Build());
 
-            Console.WriteLine($"Mqtt broker listening on port {_configuration["portNumber"]} - press enter to exit.");
+            Console.WriteLine($"Mqtt broker listening on port {_configuration["portNumber"]} echoOn={isEchoOn} - press enter to exit.");
             Console.ReadLine();
             await mqttServer.StopAsync();
         }
 
         private static Task ClientConnectedHandler(MqttServerClientConnectedEventArgs arg)
         {
-            Console.WriteLine($"Client {arg.ClientId} connected");
+            //Console.WriteLine($"Client {arg.ClientId} connected");
             return Task.FromResult(12);
         }
 
         private static Task ClientDisconnectedHandler(MqttServerClientDisconnectedEventArgs arg)
         {
-            Console.WriteLine($"Client {arg.ClientId} disconnected");
+            //Console.WriteLine($"Client {arg.ClientId} disconnected");
             return Task.FromResult(12);
         }
 
