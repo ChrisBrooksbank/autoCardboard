@@ -19,13 +19,14 @@ namespace autoCardboard.Pandemic.Game
         public PandemicPlayerFactory(IRouteHelper routeHelper, 
             IResearchStationHelper researchStationHelper, IHandManagementHelper playerDeckHelper,
             IEventCardHelper eventCardHelper, IKnowledgeShareHelper knowledgeShareHelper,
-            IMessageSender _messageSender, MessageSenderConfiguration messageSenderConfiguration)
+            IMessageSender messageSender, MessageSenderConfiguration messageSenderConfiguration)
         {
             _routeHelper = routeHelper;
             _researchStationHelper = researchStationHelper;
             _playerDeckHelper = playerDeckHelper;
             _eventCardHelper = eventCardHelper;
             _knowledgeShareHelper = knowledgeShareHelper;
+            _messageSender = messageSender;
             _messageSenderConfiguration = messageSenderConfiguration;
         }
 
