@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MQTTnet;
+using MQTTnet.Channel;
+using MQTTnet.Client.Options;
+using MQTTnet.Implementations;
 using MQTTnet.Server;
 
 namespace autoCardboard.Message.Server
@@ -28,18 +30,28 @@ namespace autoCardboard.Message.Server
             StartServer();
         }
 
+        // TODO workout how to allow GamesRoom to connect to the broker we are hosting here via WebSockets
+        // See : https://github.com/chkr1011/MQTTnet/issues/65
+        // see MqttWebSocketChannel
+        // See IMqttServerAdapter
         static async void StartServer()
         {
+            var title = $"Mqtt broker listening on port {_configuration["portNumber"]} - press enter to exit.";
+
+            IMqttChannel webSocketChannel = new MqttWebSocketChannel( new MqttClientWebSocketOptions{});
+
             var optionsBuilder = new MqttServerOptionsBuilder()
                 .WithConnectionBacklog(int.Parse(_configuration["backlog"]))
                 .WithDefaultEndpointPort(int.Parse(_configuration["portNumber"]));
+            var options = optionsBuilder.Build();
+
 
             var mqttServer = new MqttFactory().CreateMqttServer();
 
             var isEchoOn = bool.Parse(_configuration["echo"]);
             _topicsFilter = _configuration["echoTopicFilters"].Split(",");
 
-            Console.WriteLine($"Mqtt broker listening on port {_configuration["portNumber"]} - press enter to exit.");
+            Console.WriteLine(title);
 
             if (isEchoOn)
             {
@@ -49,9 +61,8 @@ namespace autoCardboard.Message.Server
                 mqttServer.UseApplicationMessageReceivedHandler(MessageReceivedHandler);
             }
           
-            await mqttServer.StartAsync(optionsBuilder.Build());
+            await mqttServer.StartAsync(options);
 
-        
             Console.ReadLine();
             await mqttServer.StopAsync();
         }
@@ -78,4 +89,6 @@ namespace autoCardboard.Message.Server
         }
 
     }
+
+
 }

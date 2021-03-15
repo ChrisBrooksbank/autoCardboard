@@ -21,8 +21,7 @@ export class PandemicComponent implements OnInit {
     return content;
   }
 
-  // TODO wire up subscription to relevant MQTT topics
-  // see https://www.npmjs.com/package/ngx-mqtt-lite
+ 
   constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string, public mqtt: NgxMqttLiteService) {      
    
     this.play = function() {
@@ -33,18 +32,25 @@ export class PandemicComponent implements OnInit {
     };
     this.play();
   }
+
+  // TODO wire up subscription to relevant MQTT topics
+  // see https://www.npmjs.com/package/ngx-mqtt-lite
+  // also : https://www.npmjs.com/package/ngx-mqtt-lite/v/7.2.1
+  // https://github.com/chkr1011/MQTTnet/issues/680
   ngOnInit(): void {
+    this.mqtt.registerClient('autocardboard.GamesRoom', null, 
+    {
+      protocol : "ws", 
+      port: 5000, 
+      hostname : "localhost"
+    }).subscribe(status => { });
+
     const topic = factoryPolicyTopic([
       { topic: '1/Thought/1', policy: 0, username: '' }
     ]);  
-
-    console.log(this.mqtt);
-
-    /*
-    this.mqtt.client('default').create(topic).subscribe(result => {
+    
+    this.mqtt.client('autocardboard.GamesRoom').create(topic).subscribe(result => {
       console.log(result.client.connected);
-    });
-    */
-
+    }); 
   }
 }
