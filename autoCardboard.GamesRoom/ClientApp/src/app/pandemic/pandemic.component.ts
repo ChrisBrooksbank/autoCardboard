@@ -20,7 +20,8 @@ export class PandemicComponent {
     return content;
   }
 
-  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {
+  constructor(http: HttpClient, @Inject('BASE_URL') baseUrl: string) {   
+    // https://github.com/kainonly/ngx-mqtt-lite
     this.play = function() {
       this.pandemicState = null;
       http.get<string>(baseUrl + 'Play?Game=Pandemic').subscribe(result => {    
