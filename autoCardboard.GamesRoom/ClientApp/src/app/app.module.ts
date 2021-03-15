@@ -9,6 +9,8 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { PandemicComponent } from './pandemic/pandemic.component';
 import { ForSaleComponent } from './forsale/forsale.component';
+import { NgxMqttLiteService } from 'ngx-mqtt-lite';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,7 +29,13 @@ import { ForSaleComponent } from './forsale/forsale.component';
       { path: 'forsale', component: ForSaleComponent },
     ])
   ],
-  providers: [],
+  providers: [NgxMqttLiteService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+  constructor(
+    ngxMqttLiteService: NgxMqttLiteService
+  ) {
+    ngxMqttLiteService.loadScript('https://unpkg.com/mqtt@4.1.0/dist/mqtt.min.js');
+  }
+}
