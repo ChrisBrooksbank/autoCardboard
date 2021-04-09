@@ -17,3 +17,5 @@ An *API* is provided which enables supported games to be played.
 * API is self documented using Swagger
 
 *GamesRoom* project provides a ( Angular 8 SPA ) application enabling games to be run, and game state to be rendered. GamesRoom calls the API to play games.
+
+Theres a [presentation on the project here](https://docs.google.com/presentation/d/1nDATDgEdOwdXd4_0JmDBBXhuMUGC-TO7n47whI2fgt8/edit?usp=sharing)
