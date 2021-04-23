@@ -1,6 +1,7 @@
-using System;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
+using System;
+using Xunit;
 
 namespace autoCardboard.Pandemic.Test
 {
@@ -9,7 +10,7 @@ namespace autoCardboard.Pandemic.Test
         private PlayerDeck deckWith6Epidemics;
         private PlayerDeck deckWith5Epidemics;
 
-        public void Setup()
+        private void Setup()
         {
             var pandemicStateEditor = new PandemicStateEditor(new PandemicActionValidator());
             var statewith6Epidemics = new PandemicState();
@@ -23,23 +24,27 @@ namespace autoCardboard.Pandemic.Test
             deckWith5Epidemics = statewith5Epidemics.PlayerDeck;
         }
 
+        [Fact]
         public void IsExpectedDeckSizeWith6Epidemics()
         {
+            Setup();
             var cityCount = Enum.GetValues(typeof(City)).Length;
-            var eventCount =Enum.GetValues(typeof(EventCard)).Length;
+            var eventCount = Enum.GetValues(typeof(EventCard)).Length;
 
-//            Assert.AreEqual(deckWith6Epidemics.CardCount, 6 + cityCount + eventCount);
+            Assert.Equal(deckWith6Epidemics.CardCount, 6 + cityCount + eventCount);
         }
 
+        [Fact]
         public void IsExpectedDeckSizeWith5Epidemics()
         {
+            Setup();
             var cityCount = Enum.GetValues(typeof(City)).Length;
-            var eventCount= Enum.GetValues(typeof(EventCard)).Length;
+            var eventCount = Enum.GetValues(typeof(EventCard)).Length;
 
-  //          Assert.AreEqual(deckWith5Epidemics.CardCount, 5 + cityCount + eventCount);
+            Assert.Equal(deckWith5Epidemics.CardCount, 5 + cityCount + eventCount);
         }
 
-     
-      
+
+
     }
 }
