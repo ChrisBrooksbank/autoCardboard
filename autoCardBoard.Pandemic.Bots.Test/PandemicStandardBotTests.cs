@@ -22,7 +22,7 @@ namespace autoCardBoard.Pandemic.Bots.Test
         private IPlayer<IPandemicTurn> _sut;
         private IPandemicTurn _turn;
 
-        private void Setup()
+        public Tests()
         {
             _serviceProvider = ServiceProviderFactory.GetServiceProvider(new MessageSenderConfiguration());
             _stateEditor = _serviceProvider.GetService<IPandemicStateEditor>();
@@ -40,7 +40,6 @@ namespace autoCardBoard.Pandemic.Bots.Test
         [Fact]
         public void StandardBotTakesShuttleFlights()
         {
-            Setup();
             _state.PlayerStates = new Dictionary<int, PandemicPlayerState>();
             _state.PlayerStates[1] = new PandemicPlayerState
             {

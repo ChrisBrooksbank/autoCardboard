@@ -3,11 +3,11 @@ using Xunit;
 
 namespace autoCardboard.Common.Test
 {
-    public class Testss
+    public class CardDeckTests
     {
         private CardDeck<Card> _cardDeck;
 
-        private void Setup()
+        public CardDeckTests()
         {
             _cardDeck = new CardDeck<Card>();
             for (var card = 1; card <= 24; card++)
@@ -19,7 +19,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void RevealCardsDoesntRemoveFromDeck()
         {
-            Setup();
             var revealedCards = _cardDeck.Reveal(3);
             Assert.Equal(24, _cardDeck.CardCount);
         }
@@ -27,7 +26,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void DrawCardsDoesRemoveFromDeck()
         {
-            Setup();
             var cards = _cardDeck.Draw(3);
             Assert.Equal(21, _cardDeck.CardCount);
         }
@@ -35,7 +33,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void CanSplitCardsInto3EqualPiles()
         {
-            Setup();
             var cardPiles = _cardDeck.Divide(3).ToList();
             Assert.True(cardPiles[0].CardCount == 8 && cardPiles[1].CardCount == 8 && cardPiles[2].CardCount == 8);
         }
@@ -43,7 +40,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void DrawBottomGetsCorrectCard()
         {
-            Setup();
             var card = _cardDeck.DrawBottom();
             Assert.Equal(24, card.Value);
         }
@@ -51,7 +47,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void DrawTopGetsCorrectCard()
         {
-            Setup();
             var card = _cardDeck.DrawTop();
             Assert.Equal(1,card.Value);
         }
@@ -59,7 +54,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void CanAddCardToTop()
         {
-            Setup();
             var card = new Card { Value = 42 };
             _cardDeck.AddCard(card, CardDeckPosition.Top);
             var drawnCard = _cardDeck.DrawTop();
@@ -69,7 +63,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void CanAddCardToBottom()
         {
-            Setup();
             var card = new Card { Value = 42 };
             _cardDeck.AddCard(card, CardDeckPosition.Bottom);
             var drawnCard = _cardDeck.DrawBottom();
@@ -79,7 +72,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void DivideDeckEmptiesOriginalDeck()
         {
-            Setup();
             var piles = _cardDeck.Divide(9);
             Assert.Equal(0, _cardDeck.CardCount);
         }
@@ -87,7 +79,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void DivideDeckCreatesCorrectNumberOfPiles()
         {
-            Setup();
             var piles = _cardDeck.Divide(9);
             Assert.True(piles.Count() == 9);
         }
@@ -95,7 +86,6 @@ namespace autoCardboard.Common.Test
         [Fact]
         public void DivideDeckIntoMorePilesThanCardsWorks()
         {
-            Setup();
             var piles = _cardDeck.Divide(100);
             Assert.Equal(100, piles.Count());
         }

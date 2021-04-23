@@ -12,7 +12,7 @@ namespace autoCardboard.Pandemic.Test
         private IPandemicState _gameState;
         private PandemicStateEditor _stateEditor;
 
-        private void Setup()
+        public PandemicStateTests()
         {
             _gameState = new PandemicState();
             _stateEditor = new PandemicStateEditor(new PandemicActionValidator());
@@ -22,7 +22,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void ChicagoHasCorrectConnectionsCount()
         {
-            Setup();
             var chicagoNode = _gameState.Cities.Single(n => n.City == City.Chicago);
             Assert.Equal(5, chicagoNode.ConnectedCities.Count());
         }
@@ -30,7 +29,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void AddingFourBlueDiseasesIncreasesOutbreakCount()
         {
-            Setup();
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
@@ -41,7 +39,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void Adding2Blue2BlackDiseasesDoesntIncreaseOutbreakCount()
         {
-            Setup();
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Black, City.Chicago);
@@ -52,7 +49,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void OutBreakInMontrealSpreadsToNewYork()
         {
-            Setup();
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
@@ -66,7 +62,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void AddingDiseaseDecrementsDiseaseCubeStock()
         {
-            Setup();
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             Assert.Equal(23, _gameState.DiseaseCubeReserve[Disease.Blue]);
         }
@@ -74,7 +69,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void DoubleOutbreakSetsDiseaseCubeStockOk()
         {
-            Setup();
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
@@ -91,7 +85,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void DoubleOutbreakSetsAddsDiseaseToCorrectCities()
         {
-            Setup();
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
@@ -111,7 +104,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void InitialInfectionDepletesDiseaseStockpile()
         {
-            Setup();
             var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState, players);
 
@@ -125,7 +117,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void InitialInfectionInfectsCities()
         {
-            Setup();
             var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState, players);
 

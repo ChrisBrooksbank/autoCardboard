@@ -12,7 +12,7 @@ namespace autoCardboard.Pandemic.Test
         private IPandemicState _gameState;
         private IPandemicStateEditor _stateEditor;
 
-        private void Setup()
+        public InfectionDeckTests()
         {
             _gameState = new PandemicState();
             _stateEditor = new PandemicStateEditor(new PandemicActionValidator());
@@ -24,7 +24,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void CheckEpidemicRefillsInfectionDeck()
         {
-            Setup();
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
@@ -35,7 +34,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void CheckEpidemicEmptiesInfectionDiscardDeck()
         {
-            Setup();
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
@@ -46,7 +44,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void CheckEpidemicAddsThreeCubesToOneCity()
         {
-            Setup();
             _stateEditor.Clear(_gameState);
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
@@ -61,7 +58,6 @@ namespace autoCardboard.Pandemic.Test
         [Fact]
         public void CheckEpidemicIncrementsInfectionRateMarker()
         {
-            Setup();
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
