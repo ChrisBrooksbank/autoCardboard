@@ -1,4 +1,5 @@
 using System.Linq;
+using Xunit;
 
 namespace autoCardboard.Common.Test
 {
@@ -6,79 +7,97 @@ namespace autoCardboard.Common.Test
     {
         private CardDeck<Card> _cardDeck;
 
-        public void Setup()
+        private void Setup()
         {
             _cardDeck = new CardDeck<Card>();
             for (var card = 1; card <= 24; card++)
             {
-                _cardDeck.AddCard(new Card{ Value = card });
+                _cardDeck.AddCard(new Card { Value = card });
             }
         }
 
+        [Fact]
         public void RevealCardsDoesntRemoveFromDeck()
         {
-
+            Setup();
             var revealedCards = _cardDeck.Reveal(3);
-            // Assert.AreEqual(_cardDeck.CardCount, 24);
+            Assert.Equal(24, _cardDeck.CardCount);
         }
 
+        [Fact]
         public void DrawCardsDoesRemoveFromDeck()
         {
-
+            Setup();
             var cards = _cardDeck.Draw(3);
-            //Assert.AreEqual(_cardDeck.CardCount, 21);
+            Assert.Equal(21, _cardDeck.CardCount);
         }
 
+        [Fact]
         public void CanSplitCardsInto3EqualPiles()
         {
-            var cardPiles= _cardDeck.Divide(3).ToList();
-            // Assert.IsTrue(cardPiles[0].CardCount == 8 && cardPiles[1].CardCount == 8 && cardPiles[2].CardCount == 8);
+            Setup();
+            var cardPiles = _cardDeck.Divide(3).ToList();
+            Assert.True(cardPiles[0].CardCount == 8 && cardPiles[1].CardCount == 8 && cardPiles[2].CardCount == 8);
         }
 
+        [Fact]
         public void DrawBottomGetsCorrectCard()
         {
+            Setup();
             var card = _cardDeck.DrawBottom();
-            // Assert.AreEqual(card.Value, 24);
+            Assert.Equal(24, card.Value);
         }
 
+        [Fact]
         public void DrawTopGetsCorrectCard()
         {
+            Setup();
             var card = _cardDeck.DrawTop();
-            // Assert.AreEqual(card.Value, 1);
+            Assert.Equal(1,card.Value);
         }
-
+        
+        [Fact]
         public void CanAddCardToTop()
         {
-            var card = new Card {Value = 42 };
+            Setup();
+            var card = new Card { Value = 42 };
             _cardDeck.AddCard(card, CardDeckPosition.Top);
             var drawnCard = _cardDeck.DrawTop();
-            // Assert.AreEqual(drawnCard.Value, 42);
+            Assert.Equal(42,drawnCard.Value);
         }
 
+        [Fact]
         public void CanAddCardToBottom()
         {
-            var card = new Card {Value = 42 };
+            Setup();
+            var card = new Card { Value = 42 };
             _cardDeck.AddCard(card, CardDeckPosition.Bottom);
             var drawnCard = _cardDeck.DrawBottom();
-            // Assert.AreEqual(drawnCard.Value, 42);
+            Assert.Equal(42,drawnCard.Value);
         }
 
+        [Fact]
         public void DivideDeckEmptiesOriginalDeck()
         {
+            Setup();
             var piles = _cardDeck.Divide(9);
-            // Assert.AreEqual(_cardDeck.CardCount, 0);
+            Assert.Equal(0, _cardDeck.CardCount);
         }
 
+        [Fact]
         public void DivideDeckCreatesCorrectNumberOfPiles()
         {
+            Setup();
             var piles = _cardDeck.Divide(9);
-            // Assert.AreEqual(piles.Count(), 9);
+            Assert.Empty(piles);
         }
 
+        [Fact]
         public void DivideDeckIntoMorePilesThanCardsWorks()
         {
+            Setup();
             var piles = _cardDeck.Divide(100);
-            // Assert.AreEqual(piles.Count(), 100);
+            Assert.Equal(100, piles.Count());
         }
 
     }
