@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale.Test", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.csproj", "{29B5E25C-8DF9-4241-BF02-950B8F94515F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common", "autoCardboard.Common\autoCardboard.Common.csproj", "{F2D5D442-055A-4C59-BA8A-743778AFDF8F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale", "autoCardboard.ForSale\autoCardboard.ForSale.csproj", "{58D8B8C9-8BF2-4496-9034-772D4ABA3F21}"
@@ -31,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common.Test",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardBoard.Pandemic.Bots.Test", "autoCardBoard.Pandemic.Bots.Test\autoCardBoard.Pandemic.Bots.Test.csproj", "{AEE573FE-7B5F-4F6E-BE26-3B7F47F89739}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.Pandemic.Test", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.csproj", "{E6C4E83C-4FA0-4DBE-B78C-52CF61791CAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Test", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.csproj", "{E6C4E83C-4FA0-4DBE-B78C-52CF61791CAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "autoCardboard.ForSale.Test", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.csproj", "{FE91AC1B-E611-486C-90B6-A31332597024}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +39,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{29B5E25C-8DF9-4241-BF02-950B8F94515F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29B5E25C-8DF9-4241-BF02-950B8F94515F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29B5E25C-8DF9-4241-BF02-950B8F94515F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29B5E25C-8DF9-4241-BF02-950B8F94515F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2D5D442-055A-4C59-BA8A-743778AFDF8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -99,6 +95,10 @@ Global
 		{E6C4E83C-4FA0-4DBE-B78C-52CF61791CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6C4E83C-4FA0-4DBE-B78C-52CF61791CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6C4E83C-4FA0-4DBE-B78C-52CF61791CAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE91AC1B-E611-486C-90B6-A31332597024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE91AC1B-E611-486C-90B6-A31332597024}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE91AC1B-E611-486C-90B6-A31332597024}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE91AC1B-E611-486C-90B6-A31332597024}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
