@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Test", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.csproj", "{D278AC30-926B-409E-9A9E-03C6A83464B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Test.MigrateMe", "autoCardboard.Pandemic.Test\autoCardboard.Pandemic.Test.MigrateMe.csproj", "{D278AC30-926B-409E-9A9E-03C6A83464B6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale.Test", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.csproj", "{29B5E25C-8DF9-4241-BF02-950B8F94515F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.ForSale.Test.MigrateMe", "autoCardboard.ForSale.Test\autoCardboard.ForSale.Test.MigrateMe.csproj", "{29B5E25C-8DF9-4241-BF02-950B8F94515F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common.Test", "autoCardboard.Common.Test\autoCardboard.Common.Test.csproj", "{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common.Test.MigrateMe", "autoCardboard.Common.Test\autoCardboard.Common.Test.MigrateMe.csproj", "{72AABFD3-C9CB-4FD8-A46C-54287F6B813E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Common", "autoCardboard.Common\autoCardboard.Common.csproj", "{F2D5D442-055A-4C59-BA8A-743778AFDF8F}"
 EndProject
@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.Stat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardboard.Pandemic.TurnState", "autoCardboard.Pandemic.TurnState\autoCardboard.Pandemic.TurnState.csproj", "{D95EB48F-1985-4CF2-9416-4F2397C21516}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardBoard.Pandemic.Bots.Test", "autoCardBoard.Pandemic.Bots.Test\autoCardBoard.Pandemic.Bots.Test.csproj", "{F89AA888-F51B-423D-85C0-590EE54E6127}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "autoCardBoard.Pandemic.Bots.Test.MigrateMe", "autoCardBoard.Pandemic.Bots.Test\autoCardBoard.Pandemic.Bots.Test.MigrateMe.csproj", "{F89AA888-F51B-423D-85C0-590EE54E6127}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
