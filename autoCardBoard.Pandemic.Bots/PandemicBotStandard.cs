@@ -191,7 +191,7 @@ namespace autoCardBoard.Pandemic.Bots
             }
             else if (startingNode.HasResearchStation && destinationNode.HasResearchStation)
             {
-                BroadCastThought($"I should tale a shuttle flight to {destinationNode.City} so I can move towards disease");
+                BroadCastThought($"I should take a shuttle flight to {destinationNode.City} so I can move towards disease");
                 turn.ShuttleFlight(bestCityToTravelToWithoutDiscard);
                 return;
             }
@@ -327,7 +327,7 @@ namespace autoCardBoard.Pandemic.Bots
 
         private string ExpandPlaceHolders(string payLoad)
         {
-            return payLoad.Replace("{gameId}",_currentTurn.State.Id);
+            return string.IsNullOrEmpty(payLoad) ? payLoad : payLoad.Replace("{gameId}",_currentTurn?.State?.Id);
         }
      
     }

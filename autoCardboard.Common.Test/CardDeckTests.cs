@@ -89,7 +89,7 @@ namespace autoCardboard.Common.Test
         {
             Setup();
             var piles = _cardDeck.Divide(9);
-            Assert.Empty(piles);
+            Assert.True(piles.Count() == 9);
         }
 
         [Fact]
