@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using autoCardBoard.Pandemic.Bots;
-using autoCardboard.Pandemic.State;
+﻿using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
-using NUnit.Framework;
+using autoCardBoard.Pandemic.Bots;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace autoCardboard.Pandemic.Test
 {
@@ -12,8 +12,7 @@ namespace autoCardboard.Pandemic.Test
         private IPandemicState _gameState;
         private IPandemicStateEditor _stateEditor;
 
-        [SetUp]
-        public void Setup()
+        public InfectionDeckTests()
         {
             _gameState = new PandemicState();
             _stateEditor = new PandemicStateEditor(new PandemicActionValidator());
@@ -21,28 +20,28 @@ namespace autoCardboard.Pandemic.Test
             var players = new List<PandemicBotStandard>();
             _stateEditor.Setup(_gameState, players);
         }
-        
-        [Test]
+
+        [Fact]
         public void CheckEpidemicRefillsInfectionDeck()
         {
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
             _stateEditor.Epidemic(_gameState);
-            Assert.AreEqual(_gameState.InfectionDeck.CardCount, 48);
+            Assert.Equal(48, _gameState.InfectionDeck.CardCount);
         }
 
-        [Test]
+        [Fact]
         public void CheckEpidemicEmptiesInfectionDiscardDeck()
         {
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
             _stateEditor.Epidemic(_gameState);
-            Assert.AreEqual(_gameState.InfectionDiscardPile.CardCount, 0);
+            Assert.Equal(0, _gameState.InfectionDiscardPile.CardCount);
         }
 
-        [Test]
+        [Fact]
         public void CheckEpidemicAddsThreeCubesToOneCity()
         {
             _stateEditor.Clear(_gameState);
@@ -53,17 +52,17 @@ namespace autoCardboard.Pandemic.Test
 
             var infectedCity = _gameState.Cities.Single(c => c.DiseaseCubeCount > 0);
 
-            Assert.AreEqual( infectedCity.DiseaseCubeCount, 3);
+            Assert.Equal( 3, infectedCity.DiseaseCubeCount);
         }
 
-        [Test]
+        [Fact]
         public void CheckEpidemicIncrementsInfectionRateMarker()
         {
             var drawnInfectionCards = _gameState.InfectionDeck.Draw(3);
             _gameState.InfectionDiscardPile.AddCards(drawnInfectionCards);
 
             _stateEditor.Epidemic(_gameState);
-            Assert.AreEqual(_gameState.InfectionRateMarker, 1);
+            Assert.Equal(1, _gameState.InfectionRateMarker);
         }
 
     }

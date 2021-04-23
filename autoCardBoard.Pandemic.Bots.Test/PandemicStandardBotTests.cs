@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using autoCardboard.Common;
 using autoCardboard.DependencyInjection;
 using autoCardboard.Infrastructure;
 using autoCardboard.Messaging;
 using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
-using FakeItEasy;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FakeItEasy;
+using Xunit;
 
 namespace autoCardBoard.Pandemic.Bots.Test
 {
@@ -22,24 +22,22 @@ namespace autoCardBoard.Pandemic.Bots.Test
         private IPlayer<IPandemicTurn> _sut;
         private IPandemicTurn _turn;
 
-        [SetUp]
-        public void Setup()
+        public Tests()
         {
             _serviceProvider = ServiceProviderFactory.GetServiceProvider(new MessageSenderConfiguration());
             _stateEditor = _serviceProvider.GetService<IPandemicStateEditor>();
             _playerFactory = _serviceProvider.GetService<IPlayerFactory<IPandemicTurn>>();
 
-            _sut = _playerFactory.CreatePlayers( new PlayerConfiguration { PlayerCount = 1 }).SingleOrDefault();
+            _sut = _playerFactory.CreatePlayers(new PlayerConfiguration { PlayerCount = 1 }).SingleOrDefault();
 
-            _state =_serviceProvider.GetService<IPandemicState>();
+            _state = _serviceProvider.GetService<IPandemicState>();
             _stateEditor.Clear(_state, 6);
 
-            var cardboardLogger = A.Fake<ICardboardLogger>();
             var turnValidator = A.Fake<IPandemicActionValidator>();
             _turn = new PandemicTurn(turnValidator);
         }
 
-        [Test]
+        [Fact]
         public void StandardBotTakesShuttleFlights()
         {
             _state.PlayerStates = new Dictionary<int, PandemicPlayerState>();
@@ -58,15 +56,15 @@ namespace autoCardBoard.Pandemic.Bots.Test
             mumbai.HasResearchStation = true;
             _state.ResearchStationStock--;
 
-            var bangkok =  _state.Cities.Single(c => c.City == City.Bangkok);
+            var bangkok = _state.Cities.Single(c => c.City == City.Bangkok);
             bangkok.DiseaseCubes[Disease.Blue] = 3;
             _state.DiseaseCubeReserve[Disease.Blue] -= 3;
-            
+
             _turn.State = _state;
             _turn.CurrentPlayerId = 1;
             _sut.GetTurn(_turn);
 
-            Assert.AreEqual(_turn.ActionTaken.PlayerActionType == PlayerActionType.ShuttleFlight, true);
+            Assert.True(_turn.ActionTaken.PlayerActionType == PlayerActionType.ShuttleFlight);
         }
     }
 }

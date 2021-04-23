@@ -1,129 +1,128 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using autoCardBoard.Pandemic.Bots;
-using autoCardboard.Pandemic.State;
+﻿using autoCardboard.Pandemic.State;
 using autoCardboard.Pandemic.TurnState;
-using NUnit.Framework;
+using autoCardBoard.Pandemic.Bots;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace autoCardboard.Pandemic.Test
 {
-    class PandemicStateTests
+    public class PandemicStateTests
     {
         private IPandemicState _gameState;
         private PandemicStateEditor _stateEditor;
 
-        [SetUp]
-        public void Setup()
+        public PandemicStateTests()
         {
             _gameState = new PandemicState();
             _stateEditor = new PandemicStateEditor(new PandemicActionValidator());
             _stateEditor.Clear(_gameState);
         }
 
-        [Test]
+        [Fact]
         public void ChicagoHasCorrectConnectionsCount()
         {
             var chicagoNode = _gameState.Cities.Single(n => n.City == City.Chicago);
-            Assert.AreEqual(chicagoNode.ConnectedCities.Count(), 5);
+            Assert.Equal(5, chicagoNode.ConnectedCities.Count());
         }
 
-        [Test]
+        [Fact]
         public void AddingFourBlueDiseasesIncreasesOutbreakCount()
         {
             _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Chicago);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Chicago);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Chicago);
-            Assert.AreEqual(_gameState.OutbreakCount, 1);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
+            Assert.Equal(1, _gameState.OutbreakCount);
         }
 
-        [Test]
+        [Fact]
         public void Adding2Blue2BlackDiseasesDoesntIncreaseOutbreakCount()
         {
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Chicago);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Chicago);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Black, City.Chicago);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Black, City.Chicago);
-            Assert.AreEqual(_gameState.OutbreakCount, 0);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Chicago);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Black, City.Chicago);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Black, City.Chicago);
+            Assert.Equal(0, _gameState.OutbreakCount);
         }
 
-        [Test]
+        [Fact]
         public void OutBreakInMontrealSpreadsToNewYork()
         {
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
 
             var montrealNode = _gameState.Cities.Single(c => c.City == City.Chicago);
             var NewYork = _gameState.Cities.Single(c => c.City == City.NewYork);
-            Assert.AreEqual(NewYork.DiseaseCubes[Disease.Blue], 1);
+            Assert.Equal(1, NewYork.DiseaseCubes[Disease.Blue]);
         }
-        
-        [Test]
+
+        [Fact]
         public void AddingDiseaseDecrementsDiseaseCubeStock()
         {
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            Assert.AreEqual(_gameState.DiseaseCubeReserve[Disease.Blue], 23);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            Assert.Equal(23, _gameState.DiseaseCubeReserve[Disease.Blue]);
         }
 
-        [Test]
+        [Fact]
         public void DoubleOutbreakSetsDiseaseCubeStockOk()
         {
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
 
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.NewYork);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.NewYork);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.NewYork);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.NewYork);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.NewYork);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.NewYork);
 
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
 
-            Assert.AreEqual(_gameState.DiseaseCubeReserve[Disease.Blue], 13);
+            Assert.Equal(13, _gameState.DiseaseCubeReserve[Disease.Blue]);
         }
 
-        [Test]
+        [Fact]
         public void DoubleOutbreakSetsAddsDiseaseToCorrectCities()
         {
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
 
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.NewYork);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.NewYork);
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.NewYork);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.NewYork);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.NewYork);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.NewYork);
 
-            _stateEditor.AddDiseaseCube(_gameState,Disease.Blue, City.Montreal);
+            _stateEditor.AddDiseaseCube(_gameState, Disease.Blue, City.Montreal);
 
             var citiesWithBlueDisease = _gameState.Cities.Where(c => c.DiseaseCubes[Disease.Blue] > 0)
-                .OrderBy(c => c.City).Select(c=> c.City.ToString()).ToList();
+                .OrderBy(c => c.City).Select(c => c.City.ToString()).ToList();
             var citiesWithBlueDiseaseCsv = string.Join(',', citiesWithBlueDisease);
-            Assert.AreEqual(citiesWithBlueDiseaseCsv, "Chicago,London,Madrid,Montreal,NewYork,Washington");
+            Assert.Equal("Chicago,London,Madrid,Montreal,NewYork,Washington", citiesWithBlueDiseaseCsv);
         }
 
-        [Test]
+        [Fact]
         public void InitialInfectionDepletesDiseaseStockpile()
         {
             var players = new List<PandemicBotStandard>();
-            _stateEditor.Setup(_gameState,players);
+            _stateEditor.Setup(_gameState, players);
 
             var diseaseCubesInStockpile = _gameState.DiseaseCubeReserve[Disease.Blue]
                                           + _gameState.DiseaseCubeReserve[Disease.Black]
                                           + _gameState.DiseaseCubeReserve[Disease.Yellow]
                                           + _gameState.DiseaseCubeReserve[Disease.Red];
-            Assert.AreEqual(diseaseCubesInStockpile, 78);
+            Assert.Equal(78, diseaseCubesInStockpile);
         }
 
-        [Test]
+        [Fact]
         public void InitialInfectionInfectsCities()
         {
             var players = new List<PandemicBotStandard>();
-            _stateEditor.Setup(_gameState,players);
+            _stateEditor.Setup(_gameState, players);
 
             var infectedCities = _gameState.Cities.Where(c => c.DiseaseCubeCount > 0);
 
-            Assert.AreEqual(infectedCities.Count(), 9);
+            Assert.Equal(9, infectedCities.Count());
         }
 
     }
