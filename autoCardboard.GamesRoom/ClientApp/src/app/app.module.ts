@@ -13,7 +13,7 @@ import { ForSaleComponent } from './forsale/forsale.component';
   declarations: [
     AppComponent,
     NavMenuComponent,
-    HomeComponent, 
+    HomeComponent,
     PandemicComponent,
     ForSaleComponent
   ],
@@ -22,7 +22,7 @@ import { ForSaleComponent } from './forsale/forsale.component';
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },      
+      { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'pandemic', component: PandemicComponent },
       { path: 'forsale', component: ForSaleComponent },
     ])
