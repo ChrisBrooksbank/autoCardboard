@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
+// lets add signalr before we plug SPA stuff back in
+// https://docs.microsoft.com/en-us/aspnet/core/tutorials/signalr?view=aspnetcore-5.0&tabs=visual-studio
+
 namespace autoCardboard.GamesRoom.Controllers
 {
    [ApiController]  
