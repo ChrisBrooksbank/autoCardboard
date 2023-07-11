@@ -24,8 +24,8 @@
     <city name="Mumbai" connections="Karachi, Delhi, Chennai" color="black"/>
     <city name="Delhi" connections="Tehran, Karachi, Mumbai, Chennai, Kolkata" color="black"/>
     <city name="Kolkata" connections="Delhi, Chennai, Bangkok, Hong Kong" color="yellow"/>
-    <city name="Chennai" connections="Mumbai, Delhi, Kolkata, Jakarta" color="yellow"/>
-    <city name="Bangkok" connections="Kolkata, Hong Kong, Ho Chi Minh City, Jakarta" color="yellow"/>
+    <city name="Chennai" connections="Mumbai, Delhi, Kolkata, Bangkok, Jakarta" color="yellow"/>
+    <city name="Bangkok" connections="Kolkata, Hong Kong, Ho Chi Minh City, Jakarta, Chennai" color="yellow"/>    
     <city name="Jakarta" connections="Chennai, Bangkok, Ho Chi Minh City, Sydney" color="yellow"/>  
     <city name="Sydney" connections="Jakarta, Manila, Los Angeles" color="yellow"/>
     <city name="Manila" connections="Hong Kong, San Francisco, Ho Chi Minh City, Sydney" color="yellow"/>
