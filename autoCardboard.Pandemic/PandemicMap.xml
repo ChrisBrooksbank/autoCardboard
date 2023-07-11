@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pandemic>
+  <cities>
+    <city name="San Francisco" connections="Chicago, Tokyo, Manila, Los Angeles" color="blue"/>
+    <city name="Chicago" connections="San Francisco, Mexico City, Atlanta, Montreal" color="blue"/>
+    <city name="Atlanta" connections="Chicago, Miami, Washington" color="blue"/>
+    <city name="Montreal" connections="Chicago, Washington, New York" color="blue"/>
+    <city name="Washington" connections="Montreal, Atlanta, Miami, New York" color="blue"/>
+    <city name="New York" connections="Montreal, Washington, Madrid, London" color="blue"/>
+    <city name="Madrid" connections="New York, London, Paris, Sao Paulo, Algiers" color="red"/>
+    <city name="London" connections="New York, Madrid, Paris, Essen" color="red"/>
+    <city name="Paris" connections="London, Madrid, Algiers, Milan, Essen" color="red"/>
+    <city name="Essen" connections="London, Paris, Milan, St Petersburg" color="red"/>
+    <city name="Milan" connections="Essen, Paris, Istanbul, Algiers" color="red"/>
+    <city name="St Petersburg" connections="Essen, Istanbul, Moscow" color="red"/>
+    <city name="Moscow" connections="St Petersburg, Istanbul, Tehran, Karachi, Beijing" color="black"/>
+    <city name="Istanbul" connections="Milan, Moscow, Baghdad, Cairo, Algiers, St Petersburg" color="black"/>
+    <city name="Algiers" connections="Paris, Istanbul, Cairo, Madrid, Milan" color="black"/>
+    <city name="Cairo" connections="Istanbul, Algiers, Riyadh, Baghdad, Khartoum" color="black"/>
+    <city name="Baghdad" connections="Tehran, Istanbul, Cairo, Riyadh, Karachi" color="black"/>
+    <city name="Riyadh" connections="Baghdad, Cairo, Karachi" color="black"/>
+    <city name="Tehran" connections="Moscow, Baghdad, Karachi, Delhi" color="black"/>
+    <city name="Karachi" connections="Tehran, Baghdad, Riyadh, Mumbai, Delhi" color="black"/>
+    <city name="Mumbai" connections="Karachi, Delhi, Chennai" color="black"/>
+    <city name="Delhi" connections="Tehran, Karachi, Mumbai, Chennai, Kolkata" color="black"/>
+    <city name="Kolkata" connections="Delhi, Chennai, Bangkok, Hong Kong" color="yellow"/>
+    <city name="Chennai" connections="Mumbai, Delhi, Kolkata, Jakarta" color="yellow"/>
+    <city name="Bangkok" connections="Kolkata, Hong Kong, Ho Chi Minh City, Jakarta" color="yellow"/>
+    <city name="Jakarta" connections="Chennai, Bangkok, Ho Chi Minh City, Sydney" color="yellow"/>  
+    <city name="Sydney" connections="Jakarta, Manila, Los Angeles" color="yellow"/>
+    <city name="Manila" connections="Hong Kong, San Francisco, Ho Chi Minh City, Sydney" color="yellow"/>
+    <city name="Ho Chi Minh City" connections="Jakarta, Bangkok, Hong Kong, Manila" color="yellow"/>
+    <city name="Hong Kong" connections="Kolkata, Bangkok, Ho Chi Minh City, Shanghai, Manila" color="yellow"/>
+    <city name="Shanghai" connections="Beijing, Hong Kong, Taipei, Seoul, Tokyo" color="red"/>
+    <city name="Beijing" connections="Shanghai, Seoul, Moscow" color="red"/> 
+    <city name="Seoul" connections="Beijing, Shanghai, Tokyo" color="red"/>
+    <city name="Tokyo" connections="Seoul, Shanghai, Osaka, San Francisco" color="red"/>
+    <city name="Osaka" connections="Taipei, Tokyo" color="red"/>
+    <city name="Taipei" connections="Shanghai, Osaka, Hong Kong" color="red"/>
+    <city name="Los Angeles" connections="San Francisco, Chicago, Mexico City, Sydney" color="yellow"/>
+    <city name="Mexico City" connections="Los Angeles, Lima, Bogota, Miami, Chicago" color="yellow"/>
+    <city name="Lima" connections="Mexico City, Bogota, Santiago" color="yellow"/>
+    <city name="Bogota" connections="Mexico City, Lima, Buenos Aires, Miami" color="yellow"/>
+    <city name="Santiago" connections="Lima, Buenos Aires" color="yellow"/>
+    <city name="Buenos Aires" connections="Bogota, Santiago, Sao Paulo" color="yellow"/>
+    <city name="Sao Paulo" connections="Buenos Aires, Madrid, Lagos" color="yellow"/>
+    <city name="Lagos" connections="Sao Paulo, Kinshasa, Khartoum" color="yellow"/>
+    <city name="Kinshasa" connections="Lagos, Khartoum, Johannesburg" color="yellow"/>
+    <city name="Khartoum" connections="Cairo, Lagos, Kinshasa, Johannesburg" color="yellow"/>
+    <city name="Johannesburg" connections="Khartoum, Kinshasa" color="yellow"/>
+    <city name="Miami" connections="Atlanta, Washington, Bogota, Mexico City" color="yellow"/>
+  </cities>
+</pandemic>
